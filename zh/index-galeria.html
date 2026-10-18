@@ -324,11 +324,11 @@
   // the pictures have to be replaced before the site goes live
   var MSW_TEXT = {
     zh: { eyebrow: '风洞 · 碳纤维大尾翼', sub: ['鼠标移到车身上，光圈里是另一种颜色；点一下，整台车换成它。', '手指划过车身，光圈里是另一种颜色；轻点一下，整台车换成它。'],
-      credit: '照片：Daniel Lu（dllu），维基共享资源，CC BY-SA 4.0；已抠图、压暗车窗、改色并左右镜像，改后的图同样按 CC BY-SA 4.0 授权。' },
+      credit: '车图：小米汽车官网选配器的正侧面渲染图（xiaomiev.com），镜面镀铬由太空银渲染图计算生成。版权归小米，仅供内部小样，上线前换图或取得小米授权。' },
     pl: { eyebrow: 'Tunel aerodynamiczny · karbonowe skrzydło', sub: ['Przesuń kursor po karoserii — w świetle zobaczysz inny lakier. Kliknij, a cały samochód zmieni kolor.', 'Przeciągnij palcem po karoserii — w świetle zobaczysz inny lakier. Stuknij, a cały samochód zmieni kolor.'],
-      credit: 'Zdjęcie: Daniel Lu (dllu), Wikimedia Commons, CC BY-SA 4.0; wycięte, z przyciemnionymi szybami, zmienionym lakierem i odbite lustrzanie — przeróbki również na licencji CC BY-SA 4.0.' },
+      credit: 'Grafika: render z konfiguratora Xiaomi (xiaomiev.com); lustrzany chrom wyliczony z renderu Space Silver. Prawa: Xiaomi — wyłącznie prototyp wewnętrzny.' },
     en: { eyebrow: 'Wind tunnel · carbon rear wing', sub: ['Move over the body — the light shows another paint. Click and the whole car takes it.', 'Drag a finger over the body — the light shows another paint. Tap and the whole car takes it.'],
-      credit: 'Photo: Daniel Lu (dllu), Wikimedia Commons, CC BY-SA 4.0; cut out, glass darkened, repainted and mirrored — the derived images are CC BY-SA 4.0 too.' }
+      credit: 'Image: Xiaomi configurator render (xiaomiev.com); mirror chrome computed from the Space Silver render. © Xiaomi — internal prototype only.' }
   };
   function WindBand(p) {
     var t = MSW_TEXT[p.lang] || MSW_TEXT.pl, ref = React.useRef(null);
@@ -359,7 +359,7 @@
       h('div', { className: 'msw-foot' },
         h('div', { className: 'wt-paints', role: 'group' }),
         h('p', { className: 'wt-readout', 'aria-live': 'polite' })),
-      h('p', { className: 'msw-credit' }, h('a', { href: 'https://commons.wikimedia.org/wiki/File:Xiaomi_SU7_Ultra_yellow_showroom_side_view_2026_dllu.jpg', target: '_blank', rel: 'noopener', style: { color: 'inherit', textDecorationColor: 'rgba(255,255,255,.35)' } }, t.credit)));
+      h('p', { className: 'msw-credit' }, t.credit));
   }
 
   // ---- hand-over band (主人 2026-10-17: 这个地方有点空，加机器手臂和人碰手指的特效; 2026-10-18 moved under 现车): touch.js ----

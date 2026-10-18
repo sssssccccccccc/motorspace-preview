@@ -2,9 +2,9 @@
    (主人 2026-10-18: 「风洞用 B 版（车头朝右、镜面镀铬），放在进口流程和现车之间，上线前再换图」).
    The same piece as the standalone prototype site/windtunnel/ (wt.js; how it works is described there and in
    dev/windtunnel/README.md), made mountable: MSWind.mount(root, { base, lang }) works inside root only, loads
-   ultra-right.json and the pictures only when the section comes near, and destroy() takes everything down again.
+   side.json and the pictures only when the section comes near, and destroy() takes everything down again.
    base is the URL of site/windtunnel/ ('windtunnel/' or '../windtunnel/').
-   Public preview: the car is the SU7 Ultra photo set (Daniel Lu, Wikimedia Commons, CC BY-SA 4.0). */
+   The car pictures are Xiaomi configurator renders: local prototype only, the live site needs other pictures. */
 (function () {
   'use strict';
   var REDUCE = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -403,8 +403,8 @@
   var near = new IntersectionObserver(function (es) {
     if (started || !es[es.length - 1].isIntersecting) return;
     started = true; near.disconnect();
-    imgBase.src = BASE + 'img/su7r-yellow.webp';
-    fetch(BASE + 'img/ultra-right.json').then(function (r) { return r.json(); }).then(function (data) {
+    imgBase.src = BASE + 'img/side-yellow.webp';
+    fetch(BASE + 'img/side.json').then(function (r) { return r.json(); }).then(function (data) {
       if (dead) return;
       IW = data.w; IH = data.h; FRONT = data.front; REAR = data.rear; MIR = data.nose === 'left';
       GROUND = Math.max(FRONT[1], REAR[1]);

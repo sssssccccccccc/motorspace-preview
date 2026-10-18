@@ -1,0 +1,76 @@
+{
+ "w": 1974,
+ "h": 600,
+ "nose": "right",
+ "front": [
+  1588.0,
+  577.0
+ ],
+ "rear": [
+  420.0,
+  580.0
+ ],
+ "paints": [
+  {
+   "id": "yellow",
+   "zh": "闪电黄",
+   "pl": "Żółć błyskawicy",
+   "en": "Lightning Yellow",
+   "sw": "#f1c40f",
+   "glow": "#ffd84a",
+   "file": "side-yellow.webp"
+  },
+  {
+   "id": "chrome",
+   "zh": "镜面镀铬",
+   "pl": "Lustrzany chrom",
+   "en": "Mirror Chrome",
+   "sw": "linear-gradient(135deg,#fff 0,#9aa3ad 38%,#f4f7fb 52%,#59616b 70%,#e7ecf2 100%)",
+   "glow": "#e6f0ff",
+   "file": "side-chrome.webp"
+  },
+  {
+   "id": "black",
+   "zh": "曜石黑",
+   "pl": "Obsydianowa czerń",
+   "en": "Obsidian Black",
+   "sw": "#16181b",
+   "glow": "#aab4c0",
+   "file": "side-black.webp"
+  },
+  {
+   "id": "white",
+   "zh": "珍珠白",
+   "pl": "Perłowa biel",
+   "en": "Pearl White",
+   "sw": "#ecebe6",
+   "glow": "#ffffff",
+   "file": "side-white.webp"
+  },
+  {
+   "id": "silver",
+   "zh": "太空银",
+   "pl": "Kosmiczne srebro",
+   "en": "Space Silver",
+   "sw": "#9fa4ab",
+   "glow": "#d4dce8",
+   "file": "side-silver.webp"
+  },
+  {
+   "id": "green",
+   "zh": "鹦鹉绿",
+   "pl": "Papuzia zieleń",
+   "en": "Parrot Green",
+   "sw": "#0e8c88",
+   "glow": "#45e2d2",
+   "file": "side-green.webp"
+  }
+ ],
+ "gloss": "side-gloss.webp",
+ "source": {
+  "title": "Xiaomi SU7 Ultra 选配赛道专业套装 · 2D side view",
+  "owner": "Xiaomi EV (xiaomiev.com configurator)",
+  "page": "https://www.xiaomiev.com/configurator/select-version?goodsId=500010402",
+  "note": "copyrighted render, local prototype only; mirrored to face right; chrome is generated from the 太空银 layer"
+ }
+}
