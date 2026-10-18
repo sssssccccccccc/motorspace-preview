@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MotorSpace · Śledzenie zamówienia</title>
+<meta name="description" content="Sprawdź, na jakim etapie jest Twoje auto z Chin: zakup, inspekcja, transport, odprawa, rejestracja.">
+<link rel="canonical" href="https://motorspace.example/sledzenie.html">
+<link rel="alternate" hreflang="pl" href="https://motorspace.example/sledzenie.html">
+<link rel="alternate" hreflang="en" href="https://motorspace.example/en/tracking.html">
+<link rel="alternate" hreflang="zh" href="https://motorspace.example/zh/tracking.html">
+<link rel="alternate" hreflang="x-default" href="https://motorspace.example/sledzenie.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MotorSpace">
+<meta property="og:title" content="MotorSpace · Śledzenie zamówienia">
+<meta property="og:description" content="Sprawdź, na jakim etapie jest Twoje auto z Chin: zakup, inspekcja, transport, odprawa, rejestracja.">
+<meta property="og:url" content="https://motorspace.example/sledzenie.html">
+<meta property="og:image" content="https://motorspace.example/assets/brand/og-pl.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="pl_PL">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0b0b0c">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+<link rel="stylesheet" href="kontener.css?v=644f994a">
+<script>(function(){var d=document.documentElement,t='dark';try{var m=/[?&]theme=(light|dark|auto)/.exec(location.search);if(m){t=m[1];localStorage.setItem('kt-theme',t);}else{t=localStorage.getItem('kt-theme')||'dark';}}catch(e){}if(t==='auto'){d.removeAttribute('data-theme');}else{d.setAttribute('data-theme',t);}})();</script>
+<style>
+  html { scroll-padding-top: 84px; background: var(--paper); }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+  
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+  .wrap { padding: 120px 48px 140px; min-height: 60vh; }
+  @media (max-width: 760px) { .wrap { padding: 96px 16px 96px; } }
+
+</style>
+<script src="vendor/react.production.min.js"></script>
+<script src="vendor/react-dom.production.min.js"></script>
+<script src="kontener-data.js?v=644f994a"></script>
+<script src="kontener.js?v=644f994a"></script>
+<script>window.KT_DOC = "track"; window.KT_PRIVACY_URL = "polityka-prywatnosci.html"; window.KT_LEAD_URL = ""; window.KT_LEAD_EXTRA = {};</script>
+<script>window.KT_LOCAL_FONTS = true; window.KT_LANG = "pl"; window.KT_LANG_URLS = {"pl": "sledzenie.html", "en": "en/tracking.html", "zh": "zh/tracking.html"}; window.KT_ASSETS = 'assets/'; window.KT_HOME_URL = 'index.html'; window.KT_OFFERS_URL = 'oferty.html'; window.KT_TRACK_URL = 'sledzenie.html';</script>
+
+</head>
+<body>
+<div id="root"></div>
+<script>
+
+  var K = window.Kontener, h = React.createElement;
+  var full = /full/.test(location.search);
+  var HOME = window.KT_HOME_URL || '../HomePage/preview.html', OFFERS = window.KT_OFFERS_URL || '../OffersPage/preview.html';
+  function Page() {
+    var l = React.useState(window.KT_LANG || 'pl'), lang = l[0], setLangState = l[1];
+    function setLang(x) { var u = window.KT_LANG_URLS; if (u && u[x]) { location.href = u[x] + location.search; } else setLangState(x); }
+    var lf = React.useState(null), lead = lf[0], setLead = lf[1];
+    var cs = React.useState(null), calc = cs[0], setCalc = cs[1];
+    function calcOrder(v, r, car) { setCalc(null); setLead({ kind: 'quote', summary: K.calcSummary(v, r, car, lang) }); }
+    var rootRef = React.useRef(null);
+    K.motion.useReveal(rootRef);
+    K.useRates(); // NBP table A once per day; prices re-render when it arrives
+    var links = [HOME + '#zamow', HOME + '#od-reki', HOME + '#o-nas', HOME + '#gwarancja', function () { setLead({ kind: 'inquiry', summary: '' }); }];
+    return h(React.Fragment, null,
+      h(React.Fragment, null,
+        h('div', { ref: rootRef, lang: lang },
+          h(K.NavBar, { lang: lang, onLang: setLang, home: HOME, links: links, onQuote: function () { setCalc({ car: null }); } }),
+          h('div', { className: 'wrap' }, h(K.OrderTracker, { lang: lang })),
+          h(K.Footer, { lang: lang, onLang: setLang }),
+          h(K.MobileBar, { lang: lang, onCalc: function () { setCalc({ car: null }); }, onAsk: function () { setLead({ kind: 'inquiry', summary: '' }); } }),
+          h(K.CalcDrawer, { open: !!calc, car: calc && calc.car, lang: lang, onClose: function () { setCalc(null); }, onOrder: calcOrder }),
+          h(K.LeadForm, { open: !!lead, context: lead || {}, lang: lang, onClose: function () { setLead(null); } }))));
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(h(Page));
+
+</script>
+</body>
+</html>

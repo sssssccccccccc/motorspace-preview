@@ -1,0 +1,32 @@
+{
+ "cars": {
+  "9x": "cut/l21.webp",
+  "su7": "cut/l4.webp",
+  "001": "cut/l5.webp",
+  "seal": "cut/l1.webp",
+  "l9": "cut/l8.webp",
+  "d9": "cut/l9.webp",
+  "s1": "cut/s1.webp",
+  "s2": "cut/s2.webp",
+  "s3": "cut/s3.webp"
+ },
+ "credit": {
+  "cut": "Cut out of the gallery photos (credits in photos.json) with macOS Vision"
+ },
+ "journey": {
+  "file": "cut/journey.webp",
+  "w": 640,
+  "h": 232,
+  "ground": 0.9957,
+  "light": [
+   0.985,
+   0.559
+  ],
+  "credit": {
+   "title": "BYD SEAL WHITE (side view), BRAZIL 20240313 150240",
+   "artist": "Mateusmatsuda",
+   "license": "CC BY 4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:BYD_SEAL_WHITE_(side_view),_BRAZIL_20240313_150240.jpg"
+  }
+ }
+}

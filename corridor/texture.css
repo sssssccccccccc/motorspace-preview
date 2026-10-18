@@ -1,0 +1,80 @@
+/* MotorSpace · material layer for the gallery homepage prototype (主人 2026-10-17: 纯黑背景不够高大、太空，留白太多，
+   要加质感). Loaded after kontener.css / corridor.css / touch.css, only on index-galeria.html.
+   Done the redesign-existing-projects way: no pure black (a cool graphite instead), fine film grain, a vignette, a
+   soft studio light behind each section, cards that read as material (a lit top edge, a tinted shadow, a faint
+   sheen), and tighter gaps between sections. One light family only: warm white with a faint cool fill. */
+
+/* graphite instead of #000; surfaces one and two steps up from it */
+.kt-dark, :root[data-theme="dark"] {
+  --paper: #0a0b0e; --paper-raised: #131419; --paper-sunken: #1a1b21;
+  --line: rgba(236, 240, 255, .085); --glass: rgba(236, 240, 255, .07);
+  --shadow-1: 0 1px 2px rgba(2, 3, 8, .6), 0 18px 40px -24px rgba(2, 3, 8, .9);
+  --shadow-case: inset 0 1px 0 rgba(255, 255, 255, .08), 0 28px 56px -26px rgba(2, 3, 8, .95);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0a0b0e; --paper-raised: #131419; --paper-sunken: #1a1b21;
+    --line: rgba(236, 240, 255, .085); --glass: rgba(236, 240, 255, .07);
+    --shadow-1: 0 1px 2px rgba(2, 3, 8, .6), 0 18px 40px -24px rgba(2, 3, 8, .9);
+    --shadow-case: inset 0 1px 0 rgba(255, 255, 255, .08), 0 28px 56px -26px rgba(2, 3, 8, .95);
+  }
+}
+
+/* film grain a little stronger than the base site's, and a vignette that keeps the eye in the middle */
+body::after { opacity: .055; }
+body::before { content: ""; position: fixed; inset: 0; z-index: 2147482999; pointer-events: none;
+  background: radial-gradient(130% 95% at 50% 45%, transparent 58%, rgba(2, 3, 8, .55) 100%); }
+
+/* a soft studio light behind every section: a warm pool behind the heading, a faint cool fill on the far side */
+.wrap > .sec, .wrap > #jak-to-dziala { position: relative; isolation: isolate; }
+.wrap > .sec::before, .wrap > #jak-to-dziala::before {
+  content: ""; position: absolute; z-index: -1; left: -48px; right: -48px; top: -140px; height: min(760px, 120%); pointer-events: none;
+  background:
+    radial-gradient(42% 55% at 14% 34%, rgba(255, 214, 178, .075), transparent 72%),
+    radial-gradient(34% 48% at 88% 18%, rgba(170, 190, 255, .045), transparent 70%);
+}
+.wrap > .sec:nth-of-type(even)::before {
+  background:
+    radial-gradient(42% 55% at 86% 34%, rgba(255, 214, 178, .07), transparent 72%),
+    radial-gradient(34% 48% at 12% 18%, rgba(170, 190, 255, .045), transparent 70%);
+}
+/* a thin horizon of light where one section hands over to the next */
+.wrap > .sec + .sec::after, .mst + .sec::after {
+  content: ""; position: absolute; z-index: -1; left: 10%; right: 10%; top: -52px; height: 1px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 236, 214, .16) 50%, transparent);
+}
+
+/* tighter rhythm between sections (主人: 留白太多) */
+.sec { margin-top: 104px; }
+.sec-first { margin-top: 80px; }
+.mst { margin-top: 24px; background: transparent; }
+.mst + .sec { margin-top: 56px; }
+@media (max-width: 760px) { .sec { margin-top: 72px; } .sec-first { margin-top: 52px; } .wrap > .sec::before, .wrap > #jak-to-dziala::before { left: -16px; right: -16px; } }
+
+/* cards as material: a lit top edge, a faint vertical sheen, a shadow tinted with the background, a light sweep on hover */
+.kt-stock, .kt-offer, .kt-why-card, .kt-step, .kt-reserved, .kt-track-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .008) 42%, rgba(255, 255, 255, 0)), var(--paper-raised);
+  border-color: rgba(236, 240, 255, .08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 1px 2px rgba(2, 3, 8, .5), 0 30px 60px -32px rgba(2, 3, 8, .95);
+}
+.kt-reserved { border-style: solid; }
+.kt-stock, .kt-offer, .kt-why-card { overflow: hidden; }
+/* the stock cards get a highlight that follows the pointer instead (motion.css) */
+.kt-offer::after, .kt-why-card::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; opacity: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .07) 48%, transparent 62%);
+  transform: translateX(-60%); transition: transform .9s cubic-bezier(.2, .7, .2, 1), opacity .3s;
+}
+@media (hover: hover) {
+  .kt-stock:hover, .kt-offer:hover, .kt-why-card:hover { border-color: rgba(236, 240, 255, .16); }
+  .kt-offer:hover::after, .kt-why-card:hover::after { opacity: 1; transform: translateX(60%); }
+}
+.kt-box { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09), 0 28px 56px -26px rgba(2, 3, 8, .95); border-color: rgba(236, 240, 255, .08); }
+
+/* the FAQ rows and the footer sit on the graphite too, with lines that do not shout */
+.kt-faq-q { border-color: rgba(236, 240, 255, .08); }
+.kt-footer { background: linear-gradient(180deg, transparent, rgba(255, 214, 178, .025) 60%, transparent), var(--paper); border-top-color: rgba(236, 240, 255, .07); }
+
+@media (prefers-reduced-motion: reduce) {
+  .kt-offer::after, .kt-why-card::after { display: none; }
+}

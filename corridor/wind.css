@@ -1,0 +1,120 @@
+/* MotorSpace gallery homepage: the wind-tunnel section (wind.js). The car, light, paints and streamlines are the
+   standalone prototype's own rules (site/windtunnel/wt.css), scoped under .msw; the section around them is new. */
+.msw { position: relative; margin: 40px -48px 0; padding: clamp(64px, 9vh, 104px) 0 28px; overflow: hidden; isolation: isolate; color: #f5f5f7;
+  --ink: #f5f5f7; --ink-muted: #a1a1a6;
+  background: radial-gradient(70% 46% at 50% 0%, rgba(245, 245, 247, .055), transparent 70%),
+    radial-gradient(58% 34% at 50% 74%, rgba(245, 245, 247, .04), transparent 72%), #050506; }
+.msw-head { position: relative; z-index: 3; text-align: center; padding: 0 20px; }
+.msw-eyebrow { margin: 0; display: inline-flex; align-items: center; gap: 12px; font: 500 11.5px/1 var(--font-mono); letter-spacing: .24em; text-transform: uppercase; color: var(--ink-muted); }
+.msw-eyebrow::before, .msw-eyebrow::after { content: ''; width: 34px; height: 1px; background: linear-gradient(90deg, transparent, rgba(245, 245, 247, .42)); }
+.msw-eyebrow::after { transform: scaleX(-1); }
+.msw-head h2 { margin: 14px 0 10px; font: 600 clamp(34px, 5.4vw, 74px)/.98 var(--font-display); letter-spacing: -.025em; color: #f5f5f7; }
+.msw-sub { margin: 0 auto; max-width: 34em; color: var(--ink-muted); font-size: clamp(14px, 1.05vw, 16px); line-height: 1.55; text-wrap: balance; }
+.msw:not(.is-ready) .wt-car img.wt-base { opacity: 0; }
+.msw .wt-car img.wt-base { transition: opacity .6s; }
+.msw-foot { position: relative; z-index: 3; padding: 4px 20px 0; }
+.msw-credit { margin: 18px auto 0; max-width: 980px; padding: 0 20px; text-align: center; color: rgba(161, 161, 166, .62); font-size: 11.5px; line-height: 1.55; }
+.msw-credit a { color: inherit; text-underline-offset: 2px; }
+.msw * { box-sizing: border-box; }
+
+/* the stage: car, its floor and the streamline canvas. JS places the car (its box is measured for the streamlines) */
+.msw .wt-stage { position: relative; flex: 1 1 auto; min-height: max(250px, 44vh); overflow-x: clip; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+.msw .wt-stage.is-over { cursor: pointer; }
+.msw .wt-flow { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; mix-blend-mode: screen; }
+/* a soft pool of light on the studio floor, under the car */
+.msw .wt-glow { position: absolute; z-index: 0; pointer-events: none; transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, rgba(245, 245, 247, .075), rgba(245, 245, 247, .025) 60%, transparent); }
+/* .wt-car is turned so the line through both tyre contacts is level inside .wt-refl, which mirrors the car about
+   that line (the floor reflection); .wt-car-in turns the photo back, so on screen the car stands as photographed */
+.msw .wt-car { position: absolute; z-index: 1; left: 50%; top: 30%; width: min(1100px, 90vw); aspect-ratio: 1974 / 600; transform: translateX(-50%); }
+.msw .wt-car.is-placed { transform-origin: var(--ox) var(--oy); transform: rotate(var(--tilt)); }
+.msw .wt-refl { position: absolute; inset: 0; }
+.msw .wt-shadow { position: absolute; left: var(--sx0); top: var(--oy); width: var(--sw0); height: var(--sh0); transform: translate(-50%, -50%); pointer-events: none;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, .95), rgba(0, 0, 0, .6) 50%, transparent); }
+.msw .wt-car-in { position: absolute; inset: 0; --lx: 50%; --ly: 50%; --lr: 0px; --sx: 50%; --sy: 50%; --sr: 0px; --lo: 0; --gp: 50%; }
+.msw .wt-car.is-placed .wt-car-in { transform-origin: var(--ox) var(--oy); transform: rotate(calc(-1 * var(--tilt))); }
+.msw .wt-car img, .msw .wt-sheen, .msw .wt-sweep, .msw .wt-glint { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; -webkit-user-drag: none; }
+.msw .wt-splash, .msw .wt-lens { visibility: hidden; }
+.msw .wt-splash.is-on, .msw .wt-lens.is-on { visibility: visible; }
+/* the light under the pointer: another paint shows through a soft ellipse */
+.msw .wt-lens { -webkit-mask-image: radial-gradient(var(--lr) calc(var(--lr) * .86) at var(--lx) var(--ly), #000 0, #000 34%, rgba(0, 0, 0, .62) 57%, rgba(0, 0, 0, .2) 80%, transparent 100%);
+  mask-image: radial-gradient(var(--lr) calc(var(--lr) * .86) at var(--lx) var(--ly), #000 0, #000 34%, rgba(0, 0, 0, .62) 57%, rgba(0, 0, 0, .2) 80%, transparent 100%); }
+/* a click floods the car with the new paint from that point */
+.msw .wt-splash { -webkit-mask-image: radial-gradient(circle var(--sr) at var(--sx) var(--sy), #000 0, #000 80%, transparent 100%);
+  mask-image: radial-gradient(circle var(--sr) at var(--sx) var(--sy), #000 0, #000 80%, transparent 100%); }
+/* clear coat: light only ever lands on the paint (su7u-gloss.webp is the paint's outline) — a studio light riding
+   with the lens, and a slow sweep across the panels every few seconds */
+.msw .wt-sheen, .msw .wt-sweep, .msw .wt-glint { mix-blend-mode: screen;
+  -webkit-mask: url(../windtunnel/img/su7u-gloss.webp) 0 0 / 100% 100% no-repeat; mask: url(../windtunnel/img/su7u-gloss.webp) 0 0 / 100% 100% no-repeat; }
+.msw .wt-sheen { opacity: var(--lo);
+  background: radial-gradient(calc(var(--lr) * .7) calc(var(--lr) * .5) at var(--lx) var(--ly), rgba(255, 255, 255, .26), rgba(255, 255, 255, .07) 50%, transparent 74%); }
+.msw .wt-sweep { background: linear-gradient(100deg, transparent 0 42%, rgba(255, 255, 255, .05) 46%, rgba(255, 255, 255, .3) 50%, rgba(255, 255, 255, .05) 54%, transparent 58% 100%) 0 0 / 300% 100% no-repeat;
+  background-position: 120% 0; animation: wt-sweep 7s cubic-bezier(.45, .05, .25, 1) 1.2s infinite; }
+.msw .wt-sweep.is-now { animation: wt-sweep-once 1.6s cubic-bezier(.45, .05, .25, 1); }
+@keyframes wt-sweep { 0% { background-position: 120% 0; } 26%, 100% { background-position: -20% 0; } }
+@keyframes wt-sweep-once { from { background-position: 120% 0; } to { background-position: -20% 0; } }
+/* chrome is a mirror: two hard-edged strip lights reflect in it and slide across the panels, faster than the pointer
+   (--gp follows the light), so moving the mouse makes the body flash the way a real chrome car does as you walk by.
+   Only on chrome: everywhere when the body is chrome, inside the light when the light shows chrome */
+.msw .wt-glint { opacity: 0; transition: opacity .45s; mix-blend-mode: overlay;
+  background:
+    linear-gradient(103deg, transparent 0 45.4%, rgba(210, 228, 255, .16) 46.2%, rgba(255, 255, 255, .95) 46.55%, rgba(255, 255, 255, .95) 46.9%, rgba(210, 228, 255, .22) 47.3%, transparent 48.6%,
+      transparent 51.2%, rgba(255, 255, 255, .7) 51.45%, rgba(255, 255, 255, .7) 51.6%, transparent 52.1% 100%) 0 0 / 300% 100% no-repeat,
+    linear-gradient(103deg, transparent 0 40%, rgba(235, 243, 255, .1) 46.5%, transparent 55% 100%) 0 0 / 300% 100% no-repeat;
+  background-position: var(--gp) 0, var(--gp) 0; }
+/* the strips take on the reflection under them (overlay: brilliant where the chrome shows sky, faint where it shows
+   the ground); a thin screen core keeps the flash crisp, strongest on the upper body */
+.msw .wt-glint.is-core { mix-blend-mode: screen;
+  background: linear-gradient(103deg, transparent 0 46.5%, rgba(255, 255, 255, .62) 46.68%, rgba(255, 255, 255, .62) 46.78%, transparent 46.95%,
+      transparent 51.42%, rgba(255, 255, 255, .45) 51.5%, transparent 51.6% 100%) 0 0 / 300% 100% no-repeat;
+  background-position: var(--gp) 0;
+  -webkit-mask: url(../windtunnel/img/su7u-gloss.webp) 0 0 / 100% 100% no-repeat, linear-gradient(#000 25%, rgba(0, 0, 0, .3) 78%);
+  -webkit-mask-composite: source-in;
+  mask: url(../windtunnel/img/su7u-gloss.webp) 0 0 / 100% 100% no-repeat, linear-gradient(#000 25%, rgba(0, 0, 0, .3) 78%);
+  mask-composite: intersect; }
+.msw .wt-car-in.is-chrome .wt-glint { opacity: 1; }
+.msw .wt-car-in.is-chrome-lens .wt-glint { opacity: var(--lo);
+  -webkit-mask: url(../windtunnel/img/su7u-gloss.webp) 0 0 / 100% 100% no-repeat, radial-gradient(var(--lr) calc(var(--lr) * .86) at var(--lx) var(--ly), #000 0, #000 40%, transparent 88%);
+  -webkit-mask-composite: source-in;
+  mask: url(../windtunnel/img/su7u-gloss.webp) 0 0 / 100% 100% no-repeat, radial-gradient(var(--lr) calc(var(--lr) * .86) at var(--lx) var(--ly), #000 0, #000 40%, transparent 88%);
+  mask-composite: intersect; }
+
+/* paints */
+.msw .wt-foot { position: relative; z-index: 3; padding: 4px 20px 0; }
+.msw .wt-paints { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+.msw .wt-chip { --sw: #888; position: relative; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.msw .wt-chip i { position: absolute; inset: 8px; border-radius: 50%; transition: transform .4s cubic-bezier(.2, .8, .2, 1);
+  background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, .5), transparent 48%), var(--sw);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2), inset 0 -6px 10px rgba(0, 0, 0, .35); }
+.msw .wt-chip::before { content: ''; position: absolute; inset: 2px; border-radius: 50%; border: 1.5px solid transparent; transition: border-color .25s; }
+.msw .wt-chip.is-base::before { border-color: var(--ink); }
+.msw .wt-chip.is-lens::before { border: 1.5px dashed rgba(245, 245, 247, .6); animation: wt-spin 10s linear infinite; }
+.msw .wt-chip:hover i { transform: scale(1.1); }
+.msw .wt-chip:active i { transform: scale(.94); }
+.msw .wt-chip:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+@keyframes wt-spin { to { transform: rotate(360deg); } }
+.msw .wt-readout { margin: 12px 0 0; min-height: 1.55em; text-align: center; color: var(--ink-muted); font-size: 13.5px; }
+.msw .wt-readout b { color: var(--ink); font-weight: 500; }
+.msw .wt-readout .wt-sep { display: inline-block; width: 4px; height: 4px; margin: 0 12px; border-radius: 50%; background: rgba(245, 245, 247, .32); vertical-align: middle; }
+
+
+/* after the prototype's rules: here the stage has a height of its own (wind.js sets it on portrait screens) */
+.msw .wt-stage { height: clamp(340px, 60vh, 640px); min-height: 0; flex: none; }
+
+@media (max-width: 760px) {
+  .msw { margin: 24px -16px 0; padding-top: 56px; }
+}
+@media (max-width: 700px) {
+  .msw-eyebrow { font-size: 10.5px; letter-spacing: .18em; gap: 10px; }
+  .msw-eyebrow::before, .msw-eyebrow::after { width: 18px; }
+  .msw-head h2 { margin: 12px 0 8px; }
+  .msw-sub { font-size: 14px; }
+  .msw .wt-paints { gap: 3px; flex-wrap: nowrap; }
+  .msw .wt-chip { width: 40px; height: 40px; }
+  .msw .wt-chip i { inset: 7px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .msw .wt-chip.is-lens::before { animation: none; }
+  .msw .wt-sweep, .msw .wt-sweep.is-now { animation: none; }
+  .msw .wt-chip i { transition: none; }
+}

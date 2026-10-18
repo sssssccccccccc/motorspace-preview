@@ -1,0 +1,274 @@
+/* MotorSpace · corridor gallery (prototype). Pairs with corridor.js. */
+.msc { position: relative; height: 100svh; min-height: 560px; margin-top: calc(-1 * var(--msc-nav-h, 60px)); overflow: hidden; background: #08090a; color: #e9ebee; isolation: isolate; }
+.msc-host { position: absolute; inset: 0; --u: .75px; --accent: #d0342c; --ink: #eceef1; --dim: rgba(236, 238, 241, .42); }
+
+/* ---------- 3D stage: 1920×1080, scaled to cover ---------- */
+.msc-view { position: absolute; inset: 0; overflow: hidden; background: #0a0b0c; transition: opacity .9s ease; }
+.msc-loading .msc-view { opacity: 0; }
+/* 主人 2026-10-17「这两个页面之间有一点点突兀」: the corridor picture dissolves into the page below over its last stretch
+   instead of ending on a hard line; the bottom bar's words stay as they are */
+.msc { --msc-fade: clamp(140px, 26svh, 280px); background: transparent; }
+.msc-view { -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - var(--msc-fade)), rgba(0, 0, 0, .5) calc(100% - var(--msc-fade) * .45), transparent);
+  mask-image: linear-gradient(180deg, #000 calc(100% - var(--msc-fade)), rgba(0, 0, 0, .5) calc(100% - var(--msc-fade) * .45), transparent); }
+.msc-stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; margin: -540px 0 0 -960px; perspective: 1000px; perspective-origin: 50% 50%; }
+.msc-corr { position: absolute; inset: 0; }
+/* no preserve-3d: each element carries its own perspective(), stacking is set by script */
+.msc-world { position: absolute; left: 960px; top: 540px; width: 0; height: 0; transform-style: flat; }
+.msc-world > div { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.msc-world > .msc-plane { z-index: 0; pointer-events: none; }
+.msc-world > .msc-panel { z-index: 1; }
+.msc-world > .msc-spot { z-index: 60000; }
+.msc-panel { pointer-events: none; transform-style: flat; overflow: visible; }
+.msc-panel .msc-in { position: absolute; top: 0; height: 100%; }
+.msc-panel .msc-ph { position: absolute; inset: 0; background: #1a1c1f center / cover no-repeat; box-shadow: 0 0 0 1px rgba(255, 255, 255, .04); transition: filter .45s ease; }
+.msc-panel.is-hover .msc-ph { filter: brightness(1.12); }
+.msc-panel .msc-fog, .msc-spot .msc-fog { position: absolute; inset: 0; background: rgb(35, 37, 42); pointer-events: none; }
+.msc-panel .msc-refl { position: absolute; left: 0; width: 100%; background: center / cover no-repeat; transform: scaleY(-1); opacity: .17;
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, .95), rgba(0, 0, 0, 0) 85%); mask-image: linear-gradient(to top, rgba(0, 0, 0, .95), rgba(0, 0, 0, 0) 85%); }
+.msc-panel .msc-cap { position: absolute; left: 6px; white-space: nowrap; font: 500 13px/1 var(--font-mono, ui-monospace, monospace); letter-spacing: .2em; text-transform: uppercase; color: rgba(236, 238, 241, .38); }
+.msc-lamps { position: absolute; inset: 0; pointer-events: none; }
+.msc-lamps > div { position: absolute; left: 0; top: 0; }
+.msc-strip { width: 712px; height: 11px; background: linear-gradient(90deg, rgba(225, 235, 246, 0), rgba(232, 240, 248, .95) 22%, #f6f9fc 50%, rgba(232, 240, 248, .95) 78%, rgba(225, 235, 246, 0)); }
+.msc-spill { width: 940px; height: 400px; background: radial-gradient(50% 50% at 50% 50%, rgba(210, 224, 240, .085), rgba(210, 224, 240, 0) 70%); }
+
+/* the framed car: brushed-aluminium frame, graphite mat, red corner marks */
+.msc-spot { transform-style: flat; pointer-events: none; display: none; }
+.msc-spot .msc-frame { position: absolute; inset: 0; border-radius: 1px; background: linear-gradient(160deg, #d4d7db, #9a9ea4 32%, #62666c 66%, #3c3f44);
+  box-shadow: 0 40px 80px rgba(0, 0, 0, .6), 0 0 0 1px rgba(0, 0, 0, .65), inset 0 1px 0 rgba(255, 255, 255, .35); }
+.msc-spot .msc-mat { position: absolute; background: linear-gradient(175deg, #17181b, #101113 60%, #0c0d0f); box-shadow: inset 0 1px 2px rgba(255, 255, 255, .06), inset 0 -1px 2px rgba(0, 0, 0, .5); }
+.msc-spot .msc-ph { position: absolute; background: #1a1c1f center / cover no-repeat; box-shadow: 0 0 0 1px rgba(255, 255, 255, .08); }
+.msc-spot .msc-br { position: absolute; width: 16px; height: 16px; border-color: var(--accent); border-style: solid; border-width: 0; opacity: 0; }
+.msc-spot .msc-br.tl { left: -15px; top: -15px; border-left-width: 1.5px; border-top-width: 1.5px; }
+.msc-spot .msc-br.tr { right: -15px; top: -15px; border-right-width: 1.5px; border-top-width: 1.5px; }
+.msc-spot .msc-br.bl { left: -15px; bottom: -15px; border-left-width: 1.5px; border-bottom-width: 1.5px; }
+.msc-spot .msc-br.bnr { right: -15px; bottom: -15px; border-right-width: 1.5px; border-bottom-width: 1.5px; }
+
+.msc-haze { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(calc(var(--u) * 420) calc(var(--u) * 260) at 50% var(--vy, 49%), rgba(58, 64, 74, .32), rgba(58, 64, 74, 0) 70%); }
+.msc-vignette { position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(130% 120% at 50% 50%, rgba(0, 0, 0, 0) 42%, rgba(0, 0, 0, .55) 78%, rgba(0, 0, 0, .85) 100%),
+    linear-gradient(to bottom, rgba(0, 0, 0, .55), rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, .55)); }
+
+/* ---------- search in the middle: a title and one search bar. While a car is shown the title fades and,
+   on wide screens, the bar glides down under the frame (--show 0→1, --dock-dy set by corridor.js) ---------- */
+.msc-hero { position: absolute; z-index: 6; left: 50%; top: 62%; width: min(460px, calc(100% - 48px)); translate: -50% 0; text-align: center; pointer-events: none; --show: 0; }
+.msc-title { margin: 0; font: 500 clamp(22px, 2.1vw, 32px)/1.1 var(--font-display, sans-serif); letter-spacing: -.025em; color: #f2f4f6; text-wrap: balance; text-shadow: 0 2px 30px rgba(0, 0, 0, .6); opacity: calc(1 - var(--show) * 1.6); }
+.msc-search { position: relative; display: flex; align-items: center; gap: 10px; height: 50px; margin-top: 16px; padding: 0 5px 0 18px; border: 1px solid rgba(255, 255, 255, .16); border-radius: 999px;
+  background: rgba(12, 13, 15, .62); -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%); box-shadow: 0 24px 70px rgba(0, 0, 0, .5);
+  pointer-events: auto; transform: translateY(calc(var(--show) * var(--dock-dy, 0px))); transition: border-color .2s, background .2s; text-align: left; }
+.msc-search:focus-within { border-color: rgba(255, 255, 255, .34); background: rgba(16, 17, 20, .78); }
+.msc-search .kt-sf { flex: 1; }
+.msc-search .kt-sf-icon { font-size: 17px; color: rgba(236, 238, 241, .5); }
+.msc-search .kt-sf input { height: 46px; font: 400 15px/1.2 var(--font-sans, sans-serif); color: #f2f4f6; }
+.msc-search .kt-sf input::placeholder { color: rgba(236, 238, 241, .45); }
+.msc-search .kt-sf input::-webkit-search-cancel-button { display: none; }
+.msc-search .kt-sf-list { left: -22px; right: auto; width: calc(100% + 120px); min-width: 320px; text-align: left; }
+.msc-hero.is-docked .kt-sf-list { top: auto; bottom: calc(100% + 14px); }
+.msc-search-go { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: #f2f4f6; color: #0b0c0d; font: 500 14px/1 var(--font-sans, sans-serif); cursor: pointer; transition: background .2s; }
+.msc-search-go:hover { background: #fff; }
+.msc-search-go:focus-visible { outline: 2px solid #f2f4f6; outline-offset: 3px; }
+.msc-pop { margin-top: 10px; font: 400 12px/1.6 var(--font-sans, sans-serif); color: rgba(236, 238, 241, .45); opacity: calc(1 - var(--show) * 1.6); }
+.msc-pop button { pointer-events: auto; padding: 2px 4px; border: 0; background: none; font: inherit; color: rgba(236, 238, 241, .72); cursor: pointer; text-decoration: underline; text-decoration-color: rgba(236, 238, 241, .22); text-underline-offset: 4px; }
+.msc-pop button:hover { color: #fff; }
+.msc-pop i { font-style: normal; margin: 0 4px; color: rgba(236, 238, 241, .25); }
+.msc-hero.is-docked .msc-pop button { pointer-events: none; }
+
+/* ---------- car info (right side; below the frame on phones) ---------- */
+.msc-info { position: absolute; z-index: 5; right: calc(var(--u) * 40); top: 0; width: calc(var(--u) * 600); height: 100%; opacity: 0; visibility: hidden; pointer-events: none; text-align: right; }
+.msc-info.is-live .msc-info-body { pointer-events: auto; }
+/* a dark scrim so the text never sits on a bright photo from the wall behind it */
+.msc-info::before { content: ""; position: absolute; top: 0; bottom: 0; right: calc(var(--u) * -40); left: calc(var(--u) * -220); pointer-events: none;
+  background: linear-gradient(to left, rgba(7, 8, 9, .94) 0%, rgba(7, 8, 9, .86) 52%, rgba(7, 8, 9, 0) 100%); }
+.msc-info > * { position: absolute; right: 0; white-space: nowrap; }
+.msc-info-big { top: calc(var(--u) * 318); font: 200 calc(var(--u) * 172)/1 var(--font-display, sans-serif); letter-spacing: -.04em; color: transparent; -webkit-text-stroke: 1px rgba(236, 238, 241, .2); }
+.msc-info-rule { top: calc(var(--u) * 452); height: 1px; width: calc(var(--u) * 160); background: rgba(236, 238, 241, .26); }
+.msc-info-no { top: calc(var(--u) * 476); font: 500 max(11px, calc(var(--u) * 13))/1 var(--font-mono, monospace); letter-spacing: .16em; text-transform: uppercase; color: #ef5a50; }
+.msc-info-body { top: calc(var(--u) * 506); display: flex; flex-direction: column; align-items: flex-end; gap: max(10px, calc(var(--u) * 16)); }
+.msc-info-title { margin: 0; font: 500 max(26px, calc(var(--u) * 46))/1.05 var(--font-display, sans-serif); letter-spacing: -.02em; color: #f4f6f8; }
+.msc-info-meta { font: 400 max(11px, calc(var(--u) * 12.5))/1 var(--font-mono, monospace); letter-spacing: .14em; text-transform: uppercase; color: rgba(236, 238, 241, .5); }
+.msc-info-price { display: flex; align-items: baseline; gap: 10px; }
+.msc-info-price span { font: 400 max(11px, calc(var(--u) * 12))/1 var(--font-mono, monospace); letter-spacing: .1em; text-transform: uppercase; color: rgba(236, 238, 241, .5); }
+.msc-info-price b { font: 500 max(20px, calc(var(--u) * 30))/1 var(--font-display, sans-serif); letter-spacing: -.01em; color: #f4f6f8; font-variant-numeric: tabular-nums; }
+.msc-info-tags { display: flex; gap: 8px; }
+.msc-info-tags span { height: max(24px, calc(var(--u) * 26)); display: flex; align-items: center; padding: 0 10px; border: 1px solid rgba(236, 238, 241, .16); font: 400 max(10px, calc(var(--u) * 10.5))/1 var(--font-mono, monospace); letter-spacing: .16em; text-transform: uppercase; color: rgba(236, 238, 241, .62); }
+.msc-info-cta { display: flex; gap: 10px; margin-top: 4px; }
+.msc-btn { display: inline-flex; align-items: center; justify-content: center; height: 44px; padding: 0 20px; border-radius: 999px; border: 1px solid rgba(236, 238, 241, .24); background: rgba(14, 15, 17, .5); color: #eceef1; font: 500 14px/1 var(--font-sans, sans-serif); text-decoration: none; cursor: pointer; transition: background .2s, border-color .2s, color .2s; }
+.msc-btn:hover { border-color: rgba(236, 238, 241, .5); background: rgba(40, 42, 46, .7); }
+.msc-btn-primary { background: #f2f4f6; border-color: #f2f4f6; color: #0b0c0d; }
+.msc-btn-primary:hover { background: #fff; border-color: #fff; color: #000; }
+.msc-btn:focus-visible, .msc-info-close:focus-visible, .msc-credits-btn:focus-visible { outline: 2px solid #f2f4f6; outline-offset: 3px; }
+.msc-info-note { margin: 0; max-width: 360px; white-space: normal; font: 400 12px/1.5 var(--font-sans, sans-serif); color: rgba(236, 238, 241, .42); }
+.msc-info-close { padding: 6px 0; border: 0; background: none; font: 400 11px/1 var(--font-mono, monospace); letter-spacing: .18em; text-transform: uppercase; color: rgba(236, 238, 241, .5); cursor: pointer; }
+.msc-info-close:hover { color: #fff; }
+
+/* ---------- bottom bar ---------- */
+.msc-bar { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 max(16px, calc(var(--u) * 30)); font: 400 11px/1 var(--font-mono, monospace); letter-spacing: .18em; text-transform: uppercase; color: rgba(236, 238, 241, .42); pointer-events: none; }
+.msc-bar-mid { position: absolute; left: 50%; translate: -50% 0; display: flex; align-items: center; gap: 10px; color: rgba(236, 238, 241, .6); }
+.msc-bar-mid i { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+.msc-bar-end { display: flex; align-items: center; gap: 18px; }
+.msc-credits-btn { pointer-events: auto; padding: 8px 0; border: 0; background: none; font: inherit; letter-spacing: inherit; text-transform: inherit; color: rgba(236, 238, 241, .6); cursor: pointer; text-decoration: underline; text-decoration-color: rgba(236, 238, 241, .25); text-underline-offset: 4px; }
+.msc-credits-btn:hover { color: #fff; }
+
+/* ---------- photo credits (CC licences require the author's name) ---------- */
+.msc-credits { position: fixed; inset: 0; z-index: 90; display: none; overflow: auto; background: rgba(8, 9, 10, .9); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); color: #dfe2e6; }
+.msc-credits.is-on { display: block; }
+.msc-credits-wrap { max-width: 980px; margin: 0 auto; padding: 80px 24px 64px; }
+.msc-credits h3 { margin: 0 0 10px; font: 500 40px/1.05 var(--font-display, sans-serif); letter-spacing: -.02em; color: #f2f4f6; }
+.msc-credits-sub { margin: 0 0 28px; font: 400 12px/1.7 var(--font-mono, monospace); letter-spacing: .08em; color: #ef5a50; }
+.msc-credits-list { list-style: none; margin: 0; padding: 0; columns: 2 380px; column-gap: 40px; }
+.msc-credits-list li { break-inside: avoid; display: grid; grid-template-columns: 40px 1fr; gap: 2px 10px; padding: 10px 0; border-top: 1px solid rgba(255, 255, 255, .08); }
+.msc-credits-list b { grid-row: span 2; font: 400 12px/1.6 var(--font-mono, monospace); color: rgba(236, 238, 241, .4); }
+.msc-credits-list span { font: 500 17px/1.3 var(--font-sans, sans-serif); color: #eceef1; }
+.msc-credits-list a { font: 400 11.5px/1.6 var(--font-mono, monospace); color: rgba(236, 238, 241, .55); text-decoration: none; overflow-wrap: anywhere; }
+.msc-credits-list a:hover { color: #fff; }
+.msc-credits-x { position: fixed; top: 16px; right: 18px; padding: 10px 14px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 999px; background: rgba(14, 15, 17, .8); font: 400 11px/1 var(--font-mono, monospace); letter-spacing: .18em; color: #e5e7ea; cursor: pointer; }
+
+/* ---------- phones and tall screens ---------- */
+@media (max-aspect-ratio: 1/1) {
+  .msc-hero { top: auto; bottom: 64px; translate: -50% 0; width: calc(100% - 32px); }
+  .msc-title { font-size: clamp(22px, 6vw, 36px); }
+  .msc-search { margin-top: 18px; }
+  .msc-info { left: 16px; right: 16px; width: auto; top: calc(var(--frame-bottom, 52vh) + 22px); height: auto; text-align: left; }
+  .msc-info::before { left: -16px; right: -16px; top: -22px; bottom: -400px; background: linear-gradient(to bottom, rgba(7, 8, 9, 0), rgba(7, 8, 9, .9) 40px, rgba(7, 8, 9, .94)); }
+  .msc-info > * { position: relative; top: auto; right: auto; white-space: normal; }
+  .msc-info-big, .msc-info-rule { display: none; }
+  .msc-info-no { margin-bottom: 12px; }
+  .msc-info-body { align-items: flex-start; gap: 10px; }
+  .msc-info-note { max-width: none; }
+  .msc-bar-hint { display: none; }
+  .msc-bar-mid { position: static; translate: none; }
+  /* short phones: keep name, price and the two buttons; the search stays visible below them */
+  .is-tight .msc-info-note, .is-tight .msc-info-tags, .is-tight .msc-info-close { display: none; }
+  .is-tight .msc-info-no { margin-bottom: 6px; }
+}
+@media (max-width: 760px) {
+  .msc { height: 100svh; min-height: 640px; }
+  .msc-search { height: 56px; padding-left: 16px; }
+  .msc-search .kt-sf input { height: 52px; font-size: 16px; }
+  .msc-search-go { height: 42px; padding: 0 16px; }
+  .msc-search .kt-sf-list { width: calc(100% + 40px); min-width: 0; }
+  .msc-info-cta { width: 100%; }
+  .msc-info-cta .msc-btn { flex: 1; padding: 0 12px; }
+}
+@media (max-width: 420px) {   /* keep the whole placeholder visible on phones: drop the arrow, tighter button */
+  .msc-search-go { padding: 0 14px; }
+  .msc-search-go span { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .msc-view { transition: none; } }
+
+/* ---------- gallery nav (主人 2026-10-17): logo, then every link in one row; a capsule grows out of the link you point at ---------- */
+:root { --msc-nav-h: 64px; --msc-spring: cubic-bezier(.22, 1.18, .36, 1); }
+.msc-nav { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: clamp(16px, 2.4vw, 36px); height: var(--msc-nav-h); padding: 0 max(20px, 3vw);
+  color: var(--ink); background: color-mix(in srgb, var(--paper) 62%, transparent); -webkit-backdrop-filter: saturate(160%) blur(18px); backdrop-filter: saturate(160%) blur(18px);
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 9%, transparent); transition: background .3s ease, border-color .3s ease; }
+.msc-nav.kt-dark:not(.is-scrolled) { background: linear-gradient(rgba(6, 7, 8, .78), rgba(6, 7, 8, 0)); -webkit-backdrop-filter: none; backdrop-filter: none; border-color: transparent; }
+.msc-nav-logo { flex: none; display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; }
+.msc-nav-logo svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
+.msc-nav-logo b { font: 600 18px/1 var(--font-display, var(--font-sans, sans-serif)); letter-spacing: .16em; }
+.msc-nav-links { position: relative; display: flex; align-items: center; gap: 2px; flex: 1; min-width: 0; }
+.msc-nav-links a { position: relative; z-index: 1; display: inline-flex; align-items: center; height: 38px; padding: 0 15px; border-radius: 999px; color: var(--ink); opacity: .8; text-decoration: none;
+  font: 500 14.5px/1 var(--font-sans, sans-serif); white-space: nowrap; transition: opacity .2s ease, color .25s ease; }
+.msc-nav-links a:hover, .msc-nav-links a.is-on { opacity: 1; }
+.msc-nav-links.has-pill a.is-on { color: var(--paper); }
+.msc-nav-links a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.msc-nav-pill { position: absolute; left: 0; top: 50%; width: 0; height: 38px; margin-top: -19px; border-radius: 999px; background: var(--ink); opacity: 0; scale: .55; pointer-events: none;
+  transition: transform .42s var(--msc-spring), width .42s var(--msc-spring), scale .45s var(--msc-spring), opacity .22s ease; }
+.msc-nav-links.has-pill .msc-nav-pill { opacity: 1; scale: 1; }
+.msc-nav-pill.no-anim { transition: none; }
+.msc-nav-end { flex: none; display: flex; align-items: center; margin-left: auto; }
+/* gooey capsule (ui.js gooeyNav, 主人 2026-10-17 react-bits GooeyNav + the earlier magnet): the shape is drawn on a canvas over the
+   bar, the labels' dark copy is clipped to it; the old CSS capsule stays as the fallback without WebGL2 */
+.msc-goo-on .msc-nav-pill { display: none; }
+.msc-goo-on .msc-nav-links { z-index: 1; }
+.msc-goo-canvas { position: absolute; left: 0; top: 0; z-index: 0; pointer-events: none; }
+.msc-goo-rim { position: absolute; z-index: 0; pointer-events: none; border-radius: 999px; background: color-mix(in srgb, var(--ink) 4%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 9%, transparent), inset 0 1px 0 color-mix(in srgb, var(--ink) 6%, transparent), 0 22px 44px -20px rgba(0, 0, 0, .8); }
+.msc-goo-ink { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; clip-path: path('M0,0Z'); }
+.msc-goo-ink a, .msc-nav-links .msc-goo-ink a { position: absolute; z-index: auto; margin: 0; color: var(--paper); opacity: 1; transition: none; }
+.msc-nav-wrap .msc-goo-rim { display: none; }
+
+/* magnetic main buttons: ease-out while following, same curve back to rest */
+[data-magnet] { transition: transform .5s cubic-bezier(.215, .61, .355, 1); }
+@media (prefers-reduced-motion: reduce) { .msc-nav-pill, .msc-nav-links a, [data-magnet] { transition-duration: .01ms !important; } }
+
+/* two rows when the links don't fit on one line next to the logo and the language switch: logo + language on top,
+   every link below in a row you can swipe sideways. Decided by measuring (GaleriaNav sets html.msc-nav-wrap),
+   because the labels are much longer in Polish than in Chinese. */
+html.msc-nav-wrap { --msc-nav-h: 106px; }
+.msc-nav-wrap .msc-nav { flex-wrap: wrap; align-content: flex-start; gap: 0 12px; padding: 0 16px; }
+.msc-nav-wrap .msc-nav.kt-dark:not(.is-scrolled) { background: linear-gradient(rgba(6, 7, 8, .96) 62%, rgba(6, 7, 8, 0)); }
+.msc-nav-wrap .msc-nav-logo { height: 58px; }
+.msc-nav-wrap .msc-nav-end { height: 58px; }
+.msc-nav-wrap .msc-nav-links { order: 3; flex: 0 0 calc(100% + 32px); margin: 0 -16px; padding: 0 10px 10px; overflow-x: auto; scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 30px), transparent); mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 30px), transparent); }
+.msc-nav-wrap .msc-nav-links::-webkit-scrollbar { display: none; }
+.msc-nav-wrap .msc-nav-links a { height: 36px; padding: 0 13px; font-size: 14px; }
+.msc-nav-wrap .msc-nav-pill { height: 36px; margin-top: -23px; }
+@media (max-width: 760px) {
+  .msc-nav-logo svg { width: 24px; height: 24px; }
+  .msc-nav-logo b { font-size: 15px; letter-spacing: .14em; }
+  .msc-nav-end .kt-lang button { min-width: 32px; padding: 0 8px; }
+}
+.msc-btn[data-magnet], .msc-search-go[data-magnet] { transition: background .2s, border-color .2s, color .2s, transform .5s cubic-bezier(.215, .61, .355, 1); }
+
+/* the order search just above the FAQ heading (主人 2026-10-18): a panel of its own. Left, a few lines on what it is for;
+   right, a small route on which the drawn car drives to where the order is, the box and the journey. */
+.msc-track { scroll-margin-top: calc(var(--msc-nav-h, 72px) + 24px); position: relative; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--space-8) clamp(32px, 5vw, 80px); padding: clamp(28px, 4vw, 56px); border-radius: 28px; border: 1px solid rgba(236, 240, 255, .09);
+  background: radial-gradient(90% 120% at 0% 0%, rgba(255, 214, 178, .07), transparent 60%), linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .012));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 30px 60px -30px rgba(0, 0, 0, .9); margin-bottom: clamp(72px, 9vw, 128px); }
+.msc-track-text { display: grid; gap: 18px; align-content: start; align-self: start; position: sticky; top: calc(var(--msc-nav-h, 72px) + 32px); }
+.msc-track-text h3 { margin: 4px 0 0; font: 600 clamp(28px, 3.1vw, 44px)/1.1 var(--font-display); letter-spacing: -.035em; }
+.msc-track-text h3 span { display: inline-block; }
+.msc-track-text p { margin: 0; max-width: 540px; font-size: 16px; line-height: 1.7; color: color-mix(in srgb, var(--ink) 78%, transparent); }
+.msc-track-text .msc-track-safe { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.5; color: var(--ink-muted); }
+.msc-track-safe svg { flex: none; width: 15px; height: 15px; margin-top: 1px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; }
+.msc-track-tool { display: grid; gap: var(--space-4); align-content: start; min-width: 0; }
+.msc-track-tool .kt-note { margin: -4px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-muted); }
+.msc-track-tool .kt-track-result { margin-top: var(--space-2); }
+.msc-track-tool .kt-track-card { background: rgba(255, 255, 255, .03); border-color: rgba(236, 240, 255, .1); box-shadow: none; }
+
+/* the route: five stops on a line; China to Poland is the sea, so that stretch is drawn as a wave. --at (0..1) is where
+   the order is: the car drives there and the line behind it lights up */
+@property --at { syntax: '<number>'; inherits: true; initial-value: 0; }
+.msc-route { --x0: 10%; --span: 80%; position: relative; padding-top: 58px; transition: --at 1.2s cubic-bezier(.2, .7, .2, 1); }
+/* the line: the sea from China to Poland as a wave, then a road with lane marks to the door. Both light up behind the car. */
+.msc-route-line { position: absolute; left: var(--x0); right: var(--x0); top: 54px; height: 8px;
+  background: repeating-linear-gradient(90deg, rgba(236, 240, 255, .4) 0 10px, transparent 10px 18px) right center / 50% 2px no-repeat,
+    linear-gradient(rgba(236, 240, 255, .07), rgba(236, 240, 255, .07)) right center / 50% 100% no-repeat; }
+.msc-route-line::before { content: ""; position: absolute; left: 0; width: 50%; top: -2px; height: 12px;
+  background: linear-gradient(90deg, var(--ink) calc(var(--at) * 200%), rgba(236, 240, 255, .3) calc(var(--at) * 200%));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12'%3E%3Cpath d='M0 6c3 0 3-4 6-4s3 4 6 4 3 4 6 4 3-4 6-4' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E") 0 50% / 24px 12px repeat-x;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12'%3E%3Cpath d='M0 6c3 0 3-4 6-4s3 4 6 4 3 4 6 4 3-4 6-4' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E") 0 50% / 24px 12px repeat-x; }
+.msc-route-line i { position: absolute; left: 50%; top: 3px; height: 2px; width: calc(max(0, var(--at) - .5) * 100%);
+  background: repeating-linear-gradient(90deg, var(--ink) 0 10px, transparent 10px 18px); }
+.msc-route-line::after { content: ""; position: absolute; top: 1px; left: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 12px 3px rgba(236, 240, 255, .5); opacity: 0; }
+.msc-route:not(.is-set) .msc-route-line::after { animation: msc-route-run 5.5s cubic-bezier(.45, 0, .55, 1) infinite 1s; }
+@keyframes msc-route-run { 0% { left: 0; opacity: 0; } 8% { opacity: 1; } 92% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+.msc-route-car { position: absolute; top: 58px; left: calc(var(--x0) + var(--at) * var(--span)); width: 70px; height: auto; transform: translate(-50%, calc(-100% - 15px));
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .55)); pointer-events: none; user-select: none; }
+.msc-route.is-set .msc-route-car { animation: msc-route-bob .3s ease-in-out 4 alternate; }
+@keyframes msc-route-bob { to { translate: 0 -2px; } }
+.msc-route ol { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; }
+.msc-route li { display: grid; justify-items: center; gap: 10px; text-align: center; font-size: 12.5px; line-height: 1.3; color: var(--ink-muted); transition: color .4s; }
+.msc-stop { display: grid; place-items: center; width: 30px; height: 30px; margin-top: -19px; border-radius: 50%; box-sizing: border-box;
+  border: 1.5px solid rgba(236, 240, 255, .26); background: rgb(16, 17, 19); color: var(--ink-muted); transition: background .4s, border-color .4s, color .4s, box-shadow .4s; }
+.msc-stop svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.msc-route li.is-done { color: var(--ink); }
+.msc-route li.is-done .msc-stop { border-color: rgba(236, 240, 255, .7); color: var(--ink); background: rgb(30, 31, 34); }
+.msc-route li.is-now { color: var(--ink); font-weight: 600; }
+.msc-route li.is-now .msc-stop { border-color: var(--ink); background: var(--ink); color: rgb(12, 13, 15); box-shadow: 0 0 0 6px rgba(236, 240, 255, .12), 0 0 22px rgba(236, 240, 255, .25); }
+.msc-route-say { margin: 2px 0 0; font-size: 15px; line-height: 1.5; color: var(--ink-muted); }
+.msc-route-say b { color: var(--ink); font-weight: 600; }
+@media (max-width: 860px) {
+  .msc-track { grid-template-columns: 1fr; border-radius: 22px; }
+  .msc-track-text { position: static; }
+  .msc-route { --x0: 9%; --span: 82%; }
+  .msc-route li { font-size: 11.5px; }
+  .msc-route-car { width: 58px; }
+  .msc-stop { width: 26px; height: 26px; margin-top: -17px; }
+  .msc-stop svg { width: 14px; height: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .msc-route, .msc-route li, .msc-stop { transition: none; }
+  .msc-route:not(.is-set) .msc-route-line::after, .msc-route.is-set .msc-route-car { animation: none; }
+}

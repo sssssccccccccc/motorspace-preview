@@ -1,0 +1,107 @@
+/* MotorSpace · motion layer for the gallery homepage prototype (motion.js; 主人 2026-10-17: 1 到 6 都做).
+   Loaded after texture.css. Warm white is the only light colour, like the rest of the page. */
+
+/* ---- 1 · journey: a container train crossing a dark aerial strip, China -> Poland (主人 2026-10-17: logistics-freight 那种，火车横向) ---- */
+.mfr-on .kt-journey-track { aspect-ratio: auto; height: clamp(200px, 25vw, 360px); overflow: hidden; isolation: isolate; }
+.mfr-on .kt-journey-svg, .mfr-on .kt-journey-mark { visibility: hidden; }
+.mfr { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+/* no frame: the ground fades out into the page at every edge, slowly at the top and bottom
+   (主人 2026-10-17: 上面灰色石头和黑色背景直接过渡有点突兀，要石头慢慢变淡过渡过去) */
+.mfr-on .mfr { -webkit-mask-image: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, .18) 12%, rgba(0, 0, 0, .55) 26%, #000 42%, #000 62%, rgba(0, 0, 0, .55) 80%, rgba(0, 0, 0, .15) 92%, transparent 100%),
+    linear-gradient(90deg, transparent 0, #000 4%, #000 96%, transparent 100%);
+  -webkit-mask-composite: source-in; mask-image: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, .18) 12%, rgba(0, 0, 0, .55) 26%, #000 42%, #000 62%, rgba(0, 0, 0, .55) 80%, rgba(0, 0, 0, .15) 92%, transparent 100%),
+    linear-gradient(90deg, transparent 0, #000 4%, #000 96%, transparent 100%);
+  mask-composite: intersect; }
+.mfr-ground { position: absolute; inset: 0; background: #0b0c0e center / auto calc(100% * var(--mfr-zoom, 1)) no-repeat; }
+.mfr-train { position: absolute; left: 0; top: 0; max-width: none; will-change: transform; user-select: none; }
+/* the locomotive's headlights: a warm cone along the track ahead, brighter while it moves */
+.mfr-beam { position: absolute; left: 0; top: 0; width: calc(var(--mfr-ppm, 10) * 30px); height: calc(var(--mfr-ppm, 10) * 7px); translate: 0 -50%;
+  background: radial-gradient(100% 50% at 0 50%, rgba(255, 240, 214, .6), rgba(255, 228, 190, .14) 55%, transparent 82%);
+  clip-path: polygon(0 42%, 100% 0, 100% 100%, 0 58%); filter: blur(3px); mix-blend-mode: screen; opacity: .75; }
+/* mist drifting across, two layers at different speeds */
+.mfr-mist { position: absolute; inset: -10% 0; background-repeat: repeat-x; background-size: auto 100%; opacity: .5; mix-blend-mode: screen;
+  animation: mfr-drift 90s linear infinite; }
+.mfr-mist-2 { opacity: .32; transform: scaleY(-1); animation-duration: 140s; animation-delay: -40s; }
+@keyframes mfr-drift { from { background-position-x: 0; } to { background-position-x: calc(var(--mfr-h, 300px) * -6); } }
+.mfr-shade { position: absolute; inset: 0; background: radial-gradient(120% 150% at 50% 50%, transparent 55%, rgba(5, 6, 8, .45) 100%); }
+/* the stops: a sign above the track, a hairline down to the rails; lit warm once the locomotive gets there */
+.mfr-on .kt-stop { top: 22% !important; z-index: 3; }
+.mfr-on .kt-stop::after { content: ""; position: absolute; left: 50%; top: 100%; width: 1px; height: calc(var(--mfr-h, 300px) * .28 - 7px);
+  background: linear-gradient(180deg, rgba(236, 240, 255, .4), rgba(236, 240, 255, 0)); }
+.mfr-on .kt-stop-dot, .mfr-on .kt-stop.is-on .kt-stop-dot { position: relative; background: rgba(12, 13, 16, .7); border-color: rgba(236, 240, 255, .45); }
+.mfr-on .kt-stop-label, .mfr-on .kt-stop.is-on .kt-stop-label { top: auto; bottom: 22px; color: rgba(236, 240, 255, .7); text-shadow: 0 1px 8px rgba(0, 0, 0, .9); }
+.mfr-on .kt-stop.is-on .kt-stop-dot { scale: 1; }
+.mfr-on .kt-stop .kt-stop-dot, .mfr-on .kt-stop .kt-stop-label, .mfr-on .kt-stop::after { transition: background .5s, border-color .5s, color .5s, box-shadow .5s; }
+.mfr-on .kt-stop[data-mfr-lit] .kt-stop-label { color: #fff4e6; }
+.mfr-on .kt-stop[data-mfr-lit]::after { background: linear-gradient(180deg, rgba(255, 228, 196, .8), rgba(255, 228, 196, 0)); }
+.mfr-on .kt-stop[data-mfr-lit] .kt-stop-dot { background: #fff4e6; border-color: #fff4e6; scale: 1.2; box-shadow: 0 0 0 5px rgba(255, 236, 214, .08), 0 0 24px 4px rgba(255, 214, 170, .45); }
+.mfr-on .kt-stop[data-mfr-lit] .kt-stop-dot::after { content: ""; position: absolute; inset: -2px; border-radius: 50%; border: 1px solid rgba(255, 228, 196, .75);
+  animation: mjr-ping 1.5s cubic-bezier(.2, .7, .2, 1) both; }
+@keyframes mjr-ping { from { transform: scale(1); opacity: .9; } to { transform: scale(4.4); opacity: 0; } }
+@media (max-width: 760px) {
+  .mfr-on .kt-journey-track { height: 220px; margin: 0; }
+  .mfr-on .kt-stop { top: 20% !important; }
+  .mfr-on .kt-stop-label { bottom: 18px; }
+}
+
+/* ---- 2 · torch: a light behind the page that follows the mouse, with a faint floor grid inside it ---- */
+html.mfx-has-torch body { background: transparent; }
+.mfx-torch { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0;
+  background: radial-gradient(560px circle at var(--x, -999px) var(--y, -999px), rgba(255, 226, 196, .085), rgba(255, 226, 196, .03) 38%, transparent 68%); }
+.mfx-torch::before { content: ""; position: absolute; inset: 0; opacity: .55;
+  background-image: radial-gradient(circle, rgba(236, 240, 255, .2) 1px, transparent 1.6px); background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(300px circle at var(--x, -999px) var(--y, -999px), #000, transparent 75%);
+  mask-image: radial-gradient(300px circle at var(--x, -999px) var(--y, -999px), #000, transparent 75%); }
+
+/* ---- 3 · tilt: the case or card leans toward the pointer, the car moves against it, a highlight follows ---- */
+.kt-box.mfx-tilt:not(.is-open), .kt-stock.mfx-tilt { transform: perspective(900px) rotateX(var(--mrx, 0deg)) rotateY(var(--mry, 0deg)); translate: 0 -4px;
+  transition: translate .45s var(--kt-ease), box-shadow .35s; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09), 0 2px 4px rgba(2, 3, 8, .5), 0 40px 70px -30px rgba(2, 3, 8, .95); }
+.kt-box .kt-car-photo, .kt-stock .kt-car-photo { transition: transform .6s var(--kt-ease); }
+.kt-box.mfx-tilt .kt-car-photo, .kt-stock.mfx-tilt .kt-car-photo { transform: translate3d(calc(var(--mpx, 0) * -12px), calc(var(--mpy, 0) * 6px), 0) scale(1.03); transition: none; }
+.mfx-spec { position: absolute; inset: 0; z-index: 8; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .45s;
+  background: radial-gradient(360px circle at var(--mgx, 50%) var(--mgy, 30%), rgba(255, 255, 255, .17), rgba(255, 255, 255, .045) 34%, transparent 62%);
+  mix-blend-mode: soft-light; }
+.mfx-tilt > .mfx-spec { opacity: 1; }
+/* the drawn car sits smaller in its case (主人 2026-10-17: 车太大、太重, then 还是太大); the stock cards keep real photos */
+.kt-box .kt-box-car .kt-car-photo, .kt-box .kt-box-refl .kt-car-photo { width: 68%; margin: 0 auto; }
+.kt-stock .kt-offer-bay .kt-car-photo { max-height: 178px; width: auto; max-width: 92%; filter: drop-shadow(0 18px 14px rgba(0, 0, 0, .55)); }
+
+/* the stock card's link to its car page: an invisible layer over the photo and the name */
+.mfx-stocklink { position: relative; height: 100%; }
+.mfx-stocklink > .kt-stock { height: 100%; }
+.mfx-stocklink-a { position: absolute; z-index: 9; inset: 0 0 96px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+.mfx-stocklink-a:focus-visible { outline: 2px solid var(--focus, #2997ff); outline-offset: 3px; }
+
+/* ---- 4 · stats: slower rolls, one after another, a hairline drawn above each, then a light across the number ---- */
+.mfx-stats .kt-stat { position: relative; }
+.mfx-stats .kt-odo-strip, .mfx-stats .kt-odo-d { transition-duration: 1.8s !important; transition-timing-function: cubic-bezier(.16, 1, .3, 1) !important; }
+.mfx-stats .kt-stat:nth-child(1) { --n: 0; } .mfx-stats .kt-stat:nth-child(2) { --n: 1; } .mfx-stats .kt-stat:nth-child(3) { --n: 2; } .mfx-stats .kt-stat:nth-child(4) { --n: 3; }
+.mfx-stats .kt-stat .kt-odo-strip, .mfx-stats .kt-stat .kt-odo-d { transition-delay: calc(var(--n) * .18s) !important; }
+.mfx-stats .kt-stat::before { content: ""; position: absolute; top: 0; left: 0; right: 24px; height: 1px; transform: scaleX(0); transform-origin: left;
+  background: linear-gradient(90deg, rgba(255, 236, 214, .55), rgba(255, 236, 214, 0)); transition: transform 1.3s cubic-bezier(.16, 1, .3, 1) calc(var(--n) * .18s); }
+.mfx-stats .kt-stat + .kt-stat::before { left: 24px; }
+.mfx-stats.mfx-in .kt-stat::before { transform: scaleX(1); }
+.mfx-stats .kt-stat dt { opacity: 0; translate: 0 8px; transition: opacity .8s ease calc(.5s + var(--n) * .18s), translate .8s cubic-bezier(.16, 1, .3, 1) calc(.5s + var(--n) * .18s); }
+.mfx-stats.mfx-in .kt-stat dt { opacity: 1; translate: 0 0; }
+.mfx-stats .kt-stat dd { position: relative; overflow: hidden; }
+.mfx-stats .kt-stat dd::after { content: ""; position: absolute; inset: 0 -10%; pointer-events: none; transform: translateX(-110%);
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 244, 228, .38) 50%, transparent 70%); mix-blend-mode: overlay; }
+.mfx-stats.mfx-in .kt-stat dd::after { animation: mfx-glint 1.2s cubic-bezier(.3, .6, .2, 1) calc(1.5s + var(--n) * .2s) both; }
+@keyframes mfx-glint { to { transform: translateX(110%); } }
+
+/* ---- 5 · the wordmark: an outline that fills with light as the page ends ---- */
+/* the word fits the page now (it used to run off the right edge), so the fill can reach the last letter */
+.kt-footer-mark.mfx-mark { position: relative; background: none; color: transparent; -webkit-text-stroke: 1px rgba(236, 240, 255, .16); font-size: clamp(56px, 14.4vw, 280px); }
+.kt-footer-mark.mfx-mark::after { content: attr(data-word); position: absolute; inset: 0; pointer-events: none; text-align: center; white-space: nowrap; -webkit-text-stroke: 0;
+  background: linear-gradient(180deg, rgba(240, 242, 248, .78) 0%, rgba(206, 212, 226, .42) 46%, rgba(255, 226, 196, .08) 90%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  clip-path: inset(0 calc((1 - var(--fill, 0)) * 100%) 0 0); }
+
+/* ---- 6 · a car's photo grows into its page ---- */
+::view-transition-group(ms-car) { animation-duration: .62s; animation-timing-function: cubic-bezier(.2, .8, .2, 1); }
+::view-transition-old(ms-car), ::view-transition-new(ms-car) { height: 100%; object-fit: cover; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mfr-on .kt-stop[data-mfr-lit] .kt-stop-dot::after, .mfx-stats .kt-stat dd::after { animation: none; display: none; }
+  .mfr-mist { animation: none; }
+  .mfx-stats .kt-stat dt { opacity: 1; translate: 0 0; }
+}

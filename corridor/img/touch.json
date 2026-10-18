@@ -1,0 +1,44 @@
+{
+ "w": 2600,
+ "h": 762,
+ "robot": {
+  "file": "touch-robot.webp",
+  "x": 0,
+  "y": 49,
+  "w": 1208,
+  "h": 548
+ },
+ "human": {
+  "file": "touch-human.webp",
+  "x": 1383,
+  "y": 326,
+  "w": 1217,
+  "h": 386
+ },
+ "tips": {
+  "robot": [
+   1210.8,
+   445.7
+  ],
+  "human": [
+   1389.2,
+   546.3
+  ]
+ },
+ "reach": {
+  "robot": [
+   0.9504,
+   0.311
+  ],
+  "human": [
+   -0.995,
+   0.1002
+  ]
+ },
+ "credit": {
+  "made": "Rendered in Blender for MotorSpace",
+  "human": "MakeHuman base mesh and \"young caucasian male\" skin (MakeHuman system assets, CC0), posed with MPFB",
+  "robot": "built from the same base mesh",
+  "light": "Poly Haven \"Wooden Studio 15\" HDRI (CC0)"
+ }
+}

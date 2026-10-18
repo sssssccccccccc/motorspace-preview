@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kontener · model 3D (.glb)</title>
+<link rel="stylesheet" href="kontener.css">
+<style>
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 24px 64px; }
+  .stage { height: 560px; border-radius: 32px; border: 1px solid var(--line); background: radial-gradient(110% 80% at 40% 35%, var(--paper-raised), var(--paper-sunken)); overflow: hidden; position: relative; }
+  .meta { display: flex; justify-content: space-between; gap: 16px; margin-top: 14px; font-size: 14px; color: var(--ink-muted); }
+  .meta b { color: var(--ink); font-weight: 600; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/DRACOLoader.js"></script>
+<script src="kontener.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  // A model file (.glb, as exported from Blender) shown in the site's own viewer: same studio light, turntable and controls.
+  var K = window.Kontener, h = React.createElement, SRC = new URLSearchParams(location.search).get('src') || 'models/kontener-sport.glb';
+  function Page() {
+    var s = React.useState('loading'), state = s[0], setState = s[1];
+    var z = React.useState(null), size = z[0], setSize = z[1];
+    React.useEffect(function () { fetch(SRC, { method: 'HEAD' }).then(function (r) { setSize(+r.headers.get('content-length') || null); }, function () {}); }, []);
+    return h('div', { className: 'wrap' },
+      h(K.HeroTitle, { lines: ['Model 3D z pliku .glb', 'Ten sam podest, to samo światło.'] }),
+      h('div', { className: 'stage', style: { marginTop: 28 } },
+        h(K.Car3DView, { three: THREE, src: SRC, body: 'sport', className: 'kt-sheet-3d', title: 'GLB', onLoad: function () { setState('ok'); }, onError: function () { setState('error'); } })),
+      h('div', { className: 'meta' },
+        h('span', null, 'Plik: ', h('b', null, SRC), size ? ' · ' + (size / 1048576).toFixed(1).replace('.', ',') + ' MB' : ''),
+        h('span', null, state === 'ok' ? 'Wczytano z pliku .glb ✓' : state === 'error' ? 'Nie udało się wczytać pliku — pokazany model zastępczy' : 'Wczytywanie…')));
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(h(Page));
+</script>
+</body>
+</html>

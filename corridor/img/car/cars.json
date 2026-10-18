@@ -1,0 +1,39 @@
+{
+ "cars": {
+  "9x": "car/box-titanium.svg",
+  "su7": "car/box-pearl.svg",
+  "001": "car/box-champagne.svg",
+  "seal": "car/box-sage.svg",
+  "l9": "car/box-silver.svg",
+  "d9": "car/box-ice.svg"
+ },
+ "view": {
+  "w": 5.25,
+  "h": 2.2,
+  "ground": 2.08
+ },
+ "journey": {
+  "file": "car/box-pearl.svg",
+  "w": 1050,
+  "h": 440.00000000000006,
+  "ground": 0.9455,
+  "light": [
+   0.9441,
+   0.4545
+  ],
+  "tail": [
+   0.0812,
+   0.4091
+  ],
+  "span": [
+   0.0412,
+   0.9588
+  ]
+ },
+ "paints": [
+  "car/box-pearl.svg",
+  "car/box-obsidian.svg",
+  "car/box-graphite.svg",
+  "car/box-silver.svg"
+ ]
+}

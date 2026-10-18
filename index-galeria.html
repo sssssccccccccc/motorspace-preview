@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MotorSpace · Auto z Chin na zamówienie · galeria (prototyp)</title>
+<meta name="description" content="Samochody z Chin prosto od producentów i dealerów: sami kupujemy, sprawdzamy i odprawiamy auto w Polsce. Pełna cena z cłem i VAT od razu, raport z niezależnej inspekcji po polsku.">
+<link rel="canonical" href="https://motorspace.example/index.html">
+<link rel="alternate" hreflang="pl" href="https://motorspace.example/index.html">
+<link rel="alternate" hreflang="en" href="https://motorspace.example/en/index.html">
+<link rel="alternate" hreflang="zh" href="https://motorspace.example/zh/index.html">
+<link rel="alternate" hreflang="x-default" href="https://motorspace.example/index.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MotorSpace">
+<meta property="og:title" content="MotorSpace · Auto z Chin na zamówienie">
+<meta property="og:description" content="Samochody z Chin prosto od producentów i dealerów: sami kupujemy, sprawdzamy i odprawiamy auto w Polsce. Pełna cena z cłem i VAT od razu, raport z niezależnej inspekcji po polsku.">
+<meta property="og:url" content="https://motorspace.example/index.html">
+<meta property="og:image" content="https://motorspace.example/assets/brand/og-pl.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="pl_PL">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0b0b0c">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+<link rel="stylesheet" href="kontener.css?v=644f994a">
+<style>.mstk-pre .msc-title{clip-path:inset(0 100% 0 0)}</style>
+<script>(function(d){try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches){d.classList.add("mstk-pre");setTimeout(function(){d.classList.remove("mstk-pre")},4000)}}catch(e){}})(document.documentElement)</script>
+<link rel="stylesheet" href="corridor/corridor.css?v=8f388c73">
+<link rel="stylesheet" href="corridor/touch.css?v=8e6fec71">
+<link rel="stylesheet" href="corridor/texture.css?v=b91ead7c">
+<link rel="stylesheet" href="corridor/motion.css?v=0f369f55">
+<link rel="stylesheet" href="corridor/wind.css?v=8c9a8278">
+<script>(function(){var d=document.documentElement,t='dark';try{var m=/[?&]theme=(light|dark|auto)/.exec(location.search);if(m){t=m[1];localStorage.setItem('kt-theme',t);}else{t=localStorage.getItem('kt-theme')||'dark';}}catch(e){}if(t==='auto'){d.removeAttribute('data-theme');}else{d.setAttribute('data-theme',t);}})();</script>
+<style>
+  html { scroll-padding-top: 84px; background: var(--paper); }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+  
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+  .wrap { padding: 0 48px; }
+  .sec { margin-top: 140px; display: grid; gap: 32px; scroll-margin-top: 84px; }
+  .sec-first { margin-top: 96px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+  .grid3 > * { min-width: 0; overflow-wrap: break-word; }
+  .grid3 .kt-stock-actions { flex-wrap: wrap; }
+  .grid3 .kt-stock-actions .kt-btn { min-width: max-content; }
+  .sec-pair { grid-template-columns: 1fr 1fr; gap: 24px; }
+  .sec-pair > div { display: grid; }
+  .gap { height: 120px; }
+  @media (max-width: 1040px) { .grid3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 760px) { .wrap { padding: 0 16px; } .grid3, .sec-pair { grid-template-columns: 1fr; } .sec { margin-top: 100px; } .sec-first { margin-top: 64px; } }
+
+</style>
+<script src="vendor/react.production.min.js"></script>
+<script src="vendor/react-dom.production.min.js"></script>
+<script src="kontener-data.js?v=644f994a"></script>
+<script src="kontener.js?v=644f994a"></script>
+<script src="corridor/corridor.js?v=d8b02c0b"></script>
+<script src="corridor/ui.js?v=015fb58b"></script>
+<script src="corridor/touch.js?v=727b55df"></script>
+<script src="corridor/motion.js?v=c3ca3f04"></script>
+<script src="corridor/inklogo.js?v=5fae32cf"></script>
+<script src="corridor/stroketext.js?v=237b5661"></script>
+<script src="corridor/particletext.js?v=f0e73c92"></script>
+<script src="corridor/clock.js?v=24c2a7b4"></script>
+<script src="corridor/reveal.js?v=59cd2a53"></script>
+<script src="corridor/branchfoot.js?v=0298b89a"></script>
+<script src="corridor/spiral.js?v=6c7fb68e"></script>
+<script src="corridor/wind.js?v=81e36ace"></script>
+<script type="speculationrules">{"prerender": [{"where": {"selector_matches": "a[data-car-link]"}, "eagerness": "moderate"}]}</script>
+<script>window.KT_DOC = "home"; window.KT_PRIVACY_URL = "polityka-prywatnosci.html"; window.KT_LEAD_URL = ""; window.KT_LEAD_EXTRA = {};</script>
+<script>window.KT_LOCAL_FONTS = true; window.KT_LANG = "pl"; window.KT_LANG_URLS = {"pl": "index-galeria.html", "en": "en/index-galeria.html", "zh": "zh/index-galeria.html"}; window.KT_ASSETS = 'assets/'; window.KT_HOME_URL = 'index.html'; window.KT_OFFERS_URL = 'oferty.html'; window.KT_TRACK_URL = 'sledzenie.html';</script>
+
+</head>
+<body>
+<div id="root"></div>
+<script>
+
+  var K = window.Kontener, h = React.createElement;
+  var full = /full/.test(location.search);
+  var OFFERS = window.KT_OFFERS_URL || '../OffersPage/preview.html';
+
+  // ---- corridor gallery hero (prototype): cars hang on both walls, the search sits in the middle ----
+  var MSC_BASE = 'corridor/';
+  var MSC_LABELS = {"pl": {"back": "Kliknij obok, aby odłożyć auto na ścianę", "hint": "Kliknij auto na ścianie, aby zobaczyć cenę i szczegóły", "walking": "Spacer po galerii", "viewing": "Oglądasz auto", "manual": "Sterujesz", "ask": "Zapytaj o to auto", "close": "Zamknij", "credits": "Źródła zdjęć", "photoNote": "Zdjęcie poglądowe modelu (Wikimedia Commons), nie konkretnego egzemplarza.", "creditsTitle": "Źródła zdjęć", "creditsSub": "Zdjęcia poglądowe modeli · Wikimedia Commons · licencje CC, autorzy poniżej"}, "en": {"back": "Click beside the car to put it back on the wall", "hint": "Click a car on the wall to see the price and details", "walking": "Walking the gallery", "viewing": "Viewing a car", "manual": "Manual", "ask": "Ask about this car", "close": "Close", "credits": "Photo credits", "photoNote": "Illustrative photo of the model (Wikimedia Commons), not this exact car.", "creditsTitle": "Photo credits", "creditsSub": "Illustrative model photos · Wikimedia Commons · CC licences, authors below"}, "zh": {"back": "点击旁边空白处，车会放回墙上", "hint": "点击墙上的车，查看价格和车辆信息", "walking": "画廊漫步中", "viewing": "正在看车", "manual": "手动浏览", "ask": "询价", "close": "关闭", "credits": "照片来源", "photoNote": "车型示意照片（维基共享资源），不是这台车的实拍。", "creditsTitle": "照片来源", "creditsSub": "车型示意照片 · 维基共享资源 · CC 许可，作者署名如下"}};
+  var MSC_AUTO = /[?&]auto=1\b/.test(location.search);   // cars come off the wall only when clicked (主人 2026-10-17 第三轮); ?auto=1 = demo rhythm
+  var MSC_FACING = {"l1": "right", "l2": "left", "l3": "right", "l4": "right", "l5": "right", "l6": "left", "l7": "right", "l8": "right", "l9": "right", "l10": "right", "l11": "right", "l12": "right", "l13": "left", "l14": "left", "l15": "left", "l16": "right", "l17": "right", "l18": "left", "l19": "right", "l20": "left", "l21": "left", "s1": "left", "s2": "left", "s3": "left", "cut/journey.": "right"};
+  var MSC_ANGLE = (/[?&]angle=(\d+)/.exec(location.search) || [])[1];
+  // real cars instead of the line drawings on the order cases and stock cards (主人 2026-10-17); make_cutouts.py
+  var MSC_CUT = {"cars": {"s1": "cut/s1.webp", "s2": "cut/s2.webp", "s3": "cut/s3.webp", "9x": "car/box-titanium.svg", "su7": "car/box-pearl.svg", "001": "car/box-champagne.svg", "seal": "car/box-sage.svg", "l9": "car/box-silver.svg", "d9": "car/box-ice.svg"}, "paints": ["car/box-pearl.svg", "car/box-obsidian.svg", "car/box-graphite.svg", "car/box-silver.svg"], "freight": {"ppm": 15, "terrain": {"w": 2400, "h": 480}, "train": {"w": 2955, "h": 150}, "mist": {"w": 1600, "h": 320}, "note": "ground 160 x 32 m with the track along the middle; the train image is the train plus 1 m, nose at the right"}}, MSC_CARS = {"l1": "byd-seal", "l2": "byd-song-plus-dm-i", "l3": "byd-han-ev", "l4": "xiaomi-su7", "l5": "zeekr-001", "l6": "zeekr-7x", "l7": "li-auto-l7", "l8": "li-auto-l9", "l9": "denza-d9-dm-i", "l10": "geely-monjaro", "l11": "geely-galaxy-l7", "l12": "changan-uni-v", "l13": "chery-tiggo-9-phev", "l14": "toyota-camry-2-5-hev", "l15": "bmw-325li-m-sport", "l16": "tank-500", "l17": "yangwang-u8", "l18": "nio-et5-touring", "l19": "xpeng-g6", "l20": "wuling-bingo", "l21": "zeekr-9x-max", "s1": "byd-seal-u-dm-i-warszawa", "s2": "zeekr-7x-gdansk", "s3": "xiaomi-su7-pro-poznan"}, MSC_CARDIR = 'auta/';
+  // 主人 2026-10-18: 「那个订单跟踪有点奇怪我觉得可以放到主页然后就在大家问的问题最多那里列出来 说如果一旦订车后发车我们会发送链接
+  // 您可以实时追踪你的车辆状态你可以用那种比较文艺的口吻来说」: a question of the transport group in the FAQ, in that voice
+  // (the tracking page itself stays: it is the link a customer gets)
+  var MSC_TRACK_FAQ = {
+    pl: ['Czy po wysyłce mogę śledzić, gdzie jest moje auto?', 'Tak. Gdy tylko auto wypłynie z chińskiego portu, wysyłamy Ci osobisty link. Od tej chwili możesz zajrzeć do niego o każdej porze i patrzeć, jak toczy się jego podróż: kolejne mile na morzu, port w Europie, odprawa, rejestracja, aż do dnia, w którym stanie przed Twoim domem. Trochę jak pocztówki od podróżnika, który wraca do Ciebie: każda z miejsca odrobinę bliżej.'],
+    en: ['Once my car ships, can I follow where it is?', 'Yes. The moment your car sails from a Chinese port, we send you a link of your own. From then on you can open it at any hour and watch the journey unfold: the miles at sea, the port in Europe, customs, registration, until the day it stands outside your door. Think of it as postcards from a traveller on the way home to you, each one sent from a little closer.'],
+    zh: ['车发出之后，我能知道它走到哪儿了吗？', '能。车一离开中国的港口，我们就把一条只属于你的链接发给你。从那一刻起，你随时都可以打开它，看这趟旅程一程一程地展开：海上的每一段航线、靠岸欧洲、清关、上牌，直到它停在你家门口的那一天。就像一位远行的朋友一路寄来明信片，每一张，都离你更近一点。']
+  };
+  ['pl', 'en', 'zh'].forEach(function (l) {
+    var f = K.copy[l] && K.copy[l].faq, g = f && f.groups[1];
+    if (g && !g.items.some(function (it) { return it[0] === MSC_TRACK_FAQ[l][0]; })) g.items.push(MSC_TRACK_FAQ[l]);
+  });
+  // 主人 2026-10-18（第二句）:「要保留那个搜索栏…他们在那个地方可以点搜索，然后搜索。就可以看到。」
+  // 主人 2026-10-18（第三句，以此为准）:「算了，把那个链接搜索栏放到这」(the FAQ heading)「…太单调了，我都不知道那个地方是干嘛的，
+  // 你还是就像我说的，你要文艺的表示出来。就不能只有一个搜索栏在那。你得有说这个是干嘛的吧？」 and asked whether whatever
+  // people type there would pop up: the order search is a panel of its own (now just above the FAQ heading), with a few lines
+  // in that voice on what it is for, a small route (China, on the way, Poland, customs and plates, your door) on which the
+  // little drawn car drives to where the order is, and the journey in place. The box takes order numbers only: letters,
+  // digits, dashes and spaces, 24 at most; whatever is typed is never shown back, opened or sent anywhere, and a number
+  // that is not ours only ever gives the one "not found" line. The bar's 订单追踪 scrolls down to it (#track).
+  var MSC_TRACK_COPY = {
+    pl: { title: ['Jest w drodze,', 'a Ty to widzisz.'],
+      body: 'Po zamówieniu Twoje auto wyrusza z Chin, płynie przez morza do Polski, przechodzi odprawę, dostaje tablice i w końcu staje pod Twoim domem. Ta podróż trwa kilka miesięcy, ale nie musisz czekać w niewiedzy: w dniu wysyłki dostajesz od nas numer zamówienia i własny link. Otwórz link albo wpisz numer tutaj, a zobaczysz, na którym etapie drogi jest właśnie teraz.',
+      safe: 'Wystarczy numer zamówienia. Twoje imię, telefon i adres nigdy się tu nie pojawiają.',
+      stops: ['Wyjazd z Chin', 'W drodze', 'W Polsce', 'Odprawa i tablice', 'Pod Twoim domem'],
+      idle: 'Wpisz numer, a autko pojedzie tam, gdzie jest teraz Twoje.', now: 'Teraz: ', hint: 'Numer jest w umowie i w każdej wiadomości od nas.' },
+    en: { title: ['It is on its way,', 'and you can watch.'],
+      body: 'Once you order, your car sets off from China, crosses the seas to Poland, clears customs, gets its plates and finally stops outside your door. The journey takes a few months, but you never have to wait in the dark: the day it ships, we send you the order number and a link of your own. Open the link, or type the number here, and see which leg of the road it is on right now.',
+      safe: 'All it takes is the order number. Your name, phone and address never appear here.',
+      stops: ['Leaves China', 'On the way', 'In Poland', 'Customs & plates', 'At your door'],
+      idle: 'Type your number and the little car drives to where yours is now.', now: 'Now: ', hint: 'The number is on your contract and in every message from us.' },
+    zh: { title: ['它在路上，', '你一直看得见。'],
+      body: '订车之后，你的车会从中国启程，漂洋过海来到波兰，清关、上牌，最后停在你家门口。这一路要走上几个月，但你不必在等待里猜：发车那天，我们会把订单号和一条只属于你的链接发给你。点开链接，或者把订单号填在这里，就能看到它此刻走到了哪一程。',
+      safe: '只凭订单号查询，页面上不会出现你的姓名、电话和地址。',
+      stops: ['中国启程', '在路上', '抵达波兰', '清关上牌', '你家门口'],
+      idle: '填上订单号，小车会开到你的车此刻所在的地方。', now: '现在：', hint: '订单号写在合同上，也在我们发给你的每条消息里。' }
+  };
+  // a small line picture for each stop (主人 2026-10-18: the plain circles on the Poland stretch were dull): the port, the
+  // ship, the pin in Poland, the number plate, the house
+  var MSC_STOP_ICON = [
+    [h('circle', { key: 0, cx: 12, cy: 4.5, r: 2 }), h('path', { key: 1, d: 'M12 6.5V20M8.5 10h7M5 14c0 3.6 3.1 6 7 6s7-2.4 7-6' })],
+    [h('path', { key: 0, d: 'M3.5 14.5h17l-2 4.5h-13z' }), h('path', { key: 1, d: 'M6.5 14.5V9h11v5.5M10 9V6h4v3' })],
+    [h('path', { key: 0, d: 'M12 21s6-6 6-10.8a6 6 0 0 0-12 0C6 15 12 21 12 21z' }), h('circle', { key: 1, cx: 12, cy: 10, r: 2 })],
+    [h('rect', { key: 0, x: 3, y: 7.5, width: 18, height: 9, rx: 2 }), h('path', { key: 1, d: 'M7 12h4.5M14.5 12h2.5' })],
+    [h('path', { key: 0, d: 'M4 11.5 12 5l8 6.5' }), h('path', { key: 1, d: 'M6.5 10v9.5h11V10M10.2 19.5v-5h3.6v5' })]
+  ];
+  var MSC_STOP_OF = { contract: 0, bought: 0, inspected: 0, shipped: 1, arrived: 2, customs: 3, registered: 3, ready: 4 };
+  function mscOrderText(v) { return String(v || '').toUpperCase().replace(/[^A-Z0-9 -]/g, '').slice(0, 24); }   // what the box accepts
+  function mscOrderKey(v) { return String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }                    // what is compared
+  function MSCTrack(p) {
+    var lang = p.lang, s = K.copy[lang] || K.copy.pl, R = s.tracker, C = MSC_TRACK_COPY[lang] || MSC_TRACK_COPY.pl, orders = K.SAMPLE_ORDERS || [];
+    var init = mscOrderText(new URLSearchParams(location.search).get('nr'));
+    function find(no) { var k = mscOrderKey(no); if (!k) return undefined; return orders.filter(function (o) { return mscOrderKey(o.no) === k; })[0] || null; }
+    var qs = React.useState(init), q = qs[0], setQ = qs[1];
+    var rs = React.useState(init ? find(init) : undefined), res = rs[0], setRes = rs[1];
+    var fmt = new Intl.DateTimeFormat({ pl: 'pl-PL', en: 'en-GB', zh: 'zh-CN' }[lang] || 'pl-PL', { day: 'numeric', month: 'long', year: 'numeric' });
+    function date(d) { return d ? fmt.format(new Date(d + 'T12:00:00')) : ''; }
+    var key = res ? res.events[res.stage][1] : null, at = res ? (MSC_STOP_OF[key] != null ? MSC_STOP_OF[key] : 0) : 0;
+    return h(React.Fragment, null,
+      h('div', { className: 'msc-track-text' },
+        h('span', { className: 'kt-sechead-n' }, R.eyebrow),
+        h('h3', null, C.title.map(function (t, i) { return h('span', { key: i }, t); })),   // one line per phrase, never broken mid-phrase
+        h('p', null, C.body),
+        h('p', { className: 'msc-track-safe' },
+          h('svg', { viewBox: '0 0 16 16', 'aria-hidden': true }, h('rect', { x: 3, y: 7, width: 10, height: 7, rx: 1.5 }), h('path', { d: 'M5.5 7V5a2.5 2.5 0 0 1 5 0v2' })),
+          C.safe)),
+      h('div', { className: 'msc-track-tool' },
+        h('div', { className: 'msc-route' + (res ? ' is-set' : ''), style: { '--at': at / 4 }, 'aria-hidden': true },
+          h('div', { className: 'msc-route-line' }, h('i', null)),
+          h('img', { className: 'msc-route-car', src: MSC_BASE + 'img/car/box-pearl.svg', alt: '', draggable: false }),
+          h('ol', null, C.stops.map(function (n, i) { return h('li', { key: i, className: res ? (i < at ? 'is-done' : i === at ? 'is-now' : '') : '' }, h('i', { className: 'msc-stop' }, h('svg', { viewBox: '0 0 24 24' }, MSC_STOP_ICON[i])), h('span', null, n)); }))),
+        h('p', { className: 'msc-route-say', 'aria-live': 'polite' }, res ? [C.now, h('b', { key: 'b' }, R.stages[key] || key)] : C.idle),
+        h('form', { className: 'kt-track-form', role: 'search', onSubmit: function (e) { e.preventDefault(); var r = find(q); setRes(r); if (r) setQ(r.no); } },
+          h('label', { className: 'kt-track-field' }, h('span', { className: 'kt-label' }, R.label),
+            h('input', { value: q, placeholder: R.ph, maxLength: 24, autoComplete: 'off', autoCapitalize: 'characters', spellCheck: false, enterKeyHint: 'search',
+              onChange: function (e) { setQ(mscOrderText(e.target.value)); } })),
+          h(K.Button, { variant: 'primary', type: 'submit', arrow: true }, R.go)),
+        h('p', { className: 'kt-note' }, C.hint + ' ' + R.demo),
+        h('div', { 'aria-live': 'polite' },
+          res === null ? h('p', { className: 'kt-track-none' }, R.notFound) : null,
+          res ? h('div', { className: 'kt-track-result', key: res.no },
+            h('div', { className: 'kt-track-card' },
+              h('div', null, h('span', { className: 'kt-label' }, R.order), h('b', null, res.no)),
+              h('div', null, h('span', { className: 'kt-label' }, s.car || { pl: 'Auto', en: 'Car', zh: '车型' }[lang] || 'Auto'), h('b', null, res.car)),
+              h('div', null, h('span', { className: 'kt-label' }, R.contract), h('b', null, date(res.contract))),
+              h('div', null, h('span', { className: 'kt-label' }, R.eta), h('b', null, date(res.eta))),
+              h('div', { className: 'kt-track-progress', style: { '--p': (res.stage + 1) / res.events.length } },
+                h('span', { className: 'kt-label' }, R.stage + ' ' + (res.stage + 1) + ' ' + R.of + ' ' + res.events.length),
+                h('i', null, h('b', null)))),
+            h('ol', { className: 'kt-track-list' }, res.events.map(function (ev, i) {
+              var st = i < res.stage ? 'done' : i === res.stage ? 'now' : 'next';
+              return h('li', { key: i, className: 'is-' + st, style: { '--i': i } },
+                h('span', { className: 'kt-track-dot', 'aria-hidden': true }),
+                h('div', { className: 'kt-track-ev' },
+                  h('div', { className: 'kt-track-ev-head' }, h('b', null, R.stages[ev[1]] || ev[1]), h('span', { className: 'kt-label' }, ev[0] ? date(ev[0]) : R[st])),
+                  ev[2] ? h('p', null, ev[2]) : null));
+            }))) : null)));
+  }
+  // scroll to the search row. Sections above it can still grow while they come into view (pictures loading), which
+  // leaves the row lower than aimed at: once the page has stopped moving, put it right
+  function mscGoTrack(smooth) {
+    var el = document.getElementById('track'); if (!el) return;
+    var how = smooth && !window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto';
+    var t0 = performance.now(), last = NaN, still = 0, fixes = 0;
+    function aim() { return el.getBoundingClientRect().top + window.scrollY - (parseFloat(getComputedStyle(el).scrollMarginTop) || 0); }
+    // from the top of the page it is a long way, and gliding through it all shows seconds of empty screens (the sections
+    // only rise in as they enter): jump to a screen short of the row, then glide the rest
+    var d = aim() - window.scrollY;
+    if (how === 'smooth' && Math.abs(d) > window.innerHeight * 1.5) window.scrollTo({ top: aim() - (d > 0 ? 1 : -1) * window.innerHeight * 0.7, behavior: 'instant' });
+    window.scrollTo({ top: aim(), behavior: how });   // scroll-margin-top keeps it clear of the bar
+    (function check() {
+      if (performance.now() - t0 > 5000) return;
+      var y = window.scrollY;
+      still = y === last ? still + 1 : 0; last = y;
+      if (still === 6) {
+        var off = aim() - window.scrollY;
+        if (Math.abs(off) > 4 && fixes < 3) { fixes++; window.scrollTo({ top: aim(), behavior: how }); }
+        else if (performance.now() - t0 > 1500) return;
+      }
+      requestAnimationFrame(check);
+    })();
+  }
+  // 主人 2026-10-18（第四句）:「这个订单追踪肯定是要放到大家问的最多的问题上面」: the panel stands on its own just above the
+  // FAQ heading (no longer inside the FAQ, so no portal any more)
+  function GaleriaFAQ(p) {
+    React.useEffect(function () {
+      // a link with #track or ?nr= opens the panel, the journey already shown
+      if (location.hash === '#track' || /[?&]nr=/.test(location.search)) setTimeout(function () { mscGoTrack(false); }, 0);
+    }, []);
+    return h(React.Fragment, null,
+      h('div', { id: 'track', className: 'msc-track', 'data-reveal': '' }, h(MSCTrack, { lang: p.lang })),
+      h(K.FAQ, { lang: p.lang }));
+  }
+
+  (function () {
+    function abs(p) { return new URL(MSC_BASE + 'img/' + p, location.href).href; }
+    K.SAMPLE_CARS.concat(K.SAMPLE_STOCK).forEach(function (c) { if (MSC_CUT.cars[c.id] && !c.photo) c.photo = abs(MSC_CUT.cars[c.id]); });
+  })();
+  // every car has its own page (make_carpages.js): a real URL with its own text, so search engines index each car
+  function carHref(id) { return MSC_CARS[id] ? MSC_CARDIR + MSC_CARS[id] + '.html' : null; }
+  function corridorItems(lang) {
+    var s = K.copy[lang] || K.copy.pl, nf = new Intl.NumberFormat({ pl: 'pl-PL', en: 'en-GB', zh: 'zh-CN' }[lang] || 'pl-PL');
+    var list = K.SAMPLE_LISTINGS.map(function (c) { return { car: c, stock: c.status === 'stock' }; })
+      .concat(K.SAMPLE_STOCK.map(function (c) { return { car: c, stock: true, final: true }; }));
+    return list.map(function (x) {
+      var c = x.car, km = typeof c.km === 'number' ? nf.format(c.km) + ' km' : (c.km || '');
+      var price = x.final ? c.priceFinal : K.landedOf(c), name = c.brand + ' ' + c.model;
+      return {
+        id: c.id, facing: MSC_FACING[c.id] || 'left', title: name, photo: MSC_BASE + 'img/' + c.id + '.jpg', small: MSC_BASE + 'img/s/' + c.id + '.jpg', hd: MSC_BASE + 'img/hd/' + c.id + '.jpg',
+        meta: [c.year, km].filter(Boolean).join(' · '),
+        priceLabel: x.final ? s.finalPrice : s.landed, price: K.money(price, lang),
+        status: x.stock ? s.inPoland : s.toOrder,
+        tags: [s[c.drive] || String(c.drive || '').toUpperCase(), x.stock ? (c.location || s.avStock) : s.weeks].filter(Boolean),
+        href: carHref(c.id) || OFFERS + '?q=' + encodeURIComponent(name) + (x.stock ? '&status=stock' : ''), carPage: !!carHref(c.id),
+        summary: [name, c.year, km, (x.final ? '' : s.landed + ' ') + K.money(price, lang)].filter(Boolean).join(' · ')
+      };
+    });
+  }
+  // one search bar (主人 2026-10-17: 中间的搜索太多太密集，要简约); the full filters stay on the offers page
+  function MiniSearch(p) {
+    var lang = p.lang, s = K.copy[lang] || K.copy.pl, qs = React.useState(''), q = qs[0], setQ = qs[1];
+    function go(x) { p.onSearch({ query: x != null ? x : q, filters: {} }); }
+    return h('form', { ref: p.formRef, className: 'msc-search', role: 'search', onSubmit: function (e) { e.preventDefault(); go(); } },
+      h(K.SearchField, { lang: lang, value: q, onChange: setQ, onSubmit: function (x) { setQ(x); go(x); }, onBrand: function (b) { setQ(b); go(b); } }),
+      h('button', { type: 'submit', className: 'msc-search-go', 'data-magnet': '0.35' }, s.search, h('span', { 'aria-hidden': true }, '→')));
+  }
+
+  // ---- gallery nav (主人 2026-10-17): MotorSpace logo, then every link in one row (calculator included) ----
+  function GaleriaNav(p) {
+    var lang = p.lang, s = K.copy[lang] || K.copy.pl, ref = React.useRef(null);
+    React.useEffect(function () {
+      var el = ref.current, raf = 0;
+      function frame() {   // over a dark section the bar uses the dark tokens, like the site's own nav
+        raf = 0; var nb = el.getBoundingClientRect().bottom - 1, dark = false;
+        Array.prototype.forEach.call(document.querySelectorAll('[data-nav-dark]'), function (d) { var r = d.getBoundingClientRect(); if (r.top <= nb && r.bottom > nb) dark = true; });
+        el.classList.toggle('kt-dark', dark); el.classList.toggle('is-scrolled', window.scrollY > 4);
+      }
+      function on() { if (!raf) raf = requestAnimationFrame(frame); }
+      frame(); window.addEventListener('scroll', on, { passive: true }); window.addEventListener('resize', on);
+      var offPill = window.MSUI ? window.MSUI.navPill(el.querySelector('.msc-nav-links')) : null, offMag = window.MSUI ? window.MSUI.magnet() : null;
+      return function () { window.removeEventListener('scroll', on); window.removeEventListener('resize', on); offPill && offPill(); offMag && offMag(); if (raf) cancelAnimationFrame(raf); };
+    }, []);
+    // one row if it fits, otherwise two (logo + language, then the links): measured, since Polish labels run much longer
+    React.useLayoutEffect(function () {
+      var el = ref.current, links = el.querySelector('.msc-nav-links'), de = document.documentElement, lastW = -1;
+      function fit() { de.classList.remove('msc-nav-wrap'); de.classList.toggle('msc-nav-wrap', links.scrollWidth > links.clientWidth + 1); }
+      fit();
+      var ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(function () { var w = el.clientWidth; if (w !== lastW) { lastW = w; fit(); } }) : null;
+      if (ro) ro.observe(el); else window.addEventListener('resize', fit);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+      return function () { if (ro) ro.disconnect(); else window.removeEventListener('resize', fit); };
+    }, [lang]);
+    var items = s.nav.map(function (n, i) { return { label: n, link: p.links && p.links[i] }; });
+    items.splice(2, 0, { label: s.quote, link: p.onQuote });
+    // 订单追踪 stays in the bar but leads down to the search in the FAQ (主人 2026-10-18: 「可以放到最上面，但是要划到下面」)
+    if (s.track) items.push({ label: s.track, link: '#track', go: function () { mscGoTrack(true); try { history.replaceState(null, '', '#track'); } catch (x) {} } });
+    return h('header', { ref: ref, className: 'kt kt-dark msc-nav' },
+      h('a', { className: 'msc-nav-logo', href: p.home || '#', 'aria-label': 'MotorSpace' },
+        h('svg', { viewBox: '0 0 32 32', 'aria-hidden': true }, h('rect', { x: 2, y: 5, width: 28, height: 22, rx: 4 }), h('path', { d: 'M16 5v22M6 10v12M26 10v12M11 10v12M21 10v12' }), h('path', { d: 'M16 5l8 3v16l-8 3' })),
+        h('b', null, 'MOTORSPACE')),
+      h('nav', { className: 'msc-nav-links', 'aria-label': s.menu || 'Menu' },
+        h('span', { className: 'msc-nav-pill', 'aria-hidden': true }),
+        items.map(function (it, i) {
+          var l = it.link;
+          return h('a', { key: i, href: typeof l === 'string' ? l : '#', onClick: it.go ? function (e) { e.preventDefault(); it.go(); } : typeof l === 'function' ? function (e) { e.preventDefault(); l(); } : undefined }, it.label);
+        })),
+      h('div', { className: 'msc-nav-end' }, h(K.LangSwitch, { value: lang || 'pl', onChange: p.onLang })));
+  }
+  function CorridorHero(p) {
+    var lang = p.lang, s = K.copy[lang] || K.copy.pl, hostRef = React.useRef(null), heroRef = React.useRef(null), dockRef = React.useRef(null), api = React.useRef(null);
+    var labels = Object.assign({ details: s.details }, MSC_LABELS[lang] || MSC_LABELS.pl);
+    var items = corridorItems(lang), busy = React.useRef(false);
+    busy.current = !!p.leadOpen;
+    React.useEffect(function () {
+      api.current = window.MSCorridor.mount(hostRef.current, { items: items, labels: labels, heroEl: heroRef.current, dockEl: dockRef.current, auto: MSC_AUTO,
+        angle: MSC_ANGLE != null ? +MSC_ANGLE : undefined,
+        creditsUrl: MSC_BASE + 'photos.json', onInquiry: p.onInquiry, isBusy: function () { return busy.current; } });
+      return function () { api.current && api.current.destroy(); };
+    }, []);
+    React.useEffect(function () { if (api.current) api.current.update(items, labels); });
+    var pop = (s.chips || []).slice(0, 3);
+    return h('section', { className: 'kt kt-dark msc', 'data-nav-dark': '', 'aria-label': s.heroEyebrow },
+      h('div', { ref: hostRef, className: 'msc-host' }),
+      h('div', { ref: heroRef, className: 'msc-hero' },
+        h('h1', { className: 'msc-title' }, s.heroTitle.join(lang === 'zh' ? '' : ' ')),
+        h(MiniSearch, { lang: lang, onSearch: p.onSearch, formRef: dockRef }),
+        pop.length ? h('div', { className: 'msc-pop' }, s.popular + '：'.replace('：', lang === 'zh' ? '：' : ': '),
+          pop.map(function (c, i) { return h(React.Fragment, { key: c[0] }, i ? h('i', null, '·') : null, h('button', { type: 'button', onClick: function () { p.onSearch({ query: c[1], filters: {} }); } }, c[0])); })) : null));
+  }
+
+  // ---- wind tunnel (主人 2026-10-18: 「风洞用 B 版（车头朝右、镜面镀铬），放在进口流程和现车之间，上线前再换图」): wind.js ----
+  // the standalone prototype site/windtunnel/ as a section; Xiaomi's configurator renders, so the credit says so and
+  // the pictures have to be replaced before the site goes live
+  var MSW_TEXT = {
+    zh: { eyebrow: '风洞 · 碳纤维大尾翼', sub: ['鼠标移到车身上，光圈里是另一种颜色；点一下，整台车换成它。', '手指划过车身，光圈里是另一种颜色；轻点一下，整台车换成它。'],
+      credit: '照片：Daniel Lu（dllu），维基共享资源，CC BY-SA 4.0；已抠图、压暗车窗并改色，改色图同样按 CC BY-SA 4.0 授权。' },
+    pl: { eyebrow: 'Tunel aerodynamiczny · karbonowe skrzydło', sub: ['Przesuń kursor po karoserii — w świetle zobaczysz inny lakier. Kliknij, a cały samochód zmieni kolor.', 'Przeciągnij palcem po karoserii — w świetle zobaczysz inny lakier. Stuknij, a cały samochód zmieni kolor.'],
+      credit: 'Zdjęcie: Daniel Lu (dllu), Wikimedia Commons, CC BY-SA 4.0; wycięte, z przyciemnionymi szybami i zmienionym lakierem — przeróbki również na licencji CC BY-SA 4.0.' },
+    en: { eyebrow: 'Wind tunnel · carbon rear wing', sub: ['Move over the body — the light shows another paint. Click and the whole car takes it.', 'Drag a finger over the body — the light shows another paint. Tap and the whole car takes it.'],
+      credit: 'Photo: Daniel Lu (dllu), Wikimedia Commons, CC BY-SA 4.0; cut out, glass darkened and repainted — the derived images are CC BY-SA 4.0 too.' }
+  };
+  function WindBand(p) {
+    var t = MSW_TEXT[p.lang] || MSW_TEXT.pl, ref = React.useRef(null);
+    var fine = window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches;
+    React.useEffect(function () {
+      var api = window.MSWind ? window.MSWind.mount(ref.current, { base: MSC_BASE + '../windtunnel/', lang: p.lang }) : null;
+      return function () { api && api.destroy(); };
+    }, [p.lang]);
+    return h('section', { ref: ref, key: p.lang, className: 'kt kt-dark msw', 'data-nav-dark': '', 'aria-label': 'Xiaomi SU7 Ultra' },
+      h('div', { className: 'msw-head' },
+        h('p', { className: 'msw-eyebrow' }, t.eyebrow),
+        h('h2', null, 'Xiaomi SU7 Ultra'),
+        h('p', { className: 'msw-sub' }, t.sub[fine ? 0 : 1])),
+      h('div', { className: 'wt-stage' },
+        h('div', { className: 'wt-glow', 'aria-hidden': true }),
+        h('div', { className: 'wt-car' },
+          h('div', { className: 'wt-shadow', 'aria-hidden': true }),
+          h('div', { className: 'wt-refl' },
+            h('div', { className: 'wt-car-in' },
+              h('img', { className: 'wt-base', width: 1974, height: 600, alt: 'Xiaomi SU7 Ultra', decoding: 'async' }),
+              h('img', { className: 'wt-splash', alt: '', 'aria-hidden': true }),
+              h('img', { className: 'wt-lens', alt: '', 'aria-hidden': true }),
+              h('div', { className: 'wt-sheen', 'aria-hidden': true }),
+              h('div', { className: 'wt-sweep', 'aria-hidden': true }),
+              h('div', { className: 'wt-glint', 'aria-hidden': true }),
+              h('div', { className: 'wt-glint is-core', 'aria-hidden': true })))),
+        h('canvas', { className: 'wt-flow', 'aria-hidden': true })),
+      h('div', { className: 'msw-foot' },
+        h('div', { className: 'wt-paints', role: 'group' }),
+        h('p', { className: 'wt-readout', 'aria-live': 'polite' })),
+      h('p', { className: 'msw-credit' }, h('a', { href: 'https://commons.wikimedia.org/wiki/File:Xiaomi_SU7_Ultra_yellow_showroom_side_view_2026_dllu.jpg', target: '_blank', rel: 'noopener', style: { color: 'inherit', textDecorationColor: 'rgba(255,255,255,.35)' } }, t.credit)));
+  }
+
+  // ---- hand-over band (主人 2026-10-17: 这个地方有点空，加机器手臂和人碰手指的特效; 2026-10-18 moved under 现车): touch.js ----
+  var MST_TEXT = {"pl": {"eyebrow": "Ostatni krok", "title": ["Z fabryki w Chinach —", "prosto w Twoje ręce."], "sub": "Jesteśmy pomiędzy: zakup u źródła, inspekcja, odprawa celna i odbiór — wszystko po naszej stronie.", "hint": "Kliknij, aby wysłać impuls"}, "en": {"eyebrow": "The last step", "title": ["From the factory in China", "into your hands."], "sub": "We stand in between: sourcing, inspection, customs and handover are all on us.", "hint": "Click to send a pulse"}, "zh": {"eyebrow": "最后一步", "title": ["从中国车厂，", "到你手里。"], "sub": "我们在两头之间：源头采购、验车、清关、交付，都由我们来做。", "hint": "点一下，传一道光过去"}};
+  function TouchBand(p) {
+    var t = MST_TEXT[p.lang] || MST_TEXT.pl, ref = React.useRef(null);
+    React.useEffect(function () {
+      var api = window.MSTouch ? window.MSTouch.mount(ref.current, { base: MSC_BASE }) : null;
+      return function () { api && api.destroy(); };
+    }, []);
+    return h('section', { ref: ref, className: 'kt kt-dark mst', 'data-nav-dark': '', 'aria-label': t.title.join(' ') },
+      h('div', { className: 'mst-copy' },
+        h('p', { className: 'mst-eyebrow' }, t.eyebrow),
+        h('h2', { className: 'mst-title' }, h('span', null, t.title[0]), h('span', null, t.title[1])),
+        h('p', { className: 'mst-sub' }, t.sub)),
+      h('div', { className: 'mst-stage', 'aria-hidden': true }),
+      h('p', { className: 'mst-hint', 'aria-hidden': true }, t.hint));
+  }
+
+  // ---- a stock card that opens its car page: the photo and the name are the link, the buttons stay buttons ----
+  function StockLink(p) {
+    var c = p.car, href = carHref(c.id);
+    return h('div', { className: 'mfx-stocklink', id: 'mfx-stock-' + c.id },
+      h(K.StockCard, p),
+      href ? h('a', { className: 'mfx-stocklink-a', href: href, 'data-car-link': '#mfx-stock-' + c.id + ' .kt-car-photo', 'aria-label': c.brand + ' ' + c.model }) : null);
+  }
+  // ---- motion layer (motion.js): journey car, torch, tilt, stats, wordmark, car-page transitions ----
+  function MotionLayer() {
+    React.useEffect(function () {
+      var off = window.MSMotion ? window.MSMotion.init({ base: MSC_BASE, cut: MSC_CUT }) : null;
+      return function () { off && off(); };
+    }, []);
+    return null;
+  }
+
+  function Page() {
+    var l = React.useState(window.KT_LANG || 'pl'), lang = l[0], setLangState = l[1];
+    // on the built site each language has its own URL; in previews the switch just re-renders
+    function setLang(x) { var u = window.KT_LANG_URLS; if (u && u[x]) { location.href = u[x] + location.hash; } else setLangState(x); }
+    var ok = React.useState(0), openKey = ok[0], setOpenKey = ok[1];
+    var rootRef = React.useRef(null), casesRef = React.useRef(null);
+    K.motion.useReveal(rootRef);
+    K.useRates(); // NBP table A once per day; prices re-render when it arrives
+    function search(x) {
+      var q = new URLSearchParams(), f = x.filters || {};
+      if (x.query) q.set('q', x.query);
+      if (f.status && f.status[0]) q.set('status', f.status[0]);
+      if (f.drive && f.drive[0]) q.set('drive', f.drive[0]);
+      if (f.body && f.body[0]) q.set('body', f.body[0]);
+      if (f.priceMax) q.set('max', f.priceMax);
+      try { sessionStorage.setItem('kt-search', q.toString()); } catch (e) {}
+      location.href = OFFERS + '?' + q.toString();
+    }
+    // every call to action opens the same lead form, pre-filled with the car it came from
+    var lf = React.useState(null), lead = lf[0], setLead = lf[1];
+    function deposit(o) { setLead({ kind: 'deposit', summary: K.leadSummary(o, lang) }); }
+    function reserve(c) { setLead({ kind: 'reserve', summary: K.leadSummary({ car: c }, lang) }); }
+    function testDrive(c) { setLead({ kind: 'testdrive', summary: K.leadSummary({ car: c }, lang) }); }
+    var cs = React.useState(null), calc = cs[0], setCalc = cs[1];
+    function quote() { setCalc({ car: null }); }
+    function calcOrder(v, r, car) { setCalc(null); setLead({ kind: 'quote', summary: K.calcSummary(v, r, car, lang) }); }
+    var s = K.copy[lang];
+    return h(React.Fragment, null,
+      h(React.Fragment, null,
+        h('div', { ref: rootRef, lang: lang },
+          h(GaleriaNav, { lang: lang, onLang: setLang, onQuote: quote, home: '#', links: ['#zamow', '#od-reki', '#o-nas', '#gwarancja', function () { setLead({ kind: 'inquiry', summary: '' }); }] }),
+          // 1 · search first, like the reference site, on a stage where container doors open
+          h(CorridorHero, { lang: lang, onSearch: search, leadOpen: !!lead, onInquiry: function (it) { setLead({ kind: 'inquiry', summary: it.summary }); } }),
+          h('div', { className: 'wrap' },
+            // 2 · the cases: click one and it zooms open right there, with trims, colours and the landed price
+            h('div', { className: 'sec sec-first', id: 'zamow', ref: casesRef },
+              h('div', { 'data-reveal': '' }, h(K.SectionHeader, { kind: 'order', index: '01', lang: lang, action: false })),
+              h(K.CarBoxGarage, { lang: lang, openIndex: 0, openKey: openKey, onDeposit: deposit, onCalc: quote })),
+            // 3 · China → Poland, whichever way the car travels
+            h('div', { id: 'jak-to-dziala' }, h(K.ImportJourney, { lang: lang, top: 60, still: full })),
+            h(WindBand, { lang: lang }),
+            // 4 · cars already in Poland
+            h('div', { className: 'sec', id: 'od-reki' },
+              h('div', { 'data-reveal': '' }, h(K.SectionHeader, { kind: 'stock', index: '02', lang: lang, href: OFFERS + '?status=stock' })),
+              h('div', { className: 'grid3' }, K.SAMPLE_STOCK.map(function (x, i) { return h('div', { key: x.id, 'data-reveal': '', style: { '--i': i } }, h(StockLink, { car: x, lang: lang, onReserve: reserve, onTestDrive: testDrive })); }))),
+            h(TouchBand, { lang: lang })),
+          // 5 · who we are (a strip of featured models with real photos goes above this later)
+          h('div', { className: 'wrap' },
+            h('section', { className: 'kt-about', id: 'o-nas', 'aria-label': s.about },
+              h('div', { className: 'kt-about-head' },
+                h('span', { className: 'kt-label', 'data-reveal': '' }, s.about),
+                h(K.ScrollWords, { key: lang, lang: lang, text: s.aboutText })),
+              h('div', { 'data-reveal': '' }, h(K.StatRow, { key: lang, lang: lang })),
+              s.sampleNote ? h('p', { className: 'kt-about-note' }, s.sampleNote) : null,
+              h('div', null,
+                h('div', { className: 'kt-about-sub', 'data-reveal': '' }, h('h3', null, s.officesTitle)),
+                h(K.OfficeClocks, { lang: lang })),
+              h('div', null,
+                h('div', { className: 'kt-about-sub', 'data-reveal': '' }, h('h3', null, s.whyTitle)),
+                h(K.WhyUs, { lang: lang }))),
+            // 6 · the questions every buyer asks, answered in place
+            h('div', { className: 'sec' }, h(GaleriaFAQ, { lang: lang })),
+            h('div', { className: 'sec sec-pair' },
+              h('div', { 'data-reveal': '', id: 'gwarancja', style: { scrollMarginTop: 84 } }, h(K.ReservedSection, { kind: 'aftersales', index: '03', lang: lang })),
+              h('div', { 'data-reveal': '' }, h(K.ReservedSection, { kind: 'privacy', index: '04', lang: lang }))),
+            h('div', { className: 'gap' })),
+          h(K.Footer, { lang: lang, onLang: setLang }),
+          h(MotionLayer, null),
+          // phones: calculator + a question, once the hero is behind you
+          h(K.MobileBar, { lang: lang, after: 560, onCalc: quote, onAsk: function () { setLead({ kind: 'inquiry', summary: '' }); } }),
+          h(K.CalcDrawer, { open: !!calc, car: calc && calc.car, lang: lang, onClose: function () { setCalc(null); }, onOrder: calcOrder }),
+          h(K.LeadForm, { open: !!lead, context: lead || {}, lang: lang, onClose: function () { setLead(null); } }))));
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(h(Page));
+
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MotorSpace · Auto z Chin na zamówienie</title>
+<meta name="description" content="Samochody z Chin prosto od producentów i dealerów: sami kupujemy, sprawdzamy i odprawiamy auto w Polsce. Pełna cena z cłem i VAT od razu, raport z niezależnej inspekcji po polsku.">
+<link rel="canonical" href="https://motorspace.example/index.html">
+<link rel="alternate" hreflang="pl" href="https://motorspace.example/index.html">
+<link rel="alternate" hreflang="en" href="https://motorspace.example/en/index.html">
+<link rel="alternate" hreflang="zh" href="https://motorspace.example/zh/index.html">
+<link rel="alternate" hreflang="x-default" href="https://motorspace.example/index.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MotorSpace">
+<meta property="og:title" content="MotorSpace · Auto z Chin na zamówienie">
+<meta property="og:description" content="Samochody z Chin prosto od producentów i dealerów: sami kupujemy, sprawdzamy i odprawiamy auto w Polsce. Pełna cena z cłem i VAT od razu, raport z niezależnej inspekcji po polsku.">
+<meta property="og:url" content="https://motorspace.example/index.html">
+<meta property="og:image" content="https://motorspace.example/assets/brand/og-pl.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="pl_PL">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0b0b0c">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+<link rel="stylesheet" href="kontener.css?v=644f994a">
+<script>(function(){var d=document.documentElement,t='dark';try{var m=/[?&]theme=(light|dark|auto)/.exec(location.search);if(m){t=m[1];localStorage.setItem('kt-theme',t);}else{t=localStorage.getItem('kt-theme')||'dark';}}catch(e){}if(t==='auto'){d.removeAttribute('data-theme');}else{d.setAttribute('data-theme',t);}})();</script>
+<style>
+  html { scroll-padding-top: 84px; background: var(--paper); }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+  
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+  .wrap { padding: 0 48px; }
+  .sec { margin-top: 140px; display: grid; gap: 32px; scroll-margin-top: 84px; }
+  .sec-first { margin-top: 96px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+  .grid3 > * { min-width: 0; overflow-wrap: break-word; }
+  .grid3 .kt-stock-actions { flex-wrap: wrap; }
+  .grid3 .kt-stock-actions .kt-btn { min-width: max-content; }
+  .sec-pair { grid-template-columns: 1fr 1fr; gap: 24px; }
+  .sec-pair > div { display: grid; }
+  .gap { height: 120px; }
+  @media (max-width: 1040px) { .grid3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 760px) { .wrap { padding: 0 16px; } .grid3, .sec-pair { grid-template-columns: 1fr; } .sec { margin-top: 100px; } .sec-first { margin-top: 64px; } }
+
+</style>
+<script src="vendor/react.production.min.js"></script>
+<script src="vendor/react-dom.production.min.js"></script>
+<script src="kontener-data.js?v=644f994a"></script>
+<script src="kontener.js?v=644f994a"></script>
+<script>window.KT_DOC = "home"; window.KT_PRIVACY_URL = "polityka-prywatnosci.html"; window.KT_LEAD_URL = ""; window.KT_LEAD_EXTRA = {};</script>
+<script>window.KT_LOCAL_FONTS = true; window.KT_LANG = "pl"; window.KT_LANG_URLS = {"pl": "index.html", "en": "en/index.html", "zh": "zh/index.html"}; window.KT_ASSETS = 'assets/'; window.KT_HOME_URL = 'index.html'; window.KT_OFFERS_URL = 'oferty.html'; window.KT_TRACK_URL = 'sledzenie.html';</script>
+
+</head>
+<body>
+<div id="root"></div>
+<script>
+
+  var K = window.Kontener, h = React.createElement;
+  var full = /full/.test(location.search);
+  var OFFERS = window.KT_OFFERS_URL || '../OffersPage/preview.html';
+  function Page() {
+    var l = React.useState(window.KT_LANG || 'pl'), lang = l[0], setLangState = l[1];
+    // on the built site each language has its own URL; in previews the switch just re-renders
+    function setLang(x) { var u = window.KT_LANG_URLS; if (u && u[x]) { location.href = u[x] + location.hash; } else setLangState(x); }
+    var ok = React.useState(0), openKey = ok[0], setOpenKey = ok[1];
+    var rootRef = React.useRef(null), casesRef = React.useRef(null);
+    K.motion.useReveal(rootRef);
+    K.useRates(); // NBP table A once per day; prices re-render when it arrives
+    function search(x) {
+      var q = new URLSearchParams(), f = x.filters || {};
+      if (x.query) q.set('q', x.query);
+      if (f.status && f.status[0]) q.set('status', f.status[0]);
+      if (f.drive && f.drive[0]) q.set('drive', f.drive[0]);
+      if (f.body && f.body[0]) q.set('body', f.body[0]);
+      if (f.priceMax) q.set('max', f.priceMax);
+      try { sessionStorage.setItem('kt-search', q.toString()); } catch (e) {}
+      location.href = OFFERS + '?' + q.toString();
+    }
+    // every call to action opens the same lead form, pre-filled with the car it came from
+    var lf = React.useState(null), lead = lf[0], setLead = lf[1];
+    function deposit(o) { setLead({ kind: 'deposit', summary: K.leadSummary(o, lang) }); }
+    function reserve(c) { setLead({ kind: 'reserve', summary: K.leadSummary({ car: c }, lang) }); }
+    function testDrive(c) { setLead({ kind: 'testdrive', summary: K.leadSummary({ car: c }, lang) }); }
+    var cs = React.useState(null), calc = cs[0], setCalc = cs[1];
+    function quote() { setCalc({ car: null }); }
+    function calcOrder(v, r, car) { setCalc(null); setLead({ kind: 'quote', summary: K.calcSummary(v, r, car, lang) }); }
+    var s = K.copy[lang];
+    return h(React.Fragment, null,
+      h(React.Fragment, null,
+        h('div', { ref: rootRef, lang: lang },
+          h(K.NavBar, { lang: lang, onLang: setLang, onQuote: quote, home: '#', links: ['#zamow', '#od-reki', '#o-nas', '#gwarancja', function () { setLead({ kind: 'inquiry', summary: '' }); }] }),
+          // 1 · search first, like the reference site, on a stage where container doors open
+          h(K.HomeHero, { lang: lang, onSearch: search }),
+          h('div', { className: 'wrap' },
+            // 2 · the cases: click one and it zooms open right there, with trims, colours and the landed price
+            h('div', { className: 'sec sec-first', id: 'zamow', ref: casesRef },
+              h('div', { 'data-reveal': '' }, h(K.SectionHeader, { kind: 'order', index: '01', lang: lang, action: false })),
+              h(K.CarBoxGarage, { lang: lang, openIndex: 0, openKey: openKey, onDeposit: deposit, onCalc: quote })),
+            // 3 · China → Poland, whichever way the car travels
+            h('div', { id: 'jak-to-dziala' }, h(K.ImportJourney, { lang: lang, top: 60, still: full })),
+            // 4 · cars already in Poland
+            h('div', { className: 'sec', id: 'od-reki' },
+              h('div', { 'data-reveal': '' }, h(K.SectionHeader, { kind: 'stock', index: '02', lang: lang, href: OFFERS + '?status=stock' })),
+              h('div', { className: 'grid3' }, K.SAMPLE_STOCK.map(function (x, i) { return h('div', { key: x.id, 'data-reveal': '', style: { '--i': i } }, h(K.StockCard, { car: x, lang: lang, onReserve: reserve, onTestDrive: testDrive })); })))),
+          // 5 · who we are (a strip of featured models with real photos goes above this later)
+          h('div', { className: 'wrap' },
+            h('section', { className: 'kt-about', id: 'o-nas', 'aria-label': s.about },
+              h('div', { className: 'kt-about-head' },
+                h('span', { className: 'kt-label', 'data-reveal': '' }, s.about),
+                h(K.ScrollWords, { key: lang, lang: lang, text: s.aboutText })),
+              h('div', { 'data-reveal': '' }, h(K.StatRow, { key: lang, lang: lang })),
+              s.sampleNote ? h('p', { className: 'kt-about-note' }, s.sampleNote) : null,
+              h('div', null,
+                h('div', { className: 'kt-about-sub', 'data-reveal': '' }, h('h3', null, s.officesTitle)),
+                h(K.OfficeClocks, { lang: lang })),
+              h('div', null,
+                h('div', { className: 'kt-about-sub', 'data-reveal': '' }, h('h3', null, s.whyTitle)),
+                h(K.WhyUs, { lang: lang }))),
+            // 6 · the questions every buyer asks, answered in place
+            h('div', { className: 'sec' }, h(K.FAQ, { lang: lang })),
+            h('div', { className: 'sec sec-pair' },
+              h('div', { 'data-reveal': '', id: 'gwarancja', style: { scrollMarginTop: 84 } }, h(K.ReservedSection, { kind: 'aftersales', index: '03', lang: lang })),
+              h('div', { 'data-reveal': '' }, h(K.ReservedSection, { kind: 'privacy', index: '04', lang: lang }))),
+            h('div', { className: 'gap' })),
+          h(K.Footer, { lang: lang, onLang: setLang }),
+          // phones: calculator + a question, once the hero is behind you
+          h(K.MobileBar, { lang: lang, after: 560, onCalc: quote, onAsk: function () { setLead({ kind: 'inquiry', summary: '' }); } }),
+          h(K.CalcDrawer, { open: !!calc, car: calc && calc.car, lang: lang, onClose: function () { setCalc(null); }, onOrder: calcOrder }),
+          h(K.LeadForm, { open: !!lead, context: lead || {}, lang: lang, onClose: function () { setLead(null); } }))));
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(h(Page));
+
+</script>
+</body>
+</html>

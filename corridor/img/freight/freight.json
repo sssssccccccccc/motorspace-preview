@@ -1,0 +1,16 @@
+{
+ "ppm": 15,
+ "terrain": {
+  "w": 2400,
+  "h": 480
+ },
+ "train": {
+  "w": 2955,
+  "h": 150
+ },
+ "mist": {
+  "w": 1600,
+  "h": 320
+ },
+ "note": "ground 160 x 32 m with the track along the middle; the train image is the train plus 1 m, nose at the right"
+}
