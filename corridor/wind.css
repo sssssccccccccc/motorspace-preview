@@ -42,10 +42,10 @@
 /* a click floods the car with the new paint from that point */
 .msw .wt-splash { -webkit-mask-image: radial-gradient(circle var(--sr) at var(--sx) var(--sy), #000 0, #000 80%, transparent 100%);
   mask-image: radial-gradient(circle var(--sr) at var(--sx) var(--sy), #000 0, #000 80%, transparent 100%); }
-/* clear coat: light only ever lands on the paint (su7u-gloss.webp is the paint's outline) — a studio light riding
+/* clear coat: light only ever lands on the paint (su7r-gloss.webp is the paint's outline) — a studio light riding
    with the lens, and a slow sweep across the panels every few seconds */
 .msw .wt-sheen, .msw .wt-sweep, .msw .wt-glint { mix-blend-mode: screen;
-  -webkit-mask: url(../windtunnel/img/su7u-gloss.webp) 0 0 / 100% 100% no-repeat; mask: url(../windtunnel/img/su7u-gloss.webp) 0 0 / 100% 100% no-repeat; }
+  -webkit-mask: url(../windtunnel/img/su7r-gloss.webp) 0 0 / 100% 100% no-repeat; mask: url(../windtunnel/img/su7r-gloss.webp) 0 0 / 100% 100% no-repeat; }
 .msw .wt-sheen { opacity: var(--lo);
   background: radial-gradient(calc(var(--lr) * .7) calc(var(--lr) * .5) at var(--lx) var(--ly), rgba(255, 255, 255, .26), rgba(255, 255, 255, .07) 50%, transparent 74%); }
 .msw .wt-sweep { background: linear-gradient(100deg, transparent 0 42%, rgba(255, 255, 255, .05) 46%, rgba(255, 255, 255, .3) 50%, rgba(255, 255, 255, .05) 54%, transparent 58% 100%) 0 0 / 300% 100% no-repeat;
@@ -68,15 +68,15 @@
   background: linear-gradient(103deg, transparent 0 46.5%, rgba(255, 255, 255, .62) 46.68%, rgba(255, 255, 255, .62) 46.78%, transparent 46.95%,
       transparent 51.42%, rgba(255, 255, 255, .45) 51.5%, transparent 51.6% 100%) 0 0 / 300% 100% no-repeat;
   background-position: var(--gp) 0;
-  -webkit-mask: url(../windtunnel/img/su7u-gloss.webp) 0 0 / 100% 100% no-repeat, linear-gradient(#000 25%, rgba(0, 0, 0, .3) 78%);
+  -webkit-mask: url(../windtunnel/img/su7r-gloss.webp) 0 0 / 100% 100% no-repeat, linear-gradient(#000 25%, rgba(0, 0, 0, .3) 78%);
   -webkit-mask-composite: source-in;
-  mask: url(../windtunnel/img/su7u-gloss.webp) 0 0 / 100% 100% no-repeat, linear-gradient(#000 25%, rgba(0, 0, 0, .3) 78%);
+  mask: url(../windtunnel/img/su7r-gloss.webp) 0 0 / 100% 100% no-repeat, linear-gradient(#000 25%, rgba(0, 0, 0, .3) 78%);
   mask-composite: intersect; }
 .msw .wt-car-in.is-chrome .wt-glint { opacity: 1; }
 .msw .wt-car-in.is-chrome-lens .wt-glint { opacity: var(--lo);
-  -webkit-mask: url(../windtunnel/img/su7u-gloss.webp) 0 0 / 100% 100% no-repeat, radial-gradient(var(--lr) calc(var(--lr) * .86) at var(--lx) var(--ly), #000 0, #000 40%, transparent 88%);
+  -webkit-mask: url(../windtunnel/img/su7r-gloss.webp) 0 0 / 100% 100% no-repeat, radial-gradient(var(--lr) calc(var(--lr) * .86) at var(--lx) var(--ly), #000 0, #000 40%, transparent 88%);
   -webkit-mask-composite: source-in;
-  mask: url(../windtunnel/img/su7u-gloss.webp) 0 0 / 100% 100% no-repeat, radial-gradient(var(--lr) calc(var(--lr) * .86) at var(--lx) var(--ly), #000 0, #000 40%, transparent 88%);
+  mask: url(../windtunnel/img/su7r-gloss.webp) 0 0 / 100% 100% no-repeat, radial-gradient(var(--lr) calc(var(--lr) * .86) at var(--lx) var(--ly), #000 0, #000 40%, transparent 88%);
   mask-composite: intersect; }
 
 /* paints */
