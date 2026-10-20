@@ -32,6 +32,8 @@
 <link rel="stylesheet" href="corridor/texture.css?v=b91ead7c">
 <link rel="stylesheet" href="corridor/motion.css?v=0f369f55">
 <link rel="stylesheet" href="corridor/wind.css?v=8c9a8278">
+<link rel="stylesheet" href="corridor/report.css?v=ae830a7b">
+<link rel="stylesheet" href="corridor/flow.css?v=84817739">
 <script>(function(){var d=document.documentElement,t='dark';try{var m=/[?&]theme=(light|dark|auto)/.exec(location.search);if(m){t=m[1];localStorage.setItem('kt-theme',t);}else{t=localStorage.getItem('kt-theme')||'dark';}}catch(e){}if(t==='auto'){d.removeAttribute('data-theme');}else{d.setAttribute('data-theme',t);}})();</script>
 <style>
   html { scroll-padding-top: 84px; background: var(--paper); }
@@ -362,6 +364,106 @@
       h('p', { className: 'msw-credit' }, t.credit));
   }
 
+  // ---- inspection report band (主人 2026-10-20: 瓜子检测报告「放到网站哪个地方最好…还有一个波兰版本…说明所有的车都会有
+  // 独立第三方报告」): right after the journey, whose last step already promises 「附检测报告」. The sample is a real report
+  // (Denza Z9 GT, Guazi, 2026-09-18): our Polish version and the original with the client's name and plate removed
+  // (dev/reports/). report.css ----
+  var MSR_DIR = MSC_BASE + '../raporty/';
+  var MSR_TEXT = {
+    zh: { eyebrow: '第三方检测', title: ['每一台车，', '都有第三方检测报告。'],
+      body: '车在中国发运之前，由一家跟我们、跟卖家都没有关系的检测机构实地验车：车身结构、火烧、泡水三大项，逐项检查、拍照记录。报告原件和波兰语译本，随车交到你手里。',
+      stats: [['59', '项车身结构'], ['24', '项火烧痕迹'], ['43', '项泡水痕迹']],
+      sample: '样本：Denza Z9 GT · 2026 年 9 月 18 日检测 · 126 项全部通过', pl: '波兰语报告', zh: '中文原件',
+      note: '原件可扫码到检测机构核验真伪。样本已隐去委托人姓名和车牌号。', paperPl: '波兰语译本', paperZh: '检测原件' },
+    pl: { eyebrow: 'Niezależna inspekcja', title: ['Każde auto', 'ma niezależny raport.'],
+      body: 'Zanim auto wyjedzie z Chin, sprawdza je na miejscu firma inspekcyjna niezwiązana ani z nami, ani ze sprzedawcą: konstrukcję nadwozia, ślady pożaru i zalania – punkt po punkcie, ze zdjęciami. Oryginał raportu i tłumaczenie na polski dostajesz razem z autem.',
+      stats: [['59', 'punktów konstrukcji'], ['24', 'punkty: ślady pożaru'], ['43', 'punkty: ślady zalania']],
+      sample: 'Przykład: Denza Z9 GT · inspekcja 18.09.2026 · 126 punktów bez zastrzeżeń', pl: 'Raport po polsku', zh: 'Oryginał po chińsku',
+      note: 'Oryginał zweryfikujesz kodem QR w systemie firmy inspekcyjnej. W przykładzie ukryliśmy dane zleceniodawcy i numer rejestracyjny.', paperPl: 'Tłumaczenie', paperZh: 'Oryginał' },
+    en: { eyebrow: 'Independent inspection', title: ['Every car gets', 'a third-party report.'],
+      body: 'Before a car leaves China, an inspection company with no ties to us or to the seller checks it on site: the body structure, fire and flood damage, point by point, with photos. You get the original report and a Polish translation with the car.',
+      stats: [['59', 'structural points'], ['24', 'fire-damage points'], ['43', 'flood-damage points']],
+      sample: 'Sample: Denza Z9 GT · inspected 18 Sep 2026 · all 126 points passed', pl: 'Polish report', zh: 'Chinese original',
+      note: 'The original can be verified by QR code with the inspection company. The client’s name and the plate number are hidden in the sample.', paperPl: 'Polish', paperZh: 'Original' }
+  };
+  var MSR_DOC = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.8h5.2L12.5 5v9.2H4z M9 2v3.3h3.3 M6 8.2h4.5 M6 10.7h4.5"/></svg>';
+  function ReportBand(p) {
+    var t = MSR_TEXT[p.lang] || MSR_TEXT.pl;
+    var pl = MSR_DIR + 'denza-z9-gt-raport-pl.pdf', zh = MSR_DIR + 'denza-z9-gt-raport-oryginal-zh.pdf';
+    function paper(cls, href, img, tag, alt) {
+      return h('a', { className: 'msr-paper ' + cls, href: href, target: '_blank', rel: 'noopener', 'aria-label': alt },
+        h('img', { src: MSR_DIR + img, alt: '', width: 720, height: 1018, loading: 'lazy', decoding: 'async' }),
+        h('span', { className: 'msr-tag' }, tag));
+    }
+    function btn(cls, href, label, size) {
+      return h('a', { className: 'msr-btn ' + cls, href: href, target: '_blank', rel: 'noopener' },
+        h('i', { dangerouslySetInnerHTML: { __html: MSR_DOC } }), h('span', null, label), h('small', null, 'PDF · ' + size));
+    }
+    return h('section', { id: 'raport', className: 'msr', 'data-reveal': '', 'aria-label': t.title.join(' ') },
+      h('div', { className: 'msr-text' },
+        h('p', { className: 'msr-eyebrow' }, t.eyebrow),
+        h('h2', null, h('span', null, t.title[0]), ' ', h('span', null, t.title[1])),
+        h('p', { className: 'msr-body' }, t.body),
+        h('ul', { className: 'msr-stats' }, t.stats.map(function (s) {
+          return h('li', { key: s[0] }, h('b', null, s[0]), h('span', null, s[1]));
+        })),
+        h('p', { className: 'msr-note' }, t.note)),
+      h('div', { className: 'msr-sample' },
+        h('div', { className: 'msr-desk' },
+          paper('is-zh', zh, 'denza-z9-gt-certyfikat.webp', t.paperZh, t.zh + ' (PDF)'),
+          paper('is-pl', pl, 'denza-z9-gt-raport-pl.webp', t.paperPl, t.pl + ' (PDF)')),
+        h('p', { className: 'msr-caption' }, t.sample),
+        h('div', { className: 'msr-btns' }, btn('is-main', pl, t.pl, '2 MB'), btn('', zh, t.zh, '9 MB'))));
+  }
+
+  // ---- ordering flowchart (主人 2026-10-20: 「改变了之后我们也要放一个流程图在我们的网站上」), under the journey.
+  // 主人 2026-10-20 on the first, tall version: 「不要站的太长了，就非常影响我们整个网站的美观」: so it is a board of four phase
+  // columns side by side, about one screen high; the buyer's four steps are the light cards, ours plain; what the buyer
+  // receives is one small line under our step. Phones: the four columns slide sideways. flow.css ----
+  var MSF_TEXT = {"zh": {"eyebrow": "订车流程", "count": "11 步", "title": ["你只做四件事，", "其余交给我们。"], "sub": "从签合同到提车，通常 12–16 周。每一步谁来做、什么时候付钱、你会收到什么，都在下面。", "swipe": "左右滑动，看四个阶段", "lanes": ["你做的", "我们做的"], "get": "你收到", "phases": ["选车签约", "中国验车与出口", "运输与清关", "上牌与交车"], "steps": [{"who": "you", "title": "选车", "text": "在网站上选车型、版本和颜色；没找到想要的车，告诉我们你要什么。"}, {"who": "us", "title": "报价", "text": "报波兰落地价：车价、运费、保险、关税、消费税、增值税、认证和上牌费，逐项列清。", "get": "报价单 PDF"}, {"who": "you", "title": "签合同，付定金", "money": "30%", "text": "签波兰语合同，把车价的 30% 转到我们波兰公司的账户，我们开发票。从这时起价格固定不变。"}, {"who": "us", "title": "中国验车", "text": "独立检测机构到现场验车：车身结构、火烧、泡水，逐项检查、拍照记录。", "get": "检测报告原件和波兰语译本", "link": ["看样本报告", "#raport"]}, {"who": "us", "title": "买车、出口", "text": "我们在中国买下车，办国内注销和出口报关。电动车和插混随车配欧标充电转换头。"}, {"who": "us", "title": "海运到欧洲", "text": "集装箱海运，全程保险。", "get": "订单号和追踪链接", "link": ["怎么追踪", "#track"]}, {"who": "you", "title": "车到港，付尾款", "money": "70%", "text": "车到达欧洲港口后，你支付其余 70%。"}, {"who": "us", "title": "波兰清关", "text": "我们向海关申报，缴关税、消费税和增值税。", "get": "海关单（SAD）和消费税缴纳证明"}, {"who": "us", "title": "认证和上牌", "text": "单车认证（有欧盟合格证的车不用做）、宣誓翻译、车检、上牌。也可以你自己办。", "get": "行驶证和车牌"}, {"who": "you", "title": "提车", "text": "签交车验收单，拿全套文件和钥匙。上路前记得买交强险（OC）。"}, {"who": "us", "title": "售后", "text": "在合作维修点保养维修。贴车衣、防腐这类是可选服务，另外报价。"}]}, "pl": {"eyebrow": "Zamówienie krok po kroku", "count": "11 kroków", "title": ["Ty robisz cztery rzeczy.", "Resztą zajmujemy się my."], "sub": "Od podpisania umowy do odbioru mija zwykle 12–16 tygodni. Tu widać, kto robi każdy krok, kiedy płacisz i co od nas dostajesz.", "swipe": "Przesuń w bok, aby zobaczyć cztery etapy", "lanes": ["Ty robisz", "My robimy"], "get": "Dostajesz", "phases": ["Wybór i umowa", "Inspekcja i eksport", "Transport i odprawa", "Rejestracja i odbiór"], "steps": [{"who": "you", "title": "Wybierasz auto", "text": "Model, wersję i kolor wybierasz na stronie. Nie ma tam auta, którego szukasz? Napisz, czego potrzebujesz."}, {"who": "us", "title": "Wycena", "text": "Cena z dostawą do Polski: auto, transport, ubezpieczenie, cło, akcyza, VAT, homologacja i rejestracja – każda pozycja osobno.", "get": "Wycenę w PDF"}, {"who": "you", "title": "Umowa i pierwsza wpłata", "money": "30%", "text": "Podpisujesz umowę po polsku i wpłacasz 30% ceny na konto polskiej spółki, na fakturę. Od tej chwili cena się nie zmienia."}, {"who": "us", "title": "Inspekcja w Chinach", "text": "Niezależna firma sprawdza auto na miejscu: konstrukcję nadwozia oraz ślady pożaru i zalania, punkt po punkcie, ze zdjęciami.", "get": "Raport i jego tłumaczenie na polski", "link": ["Zobacz przykładowy raport", "#raport"]}, {"who": "us", "title": "Zakup i eksport", "text": "Kupujemy auto, wyrejestrowujemy je w Chinach i przeprowadzamy odprawę eksportową. Auta elektryczne i hybrydy plug-in dostają adapter do europejskich ładowarek."}, {"who": "us", "title": "Transport do Europy", "text": "Kontenerem drogą morską, z ubezpieczeniem na całą trasę.", "get": "Numer zamówienia i link do śledzenia", "link": ["Jak działa śledzenie", "#track"]}, {"who": "you", "title": "Auto w porcie, reszta płatności", "money": "70%", "text": "Gdy auto dotrze do portu w Europie, wpłacasz pozostałe 70% ceny."}, {"who": "us", "title": "Odprawa celna w Polsce", "text": "Zgłaszamy auto w urzędzie celnym i płacimy cło, akcyzę i VAT.", "get": "Dokument SAD i potwierdzenie zapłaty akcyzy"}, {"who": "us", "title": "Homologacja i rejestracja", "text": "Dopuszczenie jednostkowe (niepotrzebne, gdy auto ma świadectwo zgodności WE), tłumaczenia przysięgłe, badanie techniczne i rejestracja. Możesz też załatwić to sam.", "get": "Dowód rejestracyjny i tablice"}, {"who": "you", "title": "Odbierasz auto", "text": "Podpisujesz protokół odbioru, dostajesz komplet dokumentów i kluczyki. Przed wyjazdem na drogę wykup OC."}, {"who": "us", "title": "Serwis", "text": "Przeglądy i naprawy w warsztatach partnerskich. Folia ochronna czy zabezpieczenie antykorozyjne to usługi dodatkowe, wyceniane osobno."}]}, "en": {"eyebrow": "Ordering, step by step", "count": "11 steps", "title": ["You do four things.", "We handle the rest."], "sub": "From signing to collection usually takes 12–16 weeks. Here is who does each step, when you pay and what you get from us.", "swipe": "Swipe sideways for all four stages", "lanes": ["You do", "We do"], "get": "You get", "phases": ["Choice and contract", "Inspection and export", "Shipping and customs", "Registration and handover"], "steps": [{"who": "you", "title": "Choose your car", "text": "Pick the model, trim and colour on the site. Not there? Tell us what you are looking for."}, {"who": "us", "title": "Quote", "text": "A price delivered to Poland: car, freight, insurance, duty, excise, VAT, homologation and registration, each on its own line.", "get": "A PDF quote"}, {"who": "you", "title": "Contract and first payment", "money": "30%", "text": "Sign the contract in Polish and pay 30% of the price to our Polish company account, with an invoice. From then on the price is fixed."}, {"who": "us", "title": "Inspection in China", "text": "An independent company checks the car on site: the body structure and any sign of fire or flood damage, point by point, with photos.", "get": "The report and its Polish translation", "link": ["See a sample report", "#raport"]}, {"who": "us", "title": "Purchase and export", "text": "We buy the car, deregister it in China and clear it for export. EVs and plug-in hybrids come with an adapter for European chargers."}, {"who": "us", "title": "Shipping to Europe", "text": "By container ship, insured all the way.", "get": "Your order number and a tracking link", "link": ["How tracking works", "#track"]}, {"who": "you", "title": "At the port, the rest", "money": "70%", "text": "Once the car reaches the port in Europe, you pay the remaining 70%."}, {"who": "us", "title": "Customs in Poland", "text": "We declare the car and pay the duty, excise and VAT.", "get": "The SAD customs document and proof of excise"}, {"who": "us", "title": "Homologation and registration", "text": "Individual approval (not needed if the car has an EU certificate of conformity), sworn translations, the technical inspection and registration. You can also do this yourself.", "get": "Registration certificate and plates"}, {"who": "you", "title": "Collect your car", "text": "Sign the handover protocol and get the full set of papers and the keys. Buy third-party (OC) insurance before you drive off."}, {"who": "us", "title": "Service", "text": "Maintenance and repairs at partner workshops. Paint film or rust protection are optional extras, quoted separately."}]}};
+  var MSF_PHASE_AT = [0, 3, 5, 8, 11];   // the first step of each phase (and the end)
+  function OrderFlow(p) {
+    var t = MSF_TEXT[p.lang] || MSF_TEXT.pl, ons = React.useState(0), on = ons[0], setOn = ons[1];
+    var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function go(e, href) {
+      e.preventDefault();
+      if (href === '#track') { mscGoTrack(true); return; }
+      var el = document.querySelector(href);
+      if (el) el.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+    }
+    function step(s, i) {
+      var you = s.who === 'you';
+      return h('li', { key: i, className: 'msf-step ' + (you ? 'is-you' : 'is-us') },
+        h('span', { className: 'msf-node', 'aria-hidden': true }, i + 1),
+        h('div', { className: 'msf-body' },
+          h('h3', null, s.money ? h('b', { className: 'msf-money' }, s.money) : null, s.title),
+          h('p', null, s.text),
+          s.get ? h('p', { className: 'msf-get' }, h('i', { dangerouslySetInnerHTML: { __html: MSR_DOC } }), h('span', null, t.get + (p.lang === 'zh' ? '：' : ': ')), s.get) : null,
+          s.link ? h('a', { className: 'msf-link', href: s.link[1], onClick: function (e) { go(e, s.link[1]); } }, s.link[0], h('span', { 'aria-hidden': true }, '→')) : null));
+    }
+    return h('section', { id: 'przebieg', className: 'msf', 'aria-label': t.title.join(' ') },
+      h('div', { className: 'msf-head', 'data-reveal': '' },
+        h('div', null,
+          h('p', { className: 'msf-eyebrow' }, t.eyebrow, h('span', null, t.count)),
+          h('h2', null, h('span', null, t.title[0]), p.lang === 'zh' ? '' : ' ', h('span', null, t.title[1]))),
+        h('div', { className: 'msf-side' },
+          h('p', { className: 'msf-sub' }, t.sub),
+          h('p', { className: 'msf-legend' }, h('span', { className: 'is-you' }, h('i', null), t.lanes[0]), h('span', { className: 'is-us' }, h('i', null), t.lanes[1])))),
+      // phones: one phase at a time, picked here (主人 2026-10-20: the sideways slide 「手机那个不行」)
+      h('div', { className: 'msf-tabs', role: 'tablist', 'aria-label': t.eyebrow },
+        t.phases.map(function (name, k) {
+          return h('button', { key: k, type: 'button', role: 'tab', 'aria-selected': on === k, className: on === k ? 'is-on' : '', onClick: function () { setOn(k); } },
+            h('i', null, '0' + (k + 1)), h('span', null, name));
+        })),
+      h('div', { className: 'msf-board', 'data-reveal': '' },
+        t.phases.map(function (name, k) {
+          var from = MSF_PHASE_AT[k], to = MSF_PHASE_AT[k + 1];
+          return h('div', { key: k, className: 'msf-col' + (on === k ? ' is-on' : ''), style: { '--i': k } },
+            h('div', { className: 'msf-phase' }, h('i', null, '0' + (k + 1)), h('b', null, name)),
+            h('ol', { className: 'msf-steps', start: from + 1 }, t.steps.slice(from, to).map(function (s, j) { return step(s, from + j); })));
+        })));
+  }
+
   // ---- hand-over band (主人 2026-10-17: 这个地方有点空，加机器手臂和人碰手指的特效; 2026-10-18 moved under 现车): touch.js ----
   var MST_TEXT = {"pl": {"eyebrow": "Ostatni krok", "title": ["Z fabryki w Chinach —", "prosto w Twoje ręce."], "sub": "Jesteśmy pomiędzy: zakup u źródła, inspekcja, odprawa celna i odbiór — wszystko po naszej stronie.", "hint": "Kliknij, aby wysłać impuls"}, "en": {"eyebrow": "The last step", "title": ["From the factory in China", "into your hands."], "sub": "We stand in between: sourcing, inspection, customs and handover are all on us.", "hint": "Click to send a pulse"}, "zh": {"eyebrow": "最后一步", "title": ["从中国车厂，", "到你手里。"], "sub": "我们在两头之间：源头采购、验车、清关、交付，都由我们来做。", "hint": "点一下，传一道光过去"}};
   function TouchBand(p) {
@@ -434,7 +536,9 @@
               h('div', { 'data-reveal': '' }, h(K.SectionHeader, { kind: 'order', index: '01', lang: lang, action: false })),
               h(K.CarBoxGarage, { lang: lang, openIndex: 0, openKey: openKey, onDeposit: deposit, onCalc: quote })),
             // 3 · China → Poland, whichever way the car travels
+            h(ReportBand, { lang: lang }),
             h('div', { id: 'jak-to-dziala' }, h(K.ImportJourney, { lang: lang, top: 60, still: full })),
+            h(OrderFlow, { lang: lang }),
             h(WindBand, { lang: lang }),
             // 4 · cars already in Poland
             h('div', { className: 'sec', id: 'od-reki' },
