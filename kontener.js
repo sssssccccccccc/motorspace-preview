@@ -63,14 +63,31 @@
   // all car data comes from data/cars.json, served as data/kontener-data.js (window.KT_DATA) and loaded before this bundle
   var DATA = (typeof window !== 'undefined' && window.KT_DATA) || {};
   var SAMPLE_CARS = DATA.boxes || [], SAMPLE_LISTINGS = DATA.listings || [], SAMPLE_STOCK = DATA.stock || [], SAMPLE_ORDERS = DATA.orders || [], COMPANY = DATA.company || {};
+  var SAMPLE_CATALOG = DATA.catalog || [];
+  if (!SAMPLE_CATALOG.length) SAMPLE_CATALOG = SAMPLE_LISTINGS;
   function t(lang) { return T[lang] || T.pl; }
   function money(n, lang) { return new Intl.NumberFormat(LOCALE[lang] || 'pl-PL').format(n) + ' PLN'; }
   // Landed-cost estimate for a car, from the full import calculation (calcImport below).
-  function estimate(price, drive, rules) {
-    var r = calcImport({ price: price, currency: 'PLN', drive: drive }, rules);
-    return { price: r.car, freight: r.freight + r.insurance, duty: r.duty + r.cvd, excise: r.excise, vat: r.vat, fees: r.fees + r.port, total: r.total, deposit: Math.round(r.total * 0.1 / 100) * 100 };
+  function estimate(car, rules) {
+    var r = calcImport(pricingInput(car), rules);
+    return Object.assign({}, r, { price: r.car, deposit: Math.round(r.total * 0.1 / 100) * 100 });
   }
-  function landed(c) { return c.pricePL || landedOf(c); }
+  function boxOffer(box) {
+    var prefix = (box.cipFrom || '').trim().toLowerCase();
+    if (!prefix) return null;
+    return SAMPLE_CATALOG.filter(function (c) {
+      return c.priceCip != null && (c.brand + ' ' + c.model).toLowerCase().indexOf(prefix) === 0;
+    }).sort(function (a, b) { return a.priceCip - b.priceCip; })[0] || null;
+  }
+  function boxPrice(box, rules) { var c = boxOffer(box); return c ? landedOf(c, rules) : null; }
+  function isBox(c) { return Object.prototype.hasOwnProperty.call(c, 'cipFrom'); }
+  function landed(c) { return isBox(c) ? boxPrice(c) : (c.priceFinal || c.pricePL || landedOf(c)); }
+  function pricingRows(r, lang) {
+    var s = t(lang), cs = s.calc.rows;
+    return (r.basis === 'cip' ? [[s.cip, r.car], [s.freightExtra, r.freightExtra]] :
+      [[cs.car, r.car], [cs.insurance, r.insurance], [cs.freight, r.freight]])
+      .concat([[cs.duty, r.duty], [cs.cvd, r.cvd], [cs.excise, r.excise], [cs.port, r.port], [cs.vat, r.vat], [s.fixedFees, r.fees]]);
+  }
   function cx() { return Array.prototype.filter.call(arguments, Boolean).join(' '); }
 
   // ---------- sample data (example values, not live offers) ----------
@@ -363,7 +380,7 @@
     return n + ' ' + (n === 1 ? w[0] : w[1]);
   }
   // "od 349 569 PLN" in Polish and English, "349 569 PLN 起" in Chinese
-  function fromPrice(s, lang, amount) { return lang === 'zh' ? money(amount, lang) + ' ' + s.from : s.from + ' ' + money(amount, lang); }
+  function fromPrice(s, lang, amount) { if (amount == null) return s.askPrice; return lang === 'zh' ? money(amount, lang) + ' ' + s.from : s.from + ' ' + money(amount, lang); }
   function glare(tilt) {
     if (!finePointer() || reduced()) return NO_GLARE;
     return {
@@ -544,6 +561,8 @@
   function CarDetailSheet(p) {
     var c = p.car, lang = p.lang || 'pl', s = t(lang);
     var closeRef = useRef(null);
+    var photos = useState(0), photoIndex = photos[0], setPhotoIndex = photos[1];
+    useEffect(function () { setPhotoIndex(0); }, [c && c.id]);
     useEffect(function () {
       if (!c) return;
       var prev = document.activeElement;
@@ -553,7 +572,10 @@
       return function () { document.removeEventListener('keydown', key); if (prev && prev.focus) prev.focus({ preventScroll: true }); };
     }, [c && c.id]);
     if (!c) return null;
-    var r = calcImport({ price: c.priceCN, currency: 'PLN', drive: c.drive, cc: ccBucket(c.cc), condition: c.condition || 'used' });
+    var multi = c.images && c.images.length > 1;
+    var photo = multi ? (c.images[photoIndex] || c.images[0]) : null;
+    var r = calcImport(pricingInput(c));
+    if (c.priceFinal != null) r.total = c.priceFinal;
     var nf = new Intl.NumberFormat(LOCALE[lang]);
     var specs = [[s.year, c.year], [s.mileageL, typeof c.km === 'number' ? nf.format(c.km) + ' km' : (c.km || '—')],
       [s.range, c.range ? (typeof c.range === 'number' ? c.range + ' km' : c.range) : '—'], [s.seats, c.seats || '—'],
@@ -565,8 +587,12 @@
         h('div', { className: 'kt-sheet-stage' },
           h('div', { className: 'kt-label kt-sheet-status' }, c.status === 'stock' ? s.inPoland + (c.location ? ' · ' + c.location : '') : s.toOrder + ' · ' + s.weeks),
           h('div', { className: 'kt-sheet-car', style: { viewTransitionName: p.vtName || 'none' } },
-            h(CarImage, { car: c, sheen: c.id }),
-            h('div', { className: 'kt-stage-refl', 'aria-hidden': true }, h(CarImage, { car: c, alt: '' })))),
+            h(CarImage, { car: c, sheen: c.id, image: photo }),
+            h('div', { className: 'kt-stage-refl', 'aria-hidden': true }, h(CarImage, { car: c, alt: '', image: photo }))),
+        multi ? h('div', { className: 'kt-sheet-thumbs', role: 'group', 'aria-label': s.details, style: { position: 'absolute', bottom: 12, left: 20, right: 20, display: 'flex', gap: 8, overflowX: 'auto', padding: '4px 0' } }, c.images.slice(0, 6).map(function (image, i) {
+          return h('button', { key: image, type: 'button', 'aria-pressed': photoIndex === i, 'aria-label': s.details + ' ' + (i + 1), onClick: function () { setPhotoIndex(i); }, style: { flexShrink: 0, padding: 3, border: '2px solid ' + (photoIndex === i ? 'var(--ink)' : 'transparent'), borderRadius: 8, background: 'var(--paper-raised)', cursor: 'pointer' } },
+            h('img', { src: (window.KT_ASSETS || 'assets/').replace(/assets\/$/, '') + ((c.imagesSmall || [])[i] || image), alt: c.brand + ' ' + c.model + ' · ' + (i + 1), width: 88, height: 66, loading: 'lazy', style: { display: 'block', objectFit: 'cover', borderRadius: 4 } }));
+        })) : null),
         h('div', { className: 'kt-sheet-info' },
           h('div', { className: 'kt-label' }, c.brand + ' · ' + c.year),
           h('h2', { id: 'kt-sheet-title' }, c.model),
@@ -575,7 +601,9 @@
           h('div', null,
             h('div', { className: 'kt-label' }, s.landed),
             h('div', { className: 'kt-price' }, h(RollingNumber, { value: r.total, lang: lang, suffix: ' PLN', rollIn: true })),
-            h('div', { className: 'kt-price-sub' }, s.cnPrice + ' ' + money(c.priceCN, lang) + ' · ' + s.calc.rows.duty + ' ' + money(r.duty, lang) + ' · ' + s.calc.rows.vat + ' ' + money(r.vat, lang))),
+            c.priceFinal != null ? null : h('dl', { className: 'kt-cost' }, pricingRows(r, lang).concat([[s.calc.total, r.total]]).map(function (row) {
+              return h('div', { key: row[0] }, h('dt', null, row[0]), h('dd', null, money(row[1], lang)));
+            }))),
           h('div', { className: 'kt-stage-actions' },
             h(Button, { variant: 'primary', arrow: true, onClick: function () { p.onOrder && p.onOrder(c); } }, s.orderThis),
             h(Button, { variant: 'outline', onClick: function () { p.onCalc && p.onCalc(c); } }, s.calcCost))),
@@ -1235,8 +1263,8 @@
           return h('div', { key: r[0] }, h('dt', { className: 'kt-label' }, r[0]), h('dd', null, r[1]));
         })),
       h('div', null,
-        h('div', { className: 'kt-price' }, h(RollingNumber, { value: landed(car), lang: lang, suffix: ' PLN', rollIn: true })),
-        h('div', { className: 'kt-price-sub' }, s.plPrice + ' · ' + s.cnPrice + ' ' + money(car.priceCN, lang))),
+        h('div', { className: 'kt-price' }, landed(car) == null ? s.askPrice : h(RollingNumber, { value: landed(car), lang: lang, suffix: ' PLN', rollIn: true })),
+        h('div', { className: 'kt-price-sub' }, landed(car) == null ? '' : s.landed)),
       h('div', { className: 'kt-stage-actions' },
         h(Button, { variant: 'primary', arrow: true, onClick: function () { p.onOrder && p.onOrder(car); } }, s.orderThis),
         h(Button, { variant: 'outline', onClick: function () { p.onView3D && p.onView3D(car); } }, s.view3d)));
@@ -1394,18 +1422,22 @@
         h('div', { className: 'kt-offer-body' }, h('span', { className: 'kt-skel', style: { width: '62%', height: 18 } }), h('span', { className: 'kt-skel', style: { width: '44%', height: 12 } }),
           h('span', { className: 'kt-skel', style: { width: '52%', height: 24, marginTop: 14 } })));
     }
-    function open(e) { if (!p.onOpen) return; e.preventDefault(); p.onOpen(c); }
+    var href = p.href || (c.source === 'crm' && c.slug ? (window.KT_ASSETS || 'assets/').replace(/assets\/$/, '') + (lang === 'pl' ? 'auta/' : lang + '/cars/') + c.slug + '.html' : '#');
+    function open(e) { if (href !== '#' && e.target.closest && e.target.closest('a')) return; if (!p.onOpen) return; e.preventDefault(); p.onOpen(c); }
     return h('article', Object.assign({ className: cx('kt kt-offer', p.onOpen && 'is-clickable'), style: p.vtCard ? { viewTransitionName: p.vtCard } : null, onClick: open }, glare(3)),
       c.status === 'stock' ? h('div', { className: 'kt-stock-band' }, h('span', null, s.inPoland), h('span', null, c.location || '')) : null,
       h('div', { className: 'kt-offer-bay' }, h('span', { className: 'kt-label' }, p.index || (c.status === 'stock' ? '' : s.toOrder)), h(DriveTag, { drive: c.drive, lang: lang }),
-        h('div', { className: 'kt-offer-car', style: p.vtCar ? { viewTransitionName: p.vtCar } : null }, h(CarImage, { car: c, alt: '' }))),
+        h('div', { className: 'kt-offer-car', style: p.vtCar ? { viewTransitionName: p.vtCar } : null }, h(CarImage, { car: c, alt: c.brand + ' ' + c.model, catalog: true }))),
       h('div', { className: 'kt-offer-body' },
         h('h3', null, c.brand + ' ' + c.model),
         h('div', { className: 'kt-offer-meta' }, [c.year, km, range].filter(Boolean).join(' · ')),
         h('div', { className: 'kt-offer-foot' },
-          h('div', null, h('div', { className: 'kt-label', style: { marginBottom: 4 } }, s.landed), h('div', { className: 'kt-price' }, money(landedOf(c), lang)),
-            h('div', { className: 'kt-offer-meta', style: { marginTop: 4 } }, s.cnPrice + ' ' + money(c.priceCN, lang))),
-          h('a', { href: p.href || '#' }, s.details + ' →'))));
+          h('div', null, h('div', { className: 'kt-label', style: { marginBottom: 4 } }, c.priceCip != null ? s.cip : s.landed),
+            h('div', { style: { display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' } },
+              h('div', { className: 'kt-price' }, money(c.priceCip != null ? cipOf(c) : landedOf(c), lang)),
+              c.priceCip != null ? h('small', { className: 'kt-offer-meta' }, '$' + nf.format(c.priceCip)) : null),
+            h('div', { className: 'kt-offer-meta', style: { marginTop: 4 } }, c.priceCip != null ? s.landed + ' ' + nf.format(landedOf(c)) + ' zł' : s.cnPrice + ' ' + money(c.priceCN, lang))),
+          h('a', { href: href }, s.details + ' →'))));
   }
 
   function SearchBar(p) {
@@ -1471,7 +1503,7 @@
     pl: { erev: 'EREV', hev: 'HEV',
       searchPh: 'Marka, model albo np. „SUV 7 miejsc”', brands: 'Marki', models: 'Modele', searchFor: 'Szukaj', cars: ['auto', 'auta', 'aut'],
       filters: 'Filtry', reset: 'Wyczyść', priceRange: 'Cena w Polsce (PLN)', min: 'od', max: 'do', yearRange: 'Rok produkcji', mileage: 'Przebieg do', rangeMin: 'Zasięg elektryczny od',
-      bodyType: 'Nadwozie', bodies: { sedan: 'Sedan', sport: 'Sport', hatch: 'Kombi', suv: 'SUV', van: 'Van' }, availability: 'Dostępność', avOrder: 'Na zamówienie', avStock: 'W Polsce',
+      bodyType: 'Nadwozie', bodies: { mpv: 'MPV', wagon: 'Kombi', coupe: 'Coupé', pickup: 'Pick-up', unknown: 'Inne', sedan: 'Sedan', sport: 'Sport', hatch: 'Kombi', suv: 'SUV', van: 'Van' }, availability: 'Dostępność', avOrder: 'Na zamówienie', avStock: 'W Polsce',
       noExcise: 'Tylko bez akcyzy', anySeats: 'Każda', results: 'Wyniki', sort: 'Sortuj', sorts: ['Najtańsze', 'Najnowsze', 'Najmniejszy przebieg', 'Największy zasięg'], empty: 'Brak aut dla tych filtrów.', show: 'Pokaż', moreBrands: 'Więcej marek', fewer: 'Mniej',
       landed: 'w Polsce ok.',
       calc: { title: 'Kalkulator importu', price: 'Cena zakupu w Chinach', rate: 'Kurs', condition: 'Stan', used: 'Używany', isNew: 'Nowy', engine: 'Pojemność silnika', maker: 'Producent (cło wyrównawcze UE)',
@@ -1484,7 +1516,7 @@
     en: { erev: 'EREV', hev: 'HEV',
       searchPh: 'Brand, model, or e.g. "7-seat SUV"', brands: 'Brands', models: 'Models', searchFor: 'Search', cars: ['car', 'cars'],
       filters: 'Filters', reset: 'Clear all', priceRange: 'Price in Poland (PLN)', min: 'min', max: 'max', yearRange: 'Year', mileage: 'Max mileage', rangeMin: 'Min electric range',
-      bodyType: 'Body', bodies: { sedan: 'Sedan', sport: 'Sport', hatch: 'Estate', suv: 'SUV', van: 'Van' }, availability: 'Availability', avOrder: 'To order', avStock: 'In Poland',
+      bodyType: 'Body', bodies: { mpv: 'MPV', wagon: 'Estate', coupe: 'Coupé', pickup: 'Pickup', unknown: 'Other', sedan: 'Sedan', sport: 'Sport', hatch: 'Estate', suv: 'SUV', van: 'Van' }, availability: 'Availability', avOrder: 'To order', avStock: 'In Poland',
       noExcise: 'Excise-free only', anySeats: 'Any', results: 'Results', sort: 'Sort', sorts: ['Cheapest', 'Newest', 'Lowest mileage', 'Longest range'], empty: 'No cars match these filters.', show: 'Show', moreBrands: 'More brands', fewer: 'Fewer',
       landed: 'in Poland approx.',
       calc: { title: 'Import calculator', price: 'Purchase price in China', rate: 'Exchange rate', condition: 'Condition', used: 'Used', isNew: 'New', engine: 'Engine size', maker: 'Manufacturer (EU countervailing duty)',
@@ -1497,7 +1529,7 @@
     zh: { erev: '增程', hev: '油混',
       searchPh: '品牌、车型，或例如“7 座 SUV”', brands: '品牌', models: '车型', searchFor: '搜索', cars: '辆',
       filters: '筛选', reset: '清除', priceRange: '波兰落地价 (PLN)', min: '最低', max: '最高', yearRange: '年份', mileage: '最高里程', rangeMin: '最低纯电续航',
-      bodyType: '车身', bodies: { sedan: '轿车', sport: '跑车', hatch: '旅行/两厢', suv: 'SUV', van: 'MPV' }, availability: '车源状态', avOrder: '可预订', avStock: '波兰现车',
+      bodyType: '车身', bodies: { mpv: 'MPV', wagon: '旅行车', coupe: '轿跑', pickup: '皮卡', unknown: '其他', sedan: '轿车', sport: '跑车', hatch: '旅行/两厢', suv: 'SUV', van: 'MPV' }, availability: '车源状态', avOrder: '可预订', avStock: '波兰现车',
       noExcise: '仅看免消费税车型', anySeats: '不限', results: '结果', sort: '排序', sorts: ['价格最低', '最新', '里程最少', '续航最长'], empty: '没有符合条件的车辆。', show: '显示', moreBrands: '更多品牌', fewer: '收起',
       landed: '波兰落地约',
       calc: { title: '进口费用计算器', price: '中国购车价格', rate: '汇率', condition: '车况', used: '二手', isNew: '新车', engine: '发动机排量', maker: '制造商（欧盟反补贴税）',
@@ -1509,10 +1541,13 @@
         note: '税率截至 2026 年 10 月。关税按完税价格（车价 + 运费 + 保险）计算；消费税按完税价格加关税计算；增值税按完税价格、关税、消费税及运至目的地费用计算。欧盟反补贴税只适用于中国产新纯电车。金额仅供参考。' } }
   };
   Object.keys(T2).forEach(function (k) { Object.assign(T[k], T2[k]); });
+  var PRICING_COPY = {"pl": {"cip": "Cena CIP (z transportem i ubezpieczeniem)", "cipShort": "CIP", "freightExtra": "Dopłata za fracht na trasie do Polski (szacunek)", "askPrice": "Zapytaj o cenę", "fixedFees": "Opłaty stałe"}, "en": {"cip": "CIP price (incl. freight and insurance)", "cipShort": "CIP", "freightExtra": "Polish-route freight surcharge (estimate)", "askPrice": "Ask for a price", "fixedFees": "Fixed fees"}, "zh": {"cip": "CIP 价（含运费和保险）", "cipShort": "CIP", "freightExtra": "波兰航线运费补差（估算）", "askPrice": "询价", "fixedFees": "固定费"}};
+  var PRICING_NOTE = {"pl": "Szacunek: cena CIP obejmuje fracht do portu w Europie i ubezpieczenie. Doliczamy dopłatę za trasę do Polski, cło, należne cło wyrównawcze, akcyzę, VAT oraz port, odprawę, homologację, tłumaczenia i rejestrację. Cło wyrównawcze dotyczy tylko nowych EV i aut z przedłużaczem zasięgu wyprodukowanych w Chinach, nie aut Imported. Kurs według dziennej tabeli NBP; przy braku połączenia oznaczony kurs orientacyjny. Cena ostateczna zgodnie z umową.", "en": "Estimate: CIP includes freight to a European port and insurance. We add the Polish-route surcharge, customs duty, applicable countervailing duty, excise, VAT, port charges, customs clearance, homologation, translations and registration. Countervailing duty applies only to new China-made EVs and range-extender EVs, excluding Imported cars. Exchange rates follow the daily NBP table; a labelled indicative rate is used when unavailable. The final price is set by the contract.", "zh": "估算由 CIP 价（含到欧洲港口的运费和保险）、波兰航线运费补差、关税、适用的反补贴税、消费税、增值税，以及港口、清关、认证、翻译和登记费组成。反补贴税只适用于中国产新纯电及增程车，Imported 车辆不计。汇率按 NBP 当日公布汇率；无法连接时会标明参考汇率。最终价格以合同为准。"};
+  Object.keys(PRICING_COPY).forEach(function (k) { Object.assign(T[k], PRICING_COPY[k]); });
 
   // ---------- Polish import rules for a car from China (verify before launch) ----------
-  var RULES = {
-    asOf: '2026-10', duty: 0.10, vat: 0.23, insurance: 0.005,
+  var RULES = Object.assign({
+    asOf: '2026-10', duty: 0.10, vat: 0.23, insurance: 0.005, freightPlExtra: 1500,
     // excise by drive, by engine bucket [≤2.0 l, 2.0–3.5 l, >3.5 l]; base = customs value + duty
     excise: { ev: [0, 0, 0], erev: [0, 0.093, 0.186], phev: [0, 0.093, 0.186], hev: [0.0155, 0.093, 0.186], ice: [0.031, 0.186, 0.186] },
     // EU countervailing duty, Regulation (EU) 2024/2754: NEW battery EVs (incl. range extenders) only
@@ -1520,8 +1555,7 @@
     freight: { container: 8000, rail: 12000, roro: 6500 },
     port: 1500, agency: 1200, homologation: 5000, translations: 900, inspection: 149, registration: 180, service: 0,
     fx: { CNY: 0.52, USD: 3.65, EUR: 4.25, PLN: 1 }
-  };
-  if (DATA.rules) Object.assign(RULES, DATA.rules);
+  }, DATA.rules || {});
 
   // ---------- exchange rates: the National Bank of Poland's table A (PLN per unit), fetched once a day; cars.json holds the fallback ----------
   var T11 = {"pl": {"nbp": {"from": "kurs średni NBP z", "fallback": "kurs orientacyjny (brak połączenia z NBP)"}}, "en": {"nbp": {"from": "NBP mid rate of", "fallback": "indicative rate (NBP not reachable)"}}, "zh": {"nbp": {"from": "波兰央行 NBP 中间价，日期", "fallback": "参考汇率（未能连接 NBP）"}}};
@@ -1564,11 +1598,13 @@
   function ccBucket(cc) { return !cc || cc <= 2000 ? 'le2' : cc <= 3500 ? '2to35' : 'gt35'; }
   function calcImport(inp, rules) {
     var r = Object.assign({}, RULES, rules || {});
-    var i = Object.assign({ price: 0, currency: 'PLN', condition: 'used', drive: 'ev', cc: 'le2', maker: 'other', freight: 'container', coc: false, buyer: 'private' }, inp);
+    var i = Object.assign({ price: 0, currency: 'PLN', basis: 'cn', imported: false, condition: 'used', drive: 'ev', cc: 'le2', maker: 'other', freight: 'container', coc: false, buyer: 'private' }, inp);
     var fx = i.fx || r.fx[i.currency] || 1;
-    var car = Math.round(i.price * fx), ins = Math.round(car * r.insurance), fr = r.freight[i.freight] || 0;
-    var cv = car + ins + fr, duty = Math.round(cv * r.duty);
-    var cvdRate = i.condition === 'new' && (i.drive === 'ev' || i.drive === 'erev') ? (r.cvd[i.maker] || 0) : 0;
+    var car = Math.round(i.price * fx), cip = i.basis === 'cip';
+    var ins = cip ? 0 : Math.round(car * r.insurance), fr = cip ? 0 : (r.freight[i.freight] || 0);
+    var freightExtra = cip ? Math.round(r.freightPlExtra * r.fx.USD) : 0;
+    var cv = car + ins + fr + freightExtra, duty = Math.round(cv * r.duty);
+    var cvdRate = i.condition === 'new' && (i.drive === 'ev' || i.drive === 'erev') && !i.imported ? (r.cvd[i.maker] || 0) : 0;
     var cvd = Math.round(cv * cvdRate);
     var exRate = (r.excise[i.drive] || r.excise.ice)[Math.max(0, CC.indexOf(i.cc))];
     var excise = Math.round((cv + duty + cvd) * exRate);
@@ -1577,24 +1613,30 @@
     var fees = r.agency + homologation + r.translations + r.inspection + r.registration + (i.service != null ? i.service : r.service);
     var total = cv + duty + cvd + excise + r.port + vat + fees;
     var back = i.buyer === 'co100' ? vat : i.buyer === 'co50' ? Math.round(vat / 2) : 0;
-    return { car: car, insurance: ins, freight: fr, customsValue: cv, duty: duty, cvd: cvd, cvdRate: cvdRate, excise: excise, exciseRate: exRate,
+    return { basis: i.basis, freightExtra: freightExtra, car: car, insurance: ins, freight: fr, customsValue: cv, duty: duty, cvd: cvd, cvdRate: cvdRate, excise: excise, exciseRate: exRate,
       exciseExempt: exRate === 0 && (i.drive === 'phev' || i.drive === 'erev'), vat: vat, port: r.port, agency: r.agency, homologation: homologation,
       translations: r.translations, inspection: r.inspection, registration: r.registration, service: i.service != null ? i.service : r.service,
       fees: fees, total: total, net: total - back, vatBack: back, markup: total - car, asOf: r.asOf };
   }
-  function landedOf(c, rules) {
-    return calcImport({ price: c.priceCN, currency: 'PLN', drive: c.drive, cc: ccBucket(c.cc), condition: c.condition || 'used', coc: c.coc }, rules).total;
+  function pricingInput(c) {
+    if (c.priceCip != null) return { price: c.priceCip, currency: 'USD', basis: 'cip', drive: c.drive, cc: ccBucket(c.cc),
+      condition: c.isNew ? 'new' : 'used', maker: c.makerKey || 'other', imported: !!c.imported, coc: c.coc };
+    return { price: c.priceCN, currency: 'PLN', basis: 'cn', drive: c.drive, cc: ccBucket(c.cc), condition: c.condition || 'used', coc: c.coc };
   }
+  function landedOf(c, rules) {
+    return c.priceFinal != null ? c.priceFinal : calcImport(pricingInput(c), rules).total;
+  }
+  function cipOf(c) { return c.priceCip != null ? Math.round(c.priceCip * RULES.fx.USD) : null; }
 
   // ---------- search and filtering (pure functions) ----------
-  var KEYWORDS = { body: { suv: 'suv', sedan: 'sedan', kombi: 'hatch', estate: 'hatch', hatch: 'hatch', van: 'van', mpv: 'van', 轿车: 'sedan', 跑车: 'sport', sport: 'sport', coupe: 'sport' },
+  var KEYWORDS = { body: { suv: 'suv', sedan: 'sedan', kombi: ['wagon', 'hatch'], estate: ['wagon', 'hatch'], hatch: 'hatch', van: 'van', mpv: ['mpv', 'van'], 轿车: 'sedan', 跑车: 'sport', sport: 'sport', coupe: ['coupe', 'sport'] },
     drive: { ev: 'ev', elektryk: 'ev', electric: 'ev', 纯电: 'ev', phev: 'phev', 'plug-in': 'phev', 插混: 'phev', hybryda: 'hev', hybrid: 'hev', hev: 'hev', 油混: 'hev', erev: 'erev', 增程: 'erev', spalinowy: 'ice', benzyna: 'ice', petrol: 'ice', 燃油: 'ice' } };
   function matchQuery(c, q) {
     if (!q) return true;
     var s = q.toLowerCase(), seats = /(\d)\s*(-?\s*miejsc|-?\s*seat|座)/.exec(s);
     if (seats) { if (c.seats < +seats[1]) return false; s = s.replace(seats[0], ' '); }
     return s.split(/\s+/).filter(Boolean).every(function (tok) {
-      if (KEYWORDS.body[tok]) return c.body === KEYWORDS.body[tok];
+      if (KEYWORDS.body[tok]) return [].concat(KEYWORDS.body[tok]).indexOf(c.body) >= 0;
       if (KEYWORDS.drive[tok]) return c.drive === KEYWORDS.drive[tok];
       return wordStart(c.brand + ' ' + c.model, tok);
     });
@@ -1617,7 +1659,7 @@
       if (f.kmMax && c.km > f.kmMax) return false;
       if (f.rangeMin && (c.range || 0) < f.rangeMin) return false;
       if (f.seats && c.seats < f.seats) return false;
-      if (f.noExcise && calcImport({ price: c.priceCN, drive: c.drive, cc: ccBucket(c.cc) }).excise > 0) return false;
+      if (f.noExcise && calcImport(pricingInput(c)).excise > 0) return false;
       return true;
     });
   }
@@ -1703,9 +1745,9 @@
       h('div', { className: 'kt-filters-head' }, h('span', { className: 'kt-label' }, s.filters), h('button', { type: 'button', className: 'kt-link', onClick: function () { p.onChange && p.onChange(Object.assign({}, EMPTY_FILTERS)); } }, s.reset)),
       group(s.availability, h(Seg, { label: s.availability, multi: true, value: f.status, onChange: function (v) { set('status', toggle(f.status, v)); },
         options: [{ v: 'order', l: s.avOrder + ' · ' + (sc.order || 0) }, { v: 'stock', l: s.avStock + ' · ' + (sc.stock || 0) }] })),
-      group(s.bodyType, h('div', { className: 'kt-bodies' }, ['suv', 'sedan', 'hatch', 'sport', 'van'].map(function (b) {
+      group(s.bodyType, h('div', { className: 'kt-bodies' }, Array.from(new Set(['suv', 'sedan', 'hatch', 'sport', 'van'].concat(cars.map(function (c) { return c.body; })))).map(function (b) {
         return h('button', { key: b, type: 'button', className: 'kt-body', 'aria-pressed': f.body.indexOf(b) >= 0, onClick: function () { set('body', toggle(f.body, b)); } },
-          h(CarSilhouette, { body: b }), h('span', null, s.bodies[b]), h('span', { className: 'kt-check-n' }, bc[b] || 0));
+          h(CarSilhouette, { body: b }), h('span', null, s.bodies[b] || b), h('span', { className: 'kt-check-n' }, bc[b] || 0));
       }))),
       group(s.driveSel, h('div', null, ['ev', 'erev', 'phev', 'hev', 'ice'].map(function (d) { return check('drive', d, s[d] + (lang === 'zh' ? ' ' + d.toUpperCase() : ''), dc[d]); }),
         h('label', { className: 'kt-check kt-check-strong' }, h('input', { type: 'checkbox', checked: f.noExcise, onChange: function () { set('noExcise', !f.noExcise); } }), h('span', null, s.noExcise)))),
@@ -1754,13 +1796,13 @@
   function ImportCalculator(p) {
     var lang = p.lang || 'pl', s = t(lang), cs = s.calc, rules = Object.assign({}, RULES, p.rules || {});
     var c0 = p.car;
-    var st = useState({ price: c0 ? c0.priceCN : 150000, currency: c0 ? 'PLN' : 'CNY', fx: '', condition: (c0 && c0.condition) || 'used', drive: c0 ? c0.drive : 'ev',
-      cc: c0 ? ccBucket(c0.cc) : 'le2', maker: 'other', freight: 'container', coc: false, buyer: 'private' });
+    var st = useState(Object.assign({ fx: '', freight: 'container', coc: false, buyer: 'private', maker: 'other', imported: false },
+      c0 ? pricingInput(c0) : { price: 30000, currency: 'USD', basis: 'cip', condition: 'used', drive: 'ev', cc: 'le2' }));
     var v = st[0], setV = st[1];
     function set(k, x) { var n = Object.assign({}, v); n[k] = x; if (k === 'currency') n.fx = ''; setV(n); }
     var fx = v.fx !== '' ? +v.fx : rules.fx[v.currency];
     var r = calcImport(Object.assign({}, v, { price: +v.price || 0, fx: fx }), rules);
-    var isEV = v.drive === 'ev', showMaker = v.condition === 'new' && (v.drive === 'ev' || v.drive === 'erev');
+    var isEV = v.drive === 'ev', showMaker = v.condition === 'new' && (v.drive === 'ev' || v.drive === 'erev') && !v.imported;
     function pct(x) { return (Math.round(x * 1000) / 10).toString().replace('.', lang === 'pl' ? ',' : '.') + '%'; }
     var prevRef = useRef(null), seen = {};
     useEffect(function () { prevRef.current = seen; });
@@ -1768,17 +1810,17 @@
     function row(k, val, hint, strong) {
       seen[k] = val;
       var changed = prevRef.current && prevRef.current[k] !== undefined && prevRef.current[k] !== val;
-      return h('div', { key: k, className: cx('kt-crow', strong && 'is-strong') }, h('dt', null, cs.rows[k] || k, hint ? h('small', null, hint) : null),
+      return h('div', { key: k, className: cx('kt-crow', strong && 'is-strong') }, h('dt', null, (k === 'cip' ? s.cip : k === 'freightExtra' ? s.freightExtra : cs.rows[k]) || k, hint ? h('small', null, hint) : null),
         h('dd', { key: String(val), className: changed ? 'kt-flash' : null }, money(val, lang)));
     }
-    var segs = [['car', r.car], ['freight', r.freight + r.insurance], ['duty', r.duty + r.cvd], ['excise', r.excise], ['vat', r.vat], ['fees', r.fees + r.port]];
-    var segLabel = { car: cs.rows.car, freight: cs.rows.freight, duty: cs.rows.duty, excise: cs.rows.excise, vat: cs.rows.vat, fees: cs.g3 };
+    var segs = [['car', r.car], ['freight', r.freight + r.insurance + r.freightExtra], ['duty', r.duty + r.cvd], ['excise', r.excise], ['vat', r.vat], ['fees', r.fees + r.port]];
+    var segLabel = { car: r.basis === 'cip' ? s.cipShort : cs.rows.car, freight: r.basis === 'cip' ? s.freightExtra : cs.rows.freight, duty: cs.rows.duty, excise: cs.rows.excise, vat: cs.rows.vat, fees: cs.g3 };
     return h('section', { className: 'kt kt-calc', 'aria-label': cs.title },
       h('div', { className: 'kt-calc-in' },
-        h('div', { className: 'kt-fgroup' }, h('label', { className: 'kt-label', htmlFor: 'kt-calc-price' }, cs.price),
+        h('div', { className: 'kt-fgroup' }, h('label', { className: 'kt-label', htmlFor: 'kt-calc-price' }, v.basis === 'cip' ? s.cip : cs.price),
           h('div', { className: 'kt-money' },
             h('input', { id: 'kt-calc-price', type: 'number', inputMode: 'numeric', min: 0, step: 1000, value: v.price, onChange: function (e) { set('price', e.target.value); } }),
-            h(Seg, { label: cs.price, value: v.currency, onChange: function (x) { set('currency', x); }, options: ['CNY', 'USD', 'EUR', 'PLN'].map(function (x) { return { v: x, l: x }; }) })),
+            h(Seg, { label: v.basis === 'cip' ? s.cip : cs.price, value: v.currency, onChange: function (x) { set('currency', x); }, options: ['CNY', 'USD', 'EUR', 'PLN'].map(function (x) { return { v: x, l: x }; }) })),
           v.currency !== 'PLN' ? h('div', { className: 'kt-fx' }, h('span', null, cs.rate + ': 1 ' + v.currency + ' ='),
             h('input', { type: 'number', step: 0.0001, 'aria-label': cs.rate, value: v.fx !== '' ? v.fx : rules.fx[v.currency], onChange: function (e) { set('fx', e.target.value); } }), h('span', null, 'PLN')) : null,
           v.currency !== 'PLN' ? h('small', { className: 'kt-fx-src' }, rateNote(lang)) : null),
@@ -1791,7 +1833,7 @@
         showMaker ? h('div', { className: 'kt-fgroup' }, h('label', { className: 'kt-label', htmlFor: 'kt-calc-maker' }, cs.maker),
           h('select', { id: 'kt-calc-maker', className: 'kt-select', value: v.maker, onChange: function (e) { set('maker', e.target.value); } },
             Object.keys(rules.cvd).map(function (m) { return h('option', { key: m, value: m }, cs.makers[m] + ' · ' + pct(rules.cvd[m])); }))) : null,
-        h('div', { className: 'kt-fgroup' }, h('span', { className: 'kt-label' }, cs.freight),
+        v.basis === 'cip' ? h('div', { className: 'kt-fgroup' }, h('span', { className: 'kt-label' }, s.freightExtra), h('output', null, money(r.freightExtra, lang))) : h('div', { className: 'kt-fgroup' }, h('span', { className: 'kt-label' }, cs.freight),
           h(Seg, { label: cs.freight, value: v.freight, onChange: function (x) { set('freight', x); }, options: Object.keys(rules.freight).map(function (k) { return { v: k, l: cs.freights[k] }; }) })),
         h('div', { className: 'kt-fgroup' }, h('span', { className: 'kt-label' }, cs.buyer),
           h(Seg, { label: cs.buyer, value: v.buyer, onChange: function (x) { set('buyer', x); }, options: ['private', 'co50', 'co100'].map(function (k) { return { v: k, l: cs.buyers[k] }; }) })),
@@ -1805,19 +1847,21 @@
         h('div', { className: 'kt-bar', role: 'img', 'aria-label': segs.map(function (x) { return segLabel[x[0]] + ' ' + money(x[1], lang); }).join(', ') },
           segs.map(function (x) { return h('i', { key: x[0], className: cx('kt-bar-' + x[0], !x[1] && 'is-zero'), style: { flexGrow: x[1] } }); })),
         h('ul', { className: 'kt-bar-key' }, segs.map(function (x) { return h('li', { key: x[0] }, h('i', { className: 'kt-bar-' + x[0] }), segLabel[x[0]]); })),
+        r.basis === 'cip' ? h('dl', { className: 'kt-cgroup' }, pricingRows(r, lang).map(function (x) { return row(x[0], x[1]); }), row(cs.total, r.total, null, true)) : [
         h('dl', { className: 'kt-cgroup' }, h('div', { className: 'kt-label' }, '01 · ' + cs.g1),
-          row('car', r.car, v.currency !== 'PLN' ? (+v.price || 0).toLocaleString(LOCALE[lang]) + ' ' + v.currency + ' × ' + fx : null),
-          row('insurance', r.insurance), row('freight', r.freight), row('customsValue', r.customsValue, null, true)),
+          row(r.basis === 'cip' ? 'cip' : 'car', r.car, v.currency !== 'PLN' ? (+v.price || 0).toLocaleString(LOCALE[lang]) + ' ' + v.currency + ' × ' + fx : null),
+          r.basis === 'cip' ? row('freightExtra', r.freightExtra) : [row('insurance', r.insurance), row('freight', r.freight)], row('customsValue', r.customsValue, null, true)),
         h('dl', { className: 'kt-cgroup' }, h('div', { className: 'kt-label' }, '02 · ' + cs.g2),
           row('duty', r.duty, '10% × ' + money(r.customsValue, lang)),
-          r.cvd ? row('cvd', r.cvd, pct(r.cvdRate) + ' × ' + money(r.customsValue, lang)) : null,
+          row('cvd', r.cvd, pct(r.cvdRate) + ' × ' + money(r.customsValue, lang)),
           row('excise', r.excise, r.exciseExempt ? cs.exempt : pct(r.exciseRate) + ' × ' + money(r.customsValue + r.duty + r.cvd, lang)),
+          row('port', r.port),
           row('vat', r.vat, '23% × ' + money(r.customsValue + r.duty + r.cvd + r.excise + r.port, lang))),
         h('dl', { className: 'kt-cgroup' }, h('div', { className: 'kt-label' }, '03 · ' + cs.g3),
-          row('port', r.port), row('agency', r.agency), r.homologation ? row('homologation', r.homologation) : null,
-          row('translations', r.translations), row('inspection', r.inspection), row('registration', r.registration), r.service ? row('service', r.service) : null),
+          row('agency', r.agency), r.homologation ? row('homologation', r.homologation) : null,
+          row('translations', r.translations), row('inspection', r.inspection), row('registration', r.registration), r.service ? row('service', r.service) : null)],
         p.onOrder ? h(Button, { variant: 'primary', arrow: true, className: 'kt-btn-block', onClick: function () { p.onOrder(v, r); } }, s.orderThis) : null,
-        h('p', { className: 'kt-note' }, cs.note)));
+        h('p', { className: 'kt-note' }, r.basis === 'cip' ? PRICING_NOTE[lang] || PRICING_NOTE.pl : cs.note)));
   }
 
   // ---------- ordering from China: the main section ----------
@@ -1826,14 +1870,18 @@
 
   function OrderBuilder(p) {
     var c = p.car || SAMPLE_CARS[0], lang = p.lang || 'pl', s = t(lang);
-    var trims = c.trims || p.trims || DEFAULT_TRIMS, paints = c.paints || p.paints || DEFAULT_PAINTS;
+    var pricedCar = isBox(c) ? boxOffer(c) : c;
+    var trims = pricedCar && pricedCar.priceCip != null ? [{ name: pricedCar.trim || pricedCar.model, delta: 0 }] : (c.trims || p.trims || DEFAULT_TRIMS), paints = c.paints || p.paints || DEFAULT_PAINTS;
     var tr = useState(0), ti = tr[0], setTi = tr[1];
     var pc = useState(0), ci = pc[0], setCi = pc[1];
     var qs = useState(null), quote = qs[0], setQuote = qs[1];
     useEffect(function () { setTi(0); setCi(0); }, [c.id]);
     var trim = trims[Math.min(ti, trims.length - 1)];
-    var e = estimate(c.priceCN + trim.delta, c.drive, p.rules);
-    var rows = [['price', e.price], ['freight', e.freight], ['duty', e.duty], ['excise', e.excise], ['vat', e.vat], ['fees', e.fees]];
+    if (!pricedCar) return h('section', { className: 'kt kt-order' },
+      h('h3', null, c.brand + ' ' + c.model), h('div', { className: 'kt-price' }, s.askPrice),
+      h(Button, { variant: 'primary', onClick: function () { p.onDeposit && p.onDeposit({ car: c }); } }, s.askPrice));
+    var e = estimate(pricedCar.priceCip != null ? pricedCar : Object.assign({}, pricedCar, { priceCN: pricedCar.priceCN + trim.delta }), p.rules);
+    var rows = pricingRows(e, lang);
     return h('section', { className: 'kt kt-order', 'aria-label': s.sec.order[0] },
       h('div', { className: 'kt-order-car' },
         h('div', { className: 'kt-label' }, c.brand + ' · ' + c.year + ' · ' + s.toOrder),
@@ -1857,7 +1905,7 @@
       h('div', { className: 'kt-order-cost' },
         h('div', { className: 'kt-label' }, '03 · ' + s.rows.total),
         h('dl', { className: 'kt-cost' }, rows.map(function (r, i) {
-          return h('div', { key: r[0], style: { '--i': i } }, h('dt', null, s.rows[r[0]]), h('dd', { key: r[1] }, money(r[1], lang)));
+          return h('div', { key: r[0], style: { '--i': i } }, h('dt', null, r[0]), h('dd', { key: r[1] }, money(r[1], lang)));
         })),
         h('div', { className: 'kt-cost-total' }, h('span', { className: 'kt-label' }, s.rows.total), h('div', { className: 'kt-price' }, h(RollingNumber, { value: e.total, lang: lang, suffix: ' PLN' }))),
         h(Button, { variant: 'primary', arrow: true, className: 'kt-btn-block', onClick: function () { p.onDeposit && p.onDeposit({ car: c, trim: trim, paint: paints[ci], paintName: s.colors[ci] || '', estimate: e }); } }, s.deposit + ' · ' + money(e.deposit, lang)),
@@ -1871,7 +1919,8 @@
   // ---------- photos: a car with a `photo` shows it instead of the drawn silhouette (cut-out, nose to the left) ----------
   function photoSrc(c) { var ph = c && c.photo; if (!ph) return null; return /^(https?:)?\//.test(ph) ? ph : ((typeof window !== 'undefined' && window.KT_ASSETS) || '') + ph; }
   function CarImage(p) {
-    var src = photoSrc(p.car);
+    var ph = p.image || (p.catalog && ((p.car.imagesSmall || [])[0] || (p.car.images || [])[0]));
+    var src = ph ? (((window.KT_ASSETS || 'assets/').replace(/assets\/$/, '')) + ph) : photoSrc(p.car);
     if (src) return h('img', { className: cx('kt-car-photo', p.className), src: src, alt: p.alt == null ? (p.car.brand + ' ' + p.car.model) : p.alt, loading: 'lazy', decoding: 'async', draggable: false });
     return h(CarSilhouette, { body: p.car.body, title: p.alt == null ? undefined : p.alt, ghost: p.ghost, sheen: p.sheen });
   }
@@ -1976,7 +2025,7 @@
   function quoteNumber() { var d = new Date(); return 'KT-W-' + d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate()) + '-' + pad2(d.getHours()) + pad2(d.getMinutes()); }
   function QuoteSheet(p) {
     var lang = p.lang || 'pl', s = t(lang), Q = s.quoteDoc, o = p.order, e = o.estimate, c = o.car, company = p.company || COMPANY;
-    var rows = [['price', e.price], ['freight', e.freight], ['duty', e.duty], ['excise', e.excise], ['vat', e.vat], ['fees', e.fees]];
+    var rows = pricingRows(e, lang);
     var el = useRef(null);
     if (!el.current && typeof document !== 'undefined') { el.current = document.createElement('div'); el.current.className = 'kt kt-quote'; document.body.appendChild(el.current); }
     useEffect(function () {
@@ -1987,7 +2036,8 @@
       return function () { clearTimeout(id); window.removeEventListener('afterprint', after); if (node && node.parentNode) node.parentNode.removeChild(node); el.current = null; };
     }, []);
     var today = new Intl.DateTimeFormat(LOCALE[lang], { dateStyle: 'long' }).format(new Date());
-    var fx = (RULES.fx && RULES.fx.CNY) || null;
+    var quoteCurrency = e.basis === 'cip' ? 'USD' : 'PLN';
+    var fx = RULES.fx[quoteCurrency];
     return ReactDOM.createPortal(
       h('article', { className: 'kt-quote-page', lang: lang },
         h('header', { className: 'kt-quote-head' },
@@ -1999,11 +2049,11 @@
           h('div', null, h('span', null, Q.color), h('b', null, o.paintName || '—')),
           h('div', null, h('span', null, Q.delivery), h('b', null, s.weeks))),
         h('table', { className: 'kt-quote-table' },
-          h('tbody', null, rows.map(function (r) { return h('tr', { key: r[0] }, h('td', null, s.rows[r[0]]), h('td', null, money(r[1], lang))); })),
+          h('tbody', null, rows.map(function (r) { return h('tr', { key: r[0] }, h('td', null, r[0]), h('td', null, money(r[1], lang))); })),
           h('tfoot', null,
             h('tr', { className: 'kt-quote-total' }, h('td', null, s.rows.total), h('td', null, money(e.total, lang))),
             h('tr', null, h('td', null, Q.deposit), h('td', null, money(e.deposit, lang))))),
-        h('p', { className: 'kt-quote-rate' }, (fx ? Q.rate + ' ' + fx.toFixed(4) + ' (' + rateNote(lang) + ') · ' : '') + Q.rateSrc + ' ' + (RULES.asOf || '')),
+        h('p', { className: 'kt-quote-rate' }, (fx ? '1 ' + quoteCurrency + ' = ' + fx.toFixed(4) + ' PLN' + ' (' + rateNote(lang) + ') · ' : '') + Q.rateSrc + ' ' + (RULES.asOf || '')),
         h('p', { className: 'kt-quote-note' }, Q.note),
         h('footer', { className: 'kt-quote-foot' },
           h('div', null, h('span', null, Q.contact), h('b', null, [company.phone, company.email, company.address].filter(Boolean).join(' · '))),
@@ -2382,7 +2432,7 @@
 
 
   // ---------- FAQ: four topics; each question opens in place. Also emits FAQPage structured data for search engines ----------
-  var T6 = {"pl": {"faq": {"eyebrow": "Najczęstsze pytania", "title": "Pytania, które słyszymy najczęściej.", "sub": "Nie ma Twojego pytania? Napisz do nas — odpowiadamy po polsku, angielsku i chińsku.", "groups": [{"title": "Zamówienie i płatność", "items": [["Jak wygląda zamówienie krok po kroku?", "Wybierasz model, wersję i kolor, a my potwierdzamy dostępność u dealera w Chinach i cenę. Podpisujemy umowę po polsku i wpłacasz zaliczkę. Kupujemy auto, sprawdzamy je na miejscu, a niezależny inspektor przygotowuje raport ze zdjęciami i wideo — dostajesz go razem z tłumaczeniem na polski. Potem transport do Europy i odprawa celna, którą prowadzimy sami. Homologację i rejestrację możesz zlecić nam albo załatwić samodzielnie. Cały proces trwa zwykle 12–16 tygodni."], ["Ile wynosi zaliczka i kiedy płacę resztę?", "Zaliczka to 30% ceny końcowej i płacisz ją przy podpisaniu umowy. Pozostałe 70% płacisz, gdy auto dotrze do portu w Europie. Wszystkie płatności idą przelewem na konto polskiej spółki, na fakturę."], ["Czy cena z konfiguratora jest ostateczna?", "Cena z konfiguratora obejmuje auto, transport i ubezpieczenie, cło, akcyzę i VAT oraz szacunkowe opłaty za homologację i rejestrację, jeśli zlecisz je nam. Do podpisania umowy jest orientacyjna, bo zależy od kursu walut i aktualnej ceny u dealera. W umowie cena jest stała i później już się nie zmienia."], ["Czy mogę zamówić model, którego nie ma na stronie?", "Tak. Sprowadzamy każdy model sprzedawany w Chinach — nowy albo używany. Napisz, jaki model i wersja Cię interesują, a w ciągu kilku dni dostaniesz wycenę z pełnym kosztem w Polsce."]]}, {"title": "Transport, cło i rejestracja", "items": [["Jak auto jedzie z Chin do Polski?", "Najczęściej w kontenerze drogą morską do portu w Europie, a stamtąd lawetą do Polski. Przy pilnych zamówieniach korzystamy z kolei albo transportu drogowego. Auto jest ubezpieczone na całej trasie, a Ty dostajesz zdjęcia z każdego etapu: załadunek, port, odprawa, przyjazd."], ["Czy auto z Chin można legalnie zarejestrować w Polsce?", "Tak. Jeśli model ma europejskie świadectwo zgodności (CoC), rejestracja przebiega jak przy każdym aucie z importu. Jeśli nie ma, potrzebne jest dopuszczenie jednostkowe w Polsce. Tłumaczenia przysięgłe, badanie techniczne i wizytę w wydziale komunikacji możemy załatwić za Ciebie albo przygotować Ci komplet dokumentów, żebyś zrobił to sam."], ["Jakie podatki i opłaty są wliczone w cenę?", "Cło 10% od wartości auta z transportem, akcyza zależna od pojemności silnika i napędu (auta elektryczne są z niej zwolnione, hybrydy plug-in do 2,0 l — do końca 2029 roku), VAT 23% oraz opłaty za port, agencję celną, homologację, tłumaczenia i rejestrację. Przy nowych autach elektrycznych z Chin dochodzi unijne cło wyrównawcze, zależne od producenta. Kalkulator pokazuje każdą pozycję osobno. Firmy odliczają VAT."]]}, {"title": "Auto na co dzień w Europie", "items": [["Czy auto elektryczne z Chin naładuję w Polsce?", "Auta na rynek chiński mają złącze GB/T, a w Europie standardem jest Type 2 i CCS2. Do każdego auta dołączamy przejściówki na europejski standard, więc ładowanie w domu, w pracy i na publicznych stacjach działa normalnie. Jeśli dany model jest dostępny w wersji z europejskim gniazdem, powiemy Ci o tym przed zamówieniem."], ["Czy serwis i części są dostępne w Polsce?", "Przeglądy i naprawy wykonują nasze warsztaty partnerskie, w tym serwisy wyspecjalizowane w autach elektrycznych. Części zamawiamy bezpośrednio z Chin, typowe elementy eksploatacyjne są dostępne od ręki. Aktualizacje oprogramowania zależą od marki — przed zamówieniem informujemy, jak wyglądają w danym modelu."]]}, {"title": "Gwarancja, dokumenty i ubezpieczenie", "items": [["Jaką gwarancję dostaję?", "To zależy od modelu, wieku auta i tego, czy producent obsługuje gwarancję w Europie. Przed podpisaniem umowy mówimy wprost, jaka ochrona przysługuje na konkretne auto, a jakiej nie ma — bez ogólnych obietnic. Pewne jest jedno: zanim auto wyjedzie z Chin, dostajesz raport z niezależnej inspekcji z tłumaczeniem na polski."], ["Jakie dokumenty dostanę razem z autem?", "Umowę i fakturę, dokumenty celne (SAD) i potwierdzenie zapłaty akcyzy, raport z niezależnej inspekcji z tłumaczeniem na polski, chińskie dokumenty pojazdu z tłumaczeniami przysięgłymi oraz świadectwo zgodności, jeśli model je ma. Jeśli zlecisz nam rejestrację, dostajesz też dowód rejestracyjny i tablice."], ["Czy ubezpieczę takie auto w Polsce?", "Tak, OC i AC działają tak samo jak dla każdego auta zarejestrowanego w Polsce. Niektórzy ubezpieczyciele proszą przy AC o wycenę rzeczoznawcy — pomagamy ją załatwić i podpowiadamy, które towarzystwa dobrze znają chińskie marki."]]}]}}, "en": {"faq": {"eyebrow": "Frequently asked questions", "title": "The questions we hear most often.", "sub": "Not here? Write to us. We answer in Polish, English and Chinese.", "groups": [{"title": "Ordering and payment", "items": [["How does an order work, step by step?", "You pick the model, trim and colour; we confirm availability with the dealer in China and the price. We sign a contract in Polish, with an English version, and you pay the deposit. We buy the car, our inspector checks it on site and sends you a report with photos and video. Then shipping to Europe, customs clearance and registration in Poland. You collect a car that is ready to drive. The whole process usually takes 12–16 weeks."], ["How much is the deposit, and when do I pay the rest?", "The deposit is 30% of the final price, paid when the contract is signed. The remaining 70% is due once the car reaches the port in Europe. All payments go by bank transfer to a Polish company account, with an invoice."], ["Is the configurator price final?", "The configurator price covers the car, shipping and insurance, duty, excise and VAT, plus estimated homologation and registration fees if you have us handle them. Until the contract is signed it is indicative, because it depends on exchange rates and the dealer's current price. In the contract the price is fixed and does not change afterwards."], ["Can I order a model that is not on the site?", "Yes. We import any model sold in China, new or used. Tell us the model and trim you want and within a few days you get a quote with the full cost in Poland."]]}, {"title": "Shipping, customs and registration", "items": [["How does the car get from China to Poland?", "Usually in a container by sea to a European port, then by truck to Poland. For urgent orders we use rail or road transport. The car is insured for the whole route and you get photos from every stage: loading, port, customs, arrival."], ["Can a car from China be legally registered in Poland?", "Yes. If the model has an EU certificate of conformity (CoC), registration works like for any imported car. If not, it needs individual vehicle approval in Poland. We can handle the sworn translations, the technical inspection and the registration office for you, or prepare a complete set of documents so you can do it yourself."], ["Which taxes and fees are included in the price?", "Customs duty of 10% on the car's value including shipping, excise duty based on engine size and drivetrain (EVs are exempt, plug-in hybrids up to 2.0 l until the end of 2029), VAT at 23%, plus port, customs agent, homologation, translation and registration fees. New Chinese EVs also carry the EU countervailing duty, which depends on the manufacturer. The calculator shows every item separately. Companies can deduct the VAT."]]}, {"title": "Living with the car in Europe", "items": [["Can I charge a Chinese EV in Poland?", "Chinese-market cars have a GB/T charging port, while Europe uses Type 2 and CCS2. Every car comes with adapters to the European standard, so charging at home, at work and at public stations works as normal. If a model is available with a European port, we tell you before you order."], ["Are servicing and parts available in Poland?", "Servicing and repairs are done by our partner workshops, including ones specialised in electric cars. We order parts directly from China; common wear parts are available immediately. Software updates depend on the brand, and we tell you before ordering how they work for that model."]]}, {"title": "Warranty, documents and insurance", "items": [["What warranty do I get?", "That depends on the model, the car's age and whether the manufacturer services its warranty in Europe. Before you sign, we tell you plainly what cover the specific car has and what it does not — no blanket promises. One thing is certain: before the car leaves China you receive an independent inspection report with a Polish translation."], ["Which documents come with the car?", "The contract and invoice, customs documents (SAD) and proof of excise payment, the independent inspection report with a Polish translation, the Chinese vehicle documents with sworn translations, and the certificate of conformity if the model has one. If you have us register the car, you also get the registration document and plates."], ["Can I insure the car in Poland?", "Yes, third-party and comprehensive insurance work like for any car registered in Poland. Some insurers ask for an appraiser's valuation for comprehensive cover; we help arrange it and point you to the companies that know Chinese brands well."]]}]}}, "zh": {"faq": {"eyebrow": "常见问题", "title": "大家问得最多的问题。", "sub": "没找到你的问题？给我们留言，我们用波兰语、英语和中文回复。", "groups": [{"title": "订车与付款", "items": [["下单流程是怎样的？", "你选定车型、版本和颜色，我们向中国经销商确认现车和价格。签订波兰语合同（可附中文版）并支付定金。我们买下车并到现场验车，第三方检测机构出具带照片和视频的检测报告，连同波兰语译本一起发给你。随后运往欧洲，由我们自己在波兰清关。认证和上牌可以委托我们办理，也可以你自己办。整个流程通常需要 12–16 周。"], ["定金多少？余款什么时候付？", "定金为最终价格的 30%，签合同时支付。其余 70% 在车辆到达欧洲港口后支付。所有款项都转账到波兰公司账户并开具发票。"], ["配置器里的价格是最终价吗？", "配置器价格包含车价、运输与保险、关税、消费税和增值税，以及委托我们办理时认证和上牌的预估费用。签合同前它是参考价，会随汇率和经销商实时价格变动；合同里的价格是固定的，之后不再变。"], ["网站上没有的车型可以订吗？", "可以。在中国市场销售的任何车型，新车或二手车，我们都能进口。告诉我们车型和版本，几天内就能收到含波兰落地总价的报价。"]]}, {"title": "运输、清关与上牌", "items": [["车是怎么从中国运到波兰的？", "通常是集装箱海运到欧洲港口，再用板车运到波兰；急单可以走铁路或公路。全程投保，每个环节（装柜、到港、清关、到达）都会给你发照片。"], ["中国的车能在波兰合法上牌吗？", "可以。如果车型有欧盟一致性证书（CoC），上牌流程和其他进口车一样；没有的话，需要在波兰做单车认证。宣誓翻译、车检和车管所手续可以委托我们办理，也可以由我们把全套文件准备好，你自己去办。"], ["价格里包含哪些税费？", "关税按车价加运费的 10%；消费税按排量和动力类型计算（纯电免征，2.0 升以下插混免征至 2029 年底）；增值税 23%；另有港口、报关代理、认证、翻译和上牌费用。中国产新纯电车还要加欧盟反补贴税，税率因厂商而异。计算器会把每一项分开列出。公司购车可抵扣增值税。"]]}, {"title": "在欧洲日常使用", "items": [["中国的电动车在波兰能充电吗？", "中国市场的车用 GB/T 充电口，欧洲标准是 Type 2 和 CCS2。每台车我们都配欧标转换头，家充、公司充电和公共充电桩都能正常使用。如果某款车型有欧标接口的版本，下单前我们会告诉你。"], ["在波兰有维修和配件吗？", "保养和维修由我们的合作维修点完成，其中包括专修电动车的门店。配件直接从中国订购，常用易损件有现货。软件升级因品牌而异，下单前我们会说明该车型的情况。"]]}, {"title": "质保、文件与保险", "items": [["质保是怎样的？", "这取决于车型、车龄，以及厂家在欧洲是否提供质保服务。签合同前我们会把这台车有哪些保障、没有哪些保障讲清楚，不做笼统承诺。可以确定的是：车离开中国之前，你会拿到第三方检测报告和它的波兰语译本。"], ["随车会拿到哪些文件？", "合同和发票、海关文件（SAD）和消费税缴纳证明、第三方检测报告及波兰语译本、带宣誓翻译的中国车辆文件，以及车型具备时的一致性证书。如果委托我们上牌，还会拿到行驶证和牌照。"], ["这样的车在波兰能上保险吗？", "可以，交强险（OC）和车损险（AC）与其他在波兰登记的车一样办理。部分保险公司在投保车损险时要求评估师估价，我们可以协助办理，并推荐熟悉中国品牌的保险公司。"]]}]}}};
+  var T6 = {"pl": {"faq": {"eyebrow": "Najczęstsze pytania", "title": "Pytania, które słyszymy najczęściej.", "sub": "Nie ma Twojego pytania? Napisz do nas — odpowiadamy po polsku, angielsku i chińsku.", "groups": [{"title": "Zamówienie i płatność", "items": [["Jak wygląda zamówienie krok po kroku?", "Wybierasz model, wersję i kolor, a my potwierdzamy dostępność u dealera w Chinach i cenę. Podpisujemy umowę po polsku i wpłacasz zaliczkę. Kupujemy auto, sprawdzamy je na miejscu, a niezależny inspektor przygotowuje raport ze zdjęciami i wideo — dostajesz go razem z tłumaczeniem na polski. Potem transport do Europy i odprawa celna, którą prowadzimy sami. Homologację i rejestrację możesz zlecić nam albo załatwić samodzielnie. Cały proces trwa zwykle 12–16 tygodni."], ["Ile wynosi zaliczka i kiedy płacę resztę?", "Zaliczka to 30% ceny końcowej i płacisz ją przy podpisaniu umowy. Pozostałe 70% płacisz, gdy auto dotrze do portu w Europie. Wszystkie płatności idą przelewem na konto polskiej spółki, na fakturę."], ["Czy cena z konfiguratora jest ostateczna?", "Szacunek: cena CIP obejmuje fracht do portu w Europie i ubezpieczenie. Doliczamy dopłatę za trasę do Polski, cło, należne cło wyrównawcze, akcyzę, VAT oraz port, odprawę, homologację, tłumaczenia i rejestrację. Cło wyrównawcze dotyczy tylko nowych EV i aut z przedłużaczem zasięgu wyprodukowanych w Chinach, nie aut Imported. Kurs według dziennej tabeli NBP; przy braku połączenia oznaczony kurs orientacyjny. Cena ostateczna zgodnie z umową."], ["Czy mogę zamówić model, którego nie ma na stronie?", "Tak. Sprowadzamy każdy model sprzedawany w Chinach — nowy albo używany. Napisz, jaki model i wersja Cię interesują, a w ciągu kilku dni dostaniesz wycenę z pełnym kosztem w Polsce."]]}, {"title": "Transport, cło i rejestracja", "items": [["Jak auto jedzie z Chin do Polski?", "Najczęściej w kontenerze drogą morską do portu w Europie, a stamtąd lawetą do Polski. Przy pilnych zamówieniach korzystamy z kolei albo transportu drogowego. Auto jest ubezpieczone na całej trasie, a Ty dostajesz zdjęcia z każdego etapu: załadunek, port, odprawa, przyjazd."], ["Czy auto z Chin można legalnie zarejestrować w Polsce?", "Tak. Jeśli model ma europejskie świadectwo zgodności (CoC), rejestracja przebiega jak przy każdym aucie z importu. Jeśli nie ma, potrzebne jest dopuszczenie jednostkowe w Polsce. Tłumaczenia przysięgłe, badanie techniczne i wizytę w wydziale komunikacji możemy załatwić za Ciebie albo przygotować Ci komplet dokumentów, żebyś zrobił to sam."], ["Jakie podatki i opłaty są wliczone w cenę?", "Szacunek: cena CIP obejmuje fracht do portu w Europie i ubezpieczenie. Doliczamy dopłatę za trasę do Polski, cło, należne cło wyrównawcze, akcyzę, VAT oraz port, odprawę, homologację, tłumaczenia i rejestrację. Cło wyrównawcze dotyczy tylko nowych EV i aut z przedłużaczem zasięgu wyprodukowanych w Chinach, nie aut Imported. Kurs według dziennej tabeli NBP; przy braku połączenia oznaczony kurs orientacyjny. Cena ostateczna zgodnie z umową."]]}, {"title": "Auto na co dzień w Europie", "items": [["Czy auto elektryczne z Chin naładuję w Polsce?", "Auta na rynek chiński mają złącze GB/T, a w Europie standardem jest Type 2 i CCS2. Do każdego auta dołączamy przejściówki na europejski standard, więc ładowanie w domu, w pracy i na publicznych stacjach działa normalnie. Jeśli dany model jest dostępny w wersji z europejskim gniazdem, powiemy Ci o tym przed zamówieniem."], ["Czy serwis i części są dostępne w Polsce?", "Przeglądy i naprawy wykonują nasze warsztaty partnerskie, w tym serwisy wyspecjalizowane w autach elektrycznych. Części zamawiamy bezpośrednio z Chin, typowe elementy eksploatacyjne są dostępne od ręki. Aktualizacje oprogramowania zależą od marki — przed zamówieniem informujemy, jak wyglądają w danym modelu."]]}, {"title": "Gwarancja, dokumenty i ubezpieczenie", "items": [["Jaką gwarancję dostaję?", "To zależy od modelu, wieku auta i tego, czy producent obsługuje gwarancję w Europie. Przed podpisaniem umowy mówimy wprost, jaka ochrona przysługuje na konkretne auto, a jakiej nie ma — bez ogólnych obietnic. Pewne jest jedno: zanim auto wyjedzie z Chin, dostajesz raport z niezależnej inspekcji z tłumaczeniem na polski."], ["Jakie dokumenty dostanę razem z autem?", "Umowę i fakturę, dokumenty celne (SAD) i potwierdzenie zapłaty akcyzy, raport z niezależnej inspekcji z tłumaczeniem na polski, chińskie dokumenty pojazdu z tłumaczeniami przysięgłymi oraz świadectwo zgodności, jeśli model je ma. Jeśli zlecisz nam rejestrację, dostajesz też dowód rejestracyjny i tablice."], ["Czy ubezpieczę takie auto w Polsce?", "Tak, OC i AC działają tak samo jak dla każdego auta zarejestrowanego w Polsce. Niektórzy ubezpieczyciele proszą przy AC o wycenę rzeczoznawcy — pomagamy ją załatwić i podpowiadamy, które towarzystwa dobrze znają chińskie marki."]]}]}}, "en": {"faq": {"eyebrow": "Frequently asked questions", "title": "The questions we hear most often.", "sub": "Not here? Write to us. We answer in Polish, English and Chinese.", "groups": [{"title": "Ordering and payment", "items": [["How does an order work, step by step?", "You pick the model, trim and colour; we confirm availability with the dealer in China and the price. We sign a contract in Polish, with an English version, and you pay the deposit. We buy the car, our inspector checks it on site and sends you a report with photos and video. Then shipping to Europe, customs clearance and registration in Poland. You collect a car that is ready to drive. The whole process usually takes 12–16 weeks."], ["How much is the deposit, and when do I pay the rest?", "The deposit is 30% of the final price, paid when the contract is signed. The remaining 70% is due once the car reaches the port in Europe. All payments go by bank transfer to a Polish company account, with an invoice."], ["Is the configurator price final?", "Estimate: CIP includes freight to a European port and insurance. We add the Polish-route surcharge, customs duty, applicable countervailing duty, excise, VAT, port charges, customs clearance, homologation, translations and registration. Countervailing duty applies only to new China-made EVs and range-extender EVs, excluding Imported cars. Exchange rates follow the daily NBP table; a labelled indicative rate is used when unavailable. The final price is set by the contract."], ["Can I order a model that is not on the site?", "Yes. We import any model sold in China, new or used. Tell us the model and trim you want and within a few days you get a quote with the full cost in Poland."]]}, {"title": "Shipping, customs and registration", "items": [["How does the car get from China to Poland?", "Usually in a container by sea to a European port, then by truck to Poland. For urgent orders we use rail or road transport. The car is insured for the whole route and you get photos from every stage: loading, port, customs, arrival."], ["Can a car from China be legally registered in Poland?", "Yes. If the model has an EU certificate of conformity (CoC), registration works like for any imported car. If not, it needs individual vehicle approval in Poland. We can handle the sworn translations, the technical inspection and the registration office for you, or prepare a complete set of documents so you can do it yourself."], ["Which taxes and fees are included in the price?", "Estimate: CIP includes freight to a European port and insurance. We add the Polish-route surcharge, customs duty, applicable countervailing duty, excise, VAT, port charges, customs clearance, homologation, translations and registration. Countervailing duty applies only to new China-made EVs and range-extender EVs, excluding Imported cars. Exchange rates follow the daily NBP table; a labelled indicative rate is used when unavailable. The final price is set by the contract."]]}, {"title": "Living with the car in Europe", "items": [["Can I charge a Chinese EV in Poland?", "Chinese-market cars have a GB/T charging port, while Europe uses Type 2 and CCS2. Every car comes with adapters to the European standard, so charging at home, at work and at public stations works as normal. If a model is available with a European port, we tell you before you order."], ["Are servicing and parts available in Poland?", "Servicing and repairs are done by our partner workshops, including ones specialised in electric cars. We order parts directly from China; common wear parts are available immediately. Software updates depend on the brand, and we tell you before ordering how they work for that model."]]}, {"title": "Warranty, documents and insurance", "items": [["What warranty do I get?", "That depends on the model, the car's age and whether the manufacturer services its warranty in Europe. Before you sign, we tell you plainly what cover the specific car has and what it does not — no blanket promises. One thing is certain: before the car leaves China you receive an independent inspection report with a Polish translation."], ["Which documents come with the car?", "The contract and invoice, customs documents (SAD) and proof of excise payment, the independent inspection report with a Polish translation, the Chinese vehicle documents with sworn translations, and the certificate of conformity if the model has one. If you have us register the car, you also get the registration document and plates."], ["Can I insure the car in Poland?", "Yes, third-party and comprehensive insurance work like for any car registered in Poland. Some insurers ask for an appraiser's valuation for comprehensive cover; we help arrange it and point you to the companies that know Chinese brands well."]]}]}}, "zh": {"faq": {"eyebrow": "常见问题", "title": "大家问得最多的问题。", "sub": "没找到你的问题？给我们留言，我们用波兰语、英语和中文回复。", "groups": [{"title": "订车与付款", "items": [["下单流程是怎样的？", "你选定车型、版本和颜色，我们向中国经销商确认现车和价格。签订波兰语合同（可附中文版）并支付定金。我们买下车并到现场验车，第三方检测机构出具带照片和视频的检测报告，连同波兰语译本一起发给你。随后运往欧洲，由我们自己在波兰清关。认证和上牌可以委托我们办理，也可以你自己办。整个流程通常需要 12–16 周。"], ["定金多少？余款什么时候付？", "定金为最终价格的 30%，签合同时支付。其余 70% 在车辆到达欧洲港口后支付。所有款项都转账到波兰公司账户并开具发票。"], ["配置器里的价格是最终价吗？", "估算由 CIP 价（含到欧洲港口的运费和保险）、波兰航线运费补差、关税、适用的反补贴税、消费税、增值税，以及港口、清关、认证、翻译和登记费组成。反补贴税只适用于中国产新纯电及增程车，Imported 车辆不计。汇率按 NBP 当日公布汇率；无法连接时会标明参考汇率。最终价格以合同为准。"], ["网站上没有的车型可以订吗？", "可以。在中国市场销售的任何车型，新车或二手车，我们都能进口。告诉我们车型和版本，几天内就能收到含波兰落地总价的报价。"]]}, {"title": "运输、清关与上牌", "items": [["车是怎么从中国运到波兰的？", "通常是集装箱海运到欧洲港口，再用板车运到波兰；急单可以走铁路或公路。全程投保，每个环节（装柜、到港、清关、到达）都会给你发照片。"], ["中国的车能在波兰合法上牌吗？", "可以。如果车型有欧盟一致性证书（CoC），上牌流程和其他进口车一样；没有的话，需要在波兰做单车认证。宣誓翻译、车检和车管所手续可以委托我们办理，也可以由我们把全套文件准备好，你自己去办。"], ["价格里包含哪些税费？", "估算由 CIP 价（含到欧洲港口的运费和保险）、波兰航线运费补差、关税、适用的反补贴税、消费税、增值税，以及港口、清关、认证、翻译和登记费组成。反补贴税只适用于中国产新纯电及增程车，Imported 车辆不计。汇率按 NBP 当日公布汇率；无法连接时会标明参考汇率。最终价格以合同为准。"]]}, {"title": "在欧洲日常使用", "items": [["中国的电动车在波兰能充电吗？", "中国市场的车用 GB/T 充电口，欧洲标准是 Type 2 和 CCS2。每台车我们都配欧标转换头，家充、公司充电和公共充电桩都能正常使用。如果某款车型有欧标接口的版本，下单前我们会告诉你。"], ["在波兰有维修和配件吗？", "保养和维修由我们的合作维修点完成，其中包括专修电动车的门店。配件直接从中国订购，常用易损件有现货。软件升级因品牌而异，下单前我们会说明该车型的情况。"]]}, {"title": "质保、文件与保险", "items": [["质保是怎样的？", "这取决于车型、车龄，以及厂家在欧洲是否提供质保服务。签合同前我们会把这台车有哪些保障、没有哪些保障讲清楚，不做笼统承诺。可以确定的是：车离开中国之前，你会拿到第三方检测报告和它的波兰语译本。"], ["随车会拿到哪些文件？", "合同和发票、海关文件（SAD）和消费税缴纳证明、第三方检测报告及波兰语译本、带宣誓翻译的中国车辆文件，以及车型具备时的一致性证书。如果委托我们上牌，还会拿到行驶证和牌照。"], ["这样的车在波兰能上保险吗？", "可以，交强险（OC）和车损险（AC）与其他在波兰登记的车一样办理。部分保险公司在投保车损险时要求评估师估价，我们可以协助办理，并推荐熟悉中国品牌的保险公司。"]]}]}}};
   Object.keys(T6).forEach(function (k) { Object.assign(T[k], T6[k]); });
   function FAQ(p) {
     var lang = p.lang || 'pl', s = t(lang), f = s.faq;
@@ -2499,8 +2549,8 @@
         h('div', { className: 'kt-spot-foot' },
           h('div', { className: 'kt-spot-price' },
             h('span', { className: 'kt-label' }, sp0.from),
-            h('div', { className: 'kt-price' }, money(price, lang)),
-            car.priceCNY ? h('span', { className: 'kt-spot-cny' }, sp0.cny + ' ' + new Intl.NumberFormat(LOCALE[lang] || 'pl-PL').format(car.priceCNY) + ' CNY') : null),
+            h('div', { className: 'kt-price' }, price == null ? s.askPrice : money(price, lang)),
+            !isBox(car) && car.priceCNY ? h('span', { className: 'kt-spot-cny' }, sp0.cny + ' ' + new Intl.NumberFormat(LOCALE[lang] || 'pl-PL').format(car.priceCNY) + ' CNY') : null),
           h('div', { className: 'kt-spot-cta' },
             p.src3d ? h(Button, { variant: 'outline', onClick: open3d }, sp0.turn) : null,
             h(Button, { variant: 'primary', arrow: true, onClick: function () { p.onOrder && p.onOrder(car); } }, sp0.order)),
@@ -2521,7 +2571,7 @@
     Showroom3D: Showroom3D, Car3DView: Car3DView, three3d: K3,
     HomeHero: HomeHero, HomeSearch: HomeSearch, ScrollWords: ScrollWords, StatRow: StatRow, OfficeClocks: OfficeClocks, WhyUs: WhyUs, ModelSpotlight: ModelSpotlight,
     motion: { viewTransition: viewTransition, useReveal: useReveal, glare: glare, scrollParent: scrollParent, reduced: reduced, can3D: can3D },
-    SAMPLE_CARS: SAMPLE_CARS, SAMPLE_STOCK: SAMPLE_STOCK, SAMPLE_LISTINGS: SAMPLE_LISTINGS, SAMPLE_ORDERS: SAMPLE_ORDERS, COMPANY: COMPANY, DATA: DATA, EMPTY_FILTERS: EMPTY_FILTERS, copy: T, money: money, estimate: estimate,
-    RULES: RULES, calcImport: calcImport, landedOf: landedOf, filterCars: filterCars, sortCars: sortCars, ccBucket: ccBucket
+    SAMPLE_CARS: SAMPLE_CARS, SAMPLE_STOCK: SAMPLE_STOCK, SAMPLE_LISTINGS: SAMPLE_LISTINGS, SAMPLE_CATALOG: SAMPLE_CATALOG, SAMPLE_ORDERS: SAMPLE_ORDERS, COMPANY: COMPANY, DATA: DATA, EMPTY_FILTERS: EMPTY_FILTERS, copy: T, money: money, estimate: estimate,
+    RULES: RULES, calcImport: calcImport, pricingInput: pricingInput, pricingRows: pricingRows, cipOf: cipOf, boxPrice: boxPrice, landedOf: landedOf, filterCars: filterCars, sortCars: sortCars, ccBucket: ccBucket
   });
 })();

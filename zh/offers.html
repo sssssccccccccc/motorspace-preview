@@ -24,7 +24,7 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="../assets/brand/apple-touch-icon.png">
-<link rel="stylesheet" href="../kontener.css?v=644f994a">
+<link rel="stylesheet" href="../kontener.css?v=3d99c7d8">
 <script>(function(){var d=document.documentElement,t='dark';try{var m=/[?&]theme=(light|dark|auto)/.exec(location.search);if(m){t=m[1];localStorage.setItem('kt-theme',t);}else{t=localStorage.getItem('kt-theme')||'dark';}}catch(e){}if(t==='auto'){d.removeAttribute('data-theme');}else{d.setAttribute('data-theme',t);}})();</script>
 <style>
   html { scroll-padding-top: 84px; background: var(--paper); }
@@ -64,8 +64,8 @@
 </style>
 <script src="../vendor/react.production.min.js"></script>
 <script src="../vendor/react-dom.production.min.js"></script>
-<script src="../kontener-data.js?v=644f994a"></script>
-<script src="../kontener.js?v=644f994a"></script>
+<script src="../kontener-data.js?v=3d99c7d8"></script>
+<script src="../kontener.js?v=3d99c7d8"></script>
 <script>window.KT_DOC = "offers"; window.KT_PRIVACY_URL = "privacy.html"; window.KT_LEAD_URL = ""; window.KT_LEAD_EXTRA = {};</script>
 <script>window.KT_LOCAL_FONTS = true; window.KT_LANG = "zh"; window.KT_LANG_URLS = {"pl": "../oferty.html", "en": "../en/offers.html", "zh": "../zh/offers.html"}; window.KT_ASSETS = '../assets/'; window.KT_HOME_URL = 'index.html'; window.KT_OFFERS_URL = 'offers.html'; window.KT_TRACK_URL = 'tracking.html';</script>
 
@@ -104,7 +104,7 @@
     K.useRates(); // NBP table A once per day; prices re-render when it arrives
     React.useEffect(function () { if (!loading) return; var id = setTimeout(function () { vt(function () { setLoading(false); }); }, 1100); return function () { clearTimeout(id); }; }, []);
     var s = K.copy[lang];
-    var cars = K.sortCars(K.filterCars(K.SAMPLE_LISTINGS, f, q), sort);
+    var cars = K.sortCars(K.filterCars(K.SAMPLE_CATALOG, f, q), sort);
     var nActive = Object.keys(f).reduce(function (n, k) { var v = f[k]; return n + (Array.isArray(v) ? v.length : (v ? 1 : 0)); }, 0);
     // the filter sheet holds the page still and closes on Escape
     React.useEffect(function () {
@@ -126,10 +126,10 @@
           h('div', { className: 'wrap' },
             h('div', { className: 'top' },
               h(K.HeroTitle, { key: lang, lines: TITLE[lang] }),
-              h('div', { className: 'count kt-hero-sub' }, K.nWord(lang, K.SAMPLE_LISTINGS.length, s.cars))),
-            h('div', { className: 'q kt-hero-sub' }, h(K.SearchField, { lang: lang, value: q, onSubmit: setQv, onBrand: brand })),
+              h('div', { className: 'count kt-hero-sub' }, K.nWord(lang, K.SAMPLE_CATALOG.length, s.cars))),
+            h('div', { className: 'q kt-hero-sub' }, h(K.SearchField, { cars: K.SAMPLE_CATALOG, lang: lang, value: q, onSubmit: setQv, onBrand: brand })),
             h('div', { className: 'lay' },
-              h('div', { className: 'side', 'data-reveal': '' }, h(K.FilterPanel, { lang: lang, value: f, onChange: setFv, query: q })),
+              h('div', { className: 'side', 'data-reveal': '' }, h(K.FilterPanel, { cars: K.SAMPLE_CATALOG, lang: lang, value: f, onChange: setFv, query: q })),
               h('div', null,
                 h('div', { className: 'bar' },
                   h('span', { className: 'count' }, h(K.RollingNumber, { value: cars.length, format: String }), ' ' + K.nWord(lang, cars.length, s.cars).replace(/^\d+ /, '')),
@@ -148,7 +148,7 @@
           open ? h('div', { className: 'kt kt-fsheet-wrap', onMouseDown: function (e) { if (e.target === e.currentTarget) setOpen(false); } },
             h('div', { className: 'kt-fsheet', role: 'dialog', 'aria-modal': true, 'aria-label': s.filters },
               h('div', { className: 'kt-fsheet-grab', 'aria-hidden': true }),
-              h(K.FilterPanel, { lang: lang, value: f, onChange: setFv, query: q }),
+              h(K.FilterPanel, { cars: K.SAMPLE_CATALOG, lang: lang, value: f, onChange: setFv, query: q }),
               h('div', { className: 'kt-fsheet-foot' }, h(K.Button, { variant: 'primary', onClick: function () { setOpen(false); } }, s.showN + ' ' + K.nWord(lang, cars.length, s.cars))))) : null,
           h(K.MobileBar, { lang: lang, onCalc: quote, onAsk: function () { setLead({ kind: 'inquiry', summary: '' }); } }),
           sel ? h(K.CarDetailSheet, { car: sel, lang: lang, assets: ASSETS, vtName: 'kt-car-' + sel.id, onClose: closeCar, onOrder: orderCar, onCalc: calcCar }) : null,

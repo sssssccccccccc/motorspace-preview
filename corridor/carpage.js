@@ -3,6 +3,16 @@
    - the photo transition to a similar car: its photo takes the view-transition name and the hero gives it up */
 (function () {
   'use strict';
+  // Native links keep the full-size photos usable when JavaScript is disabled.
+  document.querySelectorAll('a[data-photo]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      if (e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      document.querySelector('.cp-hero-img').src = a.href;
+      document.querySelectorAll('a[data-photo]').forEach(function (thumb) { thumb.removeAttribute('aria-current'); });
+      a.setAttribute('aria-current', 'true');
+    });
+  });
   var btn = document.querySelector('[data-lead]'), host = document.getElementById('cp-lead'), root = null;
   function render(open) {
     var K = window.Kontener, h = window.React.createElement;
