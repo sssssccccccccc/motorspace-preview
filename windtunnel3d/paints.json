@@ -1,17 +1,18 @@
 {
- "_readme": "风洞 3D 车漆表（wind3d.js 读）。color 是 sRGB 车漆色；metal/rough/clearcoat 给 three.js 的 MeshPhysicalMaterial；glow 是这色在光圈里时风线的颜色；sw 是色片的 CSS 背景。",
+ "_readme": "风洞 3D 车漆表（wind3d.js 读）。color 是 sRGB 车漆色；metal/rough/clearcoat 给 three.js 的 MeshPhysicalMaterial；spec 是底漆自己的反光强弱（深色漆主要靠清漆层反光，调低免得发灰）；glow 是这色在光圈里时风线的颜色；sw 是色片的 CSS 背景。",
  "paints": [
   {
    "id": "yellow",
    "zh": "闪电黄",
    "pl": "Żółć błyskawicy",
    "en": "Lightning Yellow",
-   "color": "#f1c40f",
-   "metal": 0.0,
-   "rough": 0.24,
-   "clearcoat": 1.0,
+   "color": "#f0b400",
+   "metal": 0.05,
+   "rough": 0.3,
+   "clearcoat": 1,
    "sw": "#f1c40f",
-   "glow": "#ffd84a"
+   "glow": "#ffd84a",
+   "spec": 0.6
   },
   {
    "id": "chrome",
@@ -23,61 +24,66 @@
    "rough": 0.05,
    "clearcoat": 0.0,
    "sw": "linear-gradient(135deg,#fff 0,#9aa3ad 38%,#f4f7fb 52%,#59616b 70%,#e7ecf2 100%)",
-   "glow": "#e6f0ff"
+   "glow": "#e6f0ff",
+   "spec": 1
   },
   {
    "id": "black",
    "zh": "曜石黑",
    "pl": "Obsydianowa czerń",
    "en": "Obsidian Black",
-   "color": "#0d0e11",
-   "metal": 0.25,
-   "rough": 0.22,
-   "clearcoat": 1.0,
+   "color": "#0b0d12",
+   "metal": 0.0,
+   "rough": 0.3,
+   "clearcoat": 1,
    "sw": "#16181b",
-   "glow": "#aab4c0"
+   "glow": "#aab4c0",
+   "spec": 0.15
   },
   {
    "id": "white",
    "zh": "珍珠白",
    "pl": "Perłowa biel",
    "en": "Pearl White",
-   "color": "#f2f1ec",
+   "color": "#eef0f2",
    "metal": 0.05,
-   "rough": 0.28,
-   "clearcoat": 1.0,
+   "rough": 0.3,
+   "clearcoat": 1,
    "sw": "#ecebe6",
-   "glow": "#ffffff"
+   "glow": "#ffffff",
+   "spec": 0.6
   },
   {
    "id": "silver",
    "zh": "太空银",
    "pl": "Kosmiczne srebro",
    "en": "Space Silver",
-   "color": "#9ea3aa",
-   "metal": 0.75,
-   "rough": 0.26,
-   "clearcoat": 1.0,
+   "color": "#b4bac2",
+   "metal": 0.85,
+   "rough": 0.3,
+   "clearcoat": 1,
    "sw": "#9fa4ab",
-   "glow": "#d4dce8"
+   "glow": "#d4dce8",
+   "spec": 1
   },
   {
    "id": "green",
    "zh": "鹦鹉绿",
    "pl": "Papuzia zieleń",
    "en": "Parrot Green",
-   "color": "#0b8f8a",
-   "metal": 0.1,
-   "rough": 0.24,
-   "clearcoat": 1.0,
+   "color": "#06857f",
+   "metal": 0.25,
+   "rough": 0.28,
+   "clearcoat": 1,
    "sw": "#0e8c88",
-   "glow": "#45e2d2"
+   "glow": "#45e2d2",
+   "spec": 0.5
   }
  ],
  "credit": {
-  "zh": "3D 模型：「2025 Xiaomi SU7 Ultra」by Dave Love SketchFab，CC BY 4.0（Sketchfab）；去掉了原模型的赛车涂装。纽北原型赛车，非在售车型。",
-  "pl": "Model 3D: „2025 Xiaomi SU7 Ultra” — Dave Love SketchFab, CC BY 4.0 (Sketchfab); malowanie wyścigowe usunięte. Prototyp torowy z Nürburgringu, nie model w sprzedaży.",
-  "en": "3D model: “2025 Xiaomi SU7 Ultra” by Dave Love SketchFab, CC BY 4.0 (Sketchfab); racing livery removed. Nürburgring track prototype, not a car on sale."
+  "zh": "3D 模型：「2025 Xiaomi SU7 Ultra」by Dave Love SketchFab，CC BY 4.0（Sketchfab）；去掉了赛车涂装和尾翼字样，改了车漆、轮毂和卡钳颜色。纽北原型赛车，非在售车型。",
+  "pl": "Model 3D: „2025 Xiaomi SU7 Ultra” — Dave Love SketchFab, CC BY 4.0 (Sketchfab); usunięto malowanie wyścigowe i napis na skrzydle, zmieniono lakier, felgi i zaciski. Prototyp torowy z Nürburgringu, nie model w sprzedaży.",
+  "en": "3D model: “2025 Xiaomi SU7 Ultra” by Dave Love SketchFab, CC BY 4.0 (Sketchfab); racing livery and wing lettering removed, paint, wheels and calipers changed. Nürburgring track prototype, not a car on sale."
  },
  "source": "https://sketchfab.com/3d-models/2025-xiaomi-su7-ultra-7b5feac3e32940b1a66b9a46fbb7122e"
 }

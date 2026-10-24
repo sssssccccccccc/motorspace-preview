@@ -33,7 +33,7 @@
 <link rel="stylesheet" href="../corridor/texture.css?v=b91ead7c">
 <link rel="stylesheet" href="../corridor/motion.css?v=0f369f55">
 <link rel="stylesheet" href="../corridor/wind.css?v=8c9a8278">
-<link rel="stylesheet" href="../corridor/wind3d.css?v=9fedcbf0">
+<link rel="stylesheet" href="../corridor/wind3d.css?v=c1e2ea4f">
 <link rel="stylesheet" href="../corridor/report.css?v=ae830a7b">
 <link rel="stylesheet" href="../corridor/flow.css?v=84817739">
 <script>(function(){var d=document.documentElement,t='dark';try{var m=/[?&]theme=(light|dark|auto)/.exec(location.search);if(m){t=m[1];localStorage.setItem('kt-theme',t);}else{t=localStorage.getItem('kt-theme')||'dark';}}catch(e){}if(t==='auto'){d.removeAttribute('data-theme');}else{d.setAttribute('data-theme',t);}})();</script>
@@ -71,7 +71,7 @@
 <script src="../corridor/reveal.js?v=59cd2a53"></script>
 <script src="../corridor/branchfoot.js?v=0298b89a"></script>
 <script src="../corridor/spiral.js?v=52cce317"></script>
-<script src="../corridor/wind3d.js?v=74858067"></script>
+<script src="../corridor/wind3d.js?v=84dbc1c2"></script>
 <script type="speculationrules">{"prerender": [{"where": {"selector_matches": "a[data-car-link]"}, "eagerness": "moderate"}]}</script>
 <script>window.KT_DOC = "home"; window.KT_PRIVACY_URL = "privacy.html"; window.KT_LEAD_URL = ""; window.KT_LEAD_EXTRA = {};</script>
 <script>window.KT_LOCAL_FONTS = true; window.KT_LANG = "zh"; window.KT_LANG_URLS = {"pl": "../index-galeria.html", "en": "../en/index-galeria.html", "zh": "../zh/index-galeria.html"}; window.KT_ASSETS = '../assets/'; window.KT_HOME_URL = 'index.html'; window.KT_OFFERS_URL = 'offers.html'; window.KT_TRACK_URL = 'tracking.html';</script>
@@ -328,12 +328,12 @@
   // removed — a Nürburgring track prototype, so the credit says it is not a car on sale) drawn with three.js, loaded when the section
   // comes near; poster.webp stands in until then and stays where there is no WebGL. Replaces the 2D Xiaomi-configurator pictures (wind.js).
   var MSW_TEXT = {
-    zh: { eyebrow: '风洞 · 碳纤维大尾翼', sub: ['鼠标移到车身上，光圈里是另一种颜色；点一下，整台车换成它。车会跟着鼠标微微转动。', '手指划过车身，光圈里是另一种颜色；轻点一下，整台车换成它。左右拖动可以转车。'],
-      credit: '3D 模型：「2025 Xiaomi SU7 Ultra」by Dave Love SketchFab，CC BY 4.0（Sketchfab）；去掉了原模型的赛车涂装。这是纽北原型赛车，不是在售车型。' },
-    pl: { eyebrow: 'Tunel aerodynamiczny · karbonowe skrzydło', sub: ['Przesuń kursor po karoserii — w świetle zobaczysz inny lakier. Kliknij, a cały samochód zmieni kolor. Auto lekko obraca się za kursorem.', 'Przeciągnij palcem po karoserii — w świetle zobaczysz inny lakier. Stuknij, a cały samochód zmieni kolor. Przesuń w bok, by obrócić auto.'],
-      credit: 'Model 3D: „2025 Xiaomi SU7 Ultra” — Dave Love SketchFab, CC BY 4.0 (Sketchfab); malowanie wyścigowe usunięte. Prototyp torowy z Nürburgringu, nie model w sprzedaży.' },
-    en: { eyebrow: 'Wind tunnel · carbon rear wing', sub: ['Move over the body — the light shows another paint. Click and the whole car takes it. The car turns a little with the pointer.', 'Drag a finger over the body — the light shows another paint. Tap and the whole car takes it. Swipe sideways to turn the car.'],
-      credit: '3D model: “2025 Xiaomi SU7 Ultra” by Dave Love SketchFab, CC BY 4.0 (Sketchfab); racing livery removed. A Nürburgring track prototype, not a car on sale.' }
+    zh: { eyebrow: '风洞 · 碳纤维大尾翼', sub: ['鼠标移到车身上，光圈里是另一种颜色；点一下，整台车换成它。按住拖动，车可以 360° 转。', '轻点车身，整台车换成光圈里的颜色；左右划动，车可以 360° 转。'],
+      credit: '3D 模型：「2025 Xiaomi SU7 Ultra」by Dave Love SketchFab，CC BY 4.0（Sketchfab）；去掉了赛车涂装和尾翼字样，改了车漆、轮毂和卡钳颜色。这是纽北原型赛车，不是在售车型。' },
+    pl: { eyebrow: 'Tunel aerodynamiczny · karbonowe skrzydło', sub: ['Przesuń kursor po karoserii — w świetle zobaczysz inny lakier. Kliknij, a cały samochód zmieni kolor. Przytrzymaj i przeciągnij, by obrócić auto o 360°.', 'Stuknij karoserię, a cały samochód przyjmie lakier ze światła. Przesuń palcem w bok, by obrócić auto o 360°.'],
+      credit: 'Model 3D: „2025 Xiaomi SU7 Ultra” — Dave Love SketchFab, CC BY 4.0 (Sketchfab); usunięto malowanie wyścigowe i napis na skrzydle, zmieniono lakier, felgi i zaciski. Prototyp torowy z Nürburgringu, nie model w sprzedaży.' },
+    en: { eyebrow: 'Wind tunnel · carbon rear wing', sub: ['Move over the body — the light shows another paint. Click and the whole car takes it. Press and drag to turn it all the way round.', 'Tap the body and the whole car takes the paint in the light. Swipe sideways to turn it all the way round.'],
+      credit: '3D model: “2025 Xiaomi SU7 Ultra” by Dave Love SketchFab, CC BY 4.0 (Sketchfab); racing livery and wing lettering removed, paint, wheels and calipers changed. A Nürburgring track prototype, not a car on sale.' }
   };
   var MSW_SOURCE = 'https://sketchfab.com/3d-models/2025-xiaomi-su7-ultra-7b5feac3e32940b1a66b9a46fbb7122e';
   function WindBand(p) {
@@ -350,7 +350,7 @@
         h('p', { className: 'msw-sub' }, t.sub[fine ? 0 : 1])),
       h('div', { className: 'wt-stage' },
         h('div', { className: 'wt-glow', 'aria-hidden': true }),
-        h('img', { className: 'wt3-poster', src: MSC_BASE + '../windtunnel3d/poster.webp', width: 1630, height: 499, alt: 'Xiaomi SU7 Ultra', decoding: 'async', loading: 'lazy' }),
+        h('img', { className: 'wt3-poster', src: MSC_BASE + '../windtunnel3d/poster.webp', width: 1630, height: 439, alt: 'Xiaomi SU7 Ultra', decoding: 'async', loading: 'lazy' }),
         h('canvas', { className: 'wt3-gl', 'aria-hidden': true }),
         h('canvas', { className: 'wt-flow', 'aria-hidden': true })),
       h('div', { className: 'msw-foot' },

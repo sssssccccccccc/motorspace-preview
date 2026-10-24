@@ -6,5 +6,8 @@
 .msw .wt3-poster { position: absolute; left: 50%; top: 50%; z-index: 1; width: min(1180px, 86%); height: auto; transform: translate(-50%, -50%); pointer-events: none; opacity: 1; transition: opacity .9s; }
 .msw.is-ready .wt3-poster { opacity: 0; }
 .msw.is-static .wt-flow { display: none; }
-.msw .wt-stage { --lo: 0; }
+.msw .wt-stage { --lo: 0; cursor: grab; }
+.msw .wt-stage.is-drag, .msw .wt-stage.is-drag.is-over { cursor: grabbing; }
+/* the car is drawn bigger than the 2D pictures' frame allowed: a taller stage (wind.js's 60vh) on wide screens */
+@media (min-width: 701px) { .msw .wt-stage { height: clamp(400px, 68vh, 760px); } }
 @media (max-width: 700px) { .msw .wt3-poster { width: 97%; } }
