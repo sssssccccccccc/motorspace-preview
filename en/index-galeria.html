@@ -25,6 +25,7 @@
 <link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="../assets/brand/apple-touch-icon.png">
 <link rel="stylesheet" href="../kontener.css?v=32f36541">
+<script type="importmap">{"imports":{"three":"../vendor/three/three.module.min.js","three/addons/":"../vendor/three/"}}</script>
 <style>.mstk-pre .msc-title{clip-path:inset(0 100% 0 0)}</style>
 <script>(function(d){try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches){d.classList.add("mstk-pre");setTimeout(function(){d.classList.remove("mstk-pre")},4000)}}catch(e){}})(document.documentElement)</script>
 <link rel="stylesheet" href="../corridor/corridor.css?v=8f388c73">
@@ -32,6 +33,7 @@
 <link rel="stylesheet" href="../corridor/texture.css?v=b91ead7c">
 <link rel="stylesheet" href="../corridor/motion.css?v=0f369f55">
 <link rel="stylesheet" href="../corridor/wind.css?v=8c9a8278">
+<link rel="stylesheet" href="../corridor/wind3d.css?v=9fedcbf0">
 <link rel="stylesheet" href="../corridor/report.css?v=ae830a7b">
 <link rel="stylesheet" href="../corridor/flow.css?v=84817739">
 <script>(function(){var d=document.documentElement,t='dark';try{var m=/[?&]theme=(light|dark|auto)/.exec(location.search);if(m){t=m[1];localStorage.setItem('kt-theme',t);}else{t=localStorage.getItem('kt-theme')||'dark';}}catch(e){}if(t==='auto'){d.removeAttribute('data-theme');}else{d.setAttribute('data-theme',t);}})();</script>
@@ -69,7 +71,7 @@
 <script src="../corridor/reveal.js?v=59cd2a53"></script>
 <script src="../corridor/branchfoot.js?v=0298b89a"></script>
 <script src="../corridor/spiral.js?v=52cce317"></script>
-<script src="../corridor/wind.js?v=81e36ace"></script>
+<script src="../corridor/wind3d.js?v=74858067"></script>
 <script type="speculationrules">{"prerender": [{"where": {"selector_matches": "a[data-car-link]"}, "eagerness": "moderate"}]}</script>
 <script>window.KT_DOC = "home"; window.KT_PRIVACY_URL = "privacy.html"; window.KT_LEAD_URL = ""; window.KT_LEAD_EXTRA = {};</script>
 <script>window.KT_LOCAL_FONTS = true; window.KT_LANG = "en"; window.KT_LANG_URLS = {"pl": "../index-galeria.html", "en": "../en/index-galeria.html", "zh": "../zh/index-galeria.html"}; window.KT_ASSETS = '../assets/'; window.KT_HOME_URL = 'index.html'; window.KT_OFFERS_URL = 'offers.html'; window.KT_TRACK_URL = 'tracking.html';</script>
@@ -321,22 +323,24 @@
           pop.map(function (c, i) { return h(React.Fragment, { key: c[0] }, i ? h('i', null, '·') : null, h('button', { type: 'button', onClick: function () { p.onSearch({ query: c[1], filters: {} }); } }, c[0])); })) : null));
   }
 
-  // ---- wind tunnel (主人 2026-10-18: 「风洞用 B 版（车头朝右、镜面镀铬），放在进口流程和现车之间，上线前再换图」): wind.js ----
-  // the standalone prototype site/windtunnel/ as a section; Xiaomi's configurator renders, so the credit says so and
-  // the pictures have to be replaced before the site goes live
+  // ---- wind tunnel, 3D (主人 2026-10-24: 「把它变成 3D 的，从网上下免费的 3D 模型，加风的感觉，同时也有变色的效果，点到哪颜色会变一下」): wind3d.js ----
+  // the car is a glTF model (site/windtunnel3d/model/su7u.glb: "2025 Xiaomi SU7 Ultra" by Dave Love SketchFab, CC BY 4.0, racing livery
+  // removed — a Nürburgring track prototype, so the credit says it is not a car on sale) drawn with three.js, loaded when the section
+  // comes near; poster.webp stands in until then and stays where there is no WebGL. Replaces the 2D Xiaomi-configurator pictures (wind.js).
   var MSW_TEXT = {
-    zh: { eyebrow: '风洞 · 碳纤维大尾翼', sub: ['鼠标移到车身上，光圈里是另一种颜色；点一下，整台车换成它。', '手指划过车身，光圈里是另一种颜色；轻点一下，整台车换成它。'],
-      credit: '车图：小米汽车官网选配器的正侧面渲染图（xiaomiev.com），镜面镀铬由太空银渲染图计算生成。版权归小米，仅供内部小样，上线前换图或取得小米授权。' },
-    pl: { eyebrow: 'Tunel aerodynamiczny · karbonowe skrzydło', sub: ['Przesuń kursor po karoserii — w świetle zobaczysz inny lakier. Kliknij, a cały samochód zmieni kolor.', 'Przeciągnij palcem po karoserii — w świetle zobaczysz inny lakier. Stuknij, a cały samochód zmieni kolor.'],
-      credit: 'Grafika: render z konfiguratora Xiaomi (xiaomiev.com); lustrzany chrom wyliczony z renderu Space Silver. Prawa: Xiaomi — wyłącznie prototyp wewnętrzny.' },
-    en: { eyebrow: 'Wind tunnel · carbon rear wing', sub: ['Move over the body — the light shows another paint. Click and the whole car takes it.', 'Drag a finger over the body — the light shows another paint. Tap and the whole car takes it.'],
-      credit: 'Image: Xiaomi configurator render (xiaomiev.com); mirror chrome computed from the Space Silver render. © Xiaomi — internal prototype only.' }
+    zh: { eyebrow: '风洞 · 碳纤维大尾翼', sub: ['鼠标移到车身上，光圈里是另一种颜色；点一下，整台车换成它。车会跟着鼠标微微转动。', '手指划过车身，光圈里是另一种颜色；轻点一下，整台车换成它。左右拖动可以转车。'],
+      credit: '3D 模型：「2025 Xiaomi SU7 Ultra」by Dave Love SketchFab，CC BY 4.0（Sketchfab）；去掉了原模型的赛车涂装。这是纽北原型赛车，不是在售车型。' },
+    pl: { eyebrow: 'Tunel aerodynamiczny · karbonowe skrzydło', sub: ['Przesuń kursor po karoserii — w świetle zobaczysz inny lakier. Kliknij, a cały samochód zmieni kolor. Auto lekko obraca się za kursorem.', 'Przeciągnij palcem po karoserii — w świetle zobaczysz inny lakier. Stuknij, a cały samochód zmieni kolor. Przesuń w bok, by obrócić auto.'],
+      credit: 'Model 3D: „2025 Xiaomi SU7 Ultra” — Dave Love SketchFab, CC BY 4.0 (Sketchfab); malowanie wyścigowe usunięte. Prototyp torowy z Nürburgringu, nie model w sprzedaży.' },
+    en: { eyebrow: 'Wind tunnel · carbon rear wing', sub: ['Move over the body — the light shows another paint. Click and the whole car takes it. The car turns a little with the pointer.', 'Drag a finger over the body — the light shows another paint. Tap and the whole car takes it. Swipe sideways to turn the car.'],
+      credit: '3D model: “2025 Xiaomi SU7 Ultra” by Dave Love SketchFab, CC BY 4.0 (Sketchfab); racing livery removed. A Nürburgring track prototype, not a car on sale.' }
   };
+  var MSW_SOURCE = 'https://sketchfab.com/3d-models/2025-xiaomi-su7-ultra-7b5feac3e32940b1a66b9a46fbb7122e';
   function WindBand(p) {
     var t = MSW_TEXT[p.lang] || MSW_TEXT.pl, ref = React.useRef(null);
     var fine = window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches;
     React.useEffect(function () {
-      var api = window.MSWind ? window.MSWind.mount(ref.current, { base: MSC_BASE + '../windtunnel/', lang: p.lang }) : null;
+      var api = window.MSWind3D ? window.MSWind3D.mount(ref.current, { base: MSC_BASE + '../windtunnel3d/', vendor: MSC_BASE + '../vendor/three/', lang: p.lang }) : null;
       return function () { api && api.destroy(); };
     }, [p.lang]);
     return h('section', { ref: ref, key: p.lang, className: 'kt kt-dark msw', 'data-nav-dark': '', 'aria-label': 'Xiaomi SU7 Ultra' },
@@ -346,22 +350,13 @@
         h('p', { className: 'msw-sub' }, t.sub[fine ? 0 : 1])),
       h('div', { className: 'wt-stage' },
         h('div', { className: 'wt-glow', 'aria-hidden': true }),
-        h('div', { className: 'wt-car' },
-          h('div', { className: 'wt-shadow', 'aria-hidden': true }),
-          h('div', { className: 'wt-refl' },
-            h('div', { className: 'wt-car-in' },
-              h('img', { className: 'wt-base', width: 1974, height: 600, alt: 'Xiaomi SU7 Ultra', decoding: 'async' }),
-              h('img', { className: 'wt-splash', alt: '', 'aria-hidden': true }),
-              h('img', { className: 'wt-lens', alt: '', 'aria-hidden': true }),
-              h('div', { className: 'wt-sheen', 'aria-hidden': true }),
-              h('div', { className: 'wt-sweep', 'aria-hidden': true }),
-              h('div', { className: 'wt-glint', 'aria-hidden': true }),
-              h('div', { className: 'wt-glint is-core', 'aria-hidden': true })))),
+        h('img', { className: 'wt3-poster', src: MSC_BASE + '../windtunnel3d/poster.webp', width: 1630, height: 499, alt: 'Xiaomi SU7 Ultra', decoding: 'async', loading: 'lazy' }),
+        h('canvas', { className: 'wt3-gl', 'aria-hidden': true }),
         h('canvas', { className: 'wt-flow', 'aria-hidden': true })),
       h('div', { className: 'msw-foot' },
         h('div', { className: 'wt-paints', role: 'group' }),
         h('p', { className: 'wt-readout', 'aria-live': 'polite' })),
-      h('p', { className: 'msw-credit' }, t.credit));
+      h('p', { className: 'msw-credit' }, h('a', { href: MSW_SOURCE, target: '_blank', rel: 'noopener' }, t.credit)));
   }
 
   // ---- inspection report band (主人 2026-10-20: 瓜子检测报告「放到网站哪个地方最好…还有一个波兰版本…说明所有的车都会有

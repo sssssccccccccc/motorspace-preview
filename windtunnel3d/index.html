@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh"><head>
+  <meta name="robots" content="noindex, nofollow"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>风洞 3D 小样 · Xiaomi SU7 Ultra</title>
+<meta name="robots" content="noindex">
+<script type="importmap">{"imports":{"three":"../vendor/three/three.module.min.js","three/addons/":"../vendor/three/"}}</script>
+<link rel="stylesheet" href="../corridor/wind.css"><link rel="stylesheet" href="../corridor/wind3d.css">
+<style>
+  :root { --font-display: -apple-system, 'Helvetica Neue', Arial, sans-serif; --font-mono: ui-monospace, Menlo, monospace; }
+  html, body { margin: 0; background: #050506; color: #f5f5f7; font-family: var(--font-display); }
+  .msw { margin: 0 !important; min-height: 100vh; }
+</style></head>
+<body>
+<section class="kt kt-dark msw" aria-label="Xiaomi SU7 Ultra">
+  <div class="msw-head"><p class="msw-eyebrow">风洞 · 碳纤维大尾翼</p><h2>Xiaomi SU7 Ultra</h2>
+    <p class="msw-sub">鼠标移到车身上，光圈里是另一种颜色；点一下，整台车换成它。</p></div>
+  <div class="wt-stage">
+    <div class="wt-glow" aria-hidden="true"></div>
+    <img class="wt3-poster" src="poster.webp" alt="" aria-hidden="true">
+    <canvas class="wt3-gl" aria-hidden="true"></canvas>
+    <canvas class="wt-flow" aria-hidden="true"></canvas>
+  </div>
+  <div class="msw-foot"><div class="wt-paints" role="group"></div><p class="wt-readout" aria-live="polite"></p></div>
+  <p class="msw-credit">3D 模型：「2025 Xiaomi SU7 Ultra」by Dave Love SketchFab，CC BY 4.0</p>
+</section>
+<script src="../corridor/wind3d.js"></script>
+<script>
+  var q = new URLSearchParams(location.search);
+  window.__api = MSWind3D.mount(document.querySelector('.msw'), { base: './', lang: q.get('lang') || 'zh', still: q.has('still') });
+</script>
+</body></html>

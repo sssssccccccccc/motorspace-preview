@@ -1,0 +1,83 @@
+{
+ "_readme": "风洞 3D 车漆表（wind3d.js 读）。color 是 sRGB 车漆色；metal/rough/clearcoat 给 three.js 的 MeshPhysicalMaterial；glow 是这色在光圈里时风线的颜色；sw 是色片的 CSS 背景。",
+ "paints": [
+  {
+   "id": "yellow",
+   "zh": "闪电黄",
+   "pl": "Żółć błyskawicy",
+   "en": "Lightning Yellow",
+   "color": "#f1c40f",
+   "metal": 0.0,
+   "rough": 0.24,
+   "clearcoat": 1.0,
+   "sw": "#f1c40f",
+   "glow": "#ffd84a"
+  },
+  {
+   "id": "chrome",
+   "zh": "镜面镀铬",
+   "pl": "Lustrzany chrom",
+   "en": "Mirror Chrome",
+   "color": "#ffffff",
+   "metal": 1.0,
+   "rough": 0.05,
+   "clearcoat": 0.0,
+   "sw": "linear-gradient(135deg,#fff 0,#9aa3ad 38%,#f4f7fb 52%,#59616b 70%,#e7ecf2 100%)",
+   "glow": "#e6f0ff"
+  },
+  {
+   "id": "black",
+   "zh": "曜石黑",
+   "pl": "Obsydianowa czerń",
+   "en": "Obsidian Black",
+   "color": "#0d0e11",
+   "metal": 0.25,
+   "rough": 0.22,
+   "clearcoat": 1.0,
+   "sw": "#16181b",
+   "glow": "#aab4c0"
+  },
+  {
+   "id": "white",
+   "zh": "珍珠白",
+   "pl": "Perłowa biel",
+   "en": "Pearl White",
+   "color": "#f2f1ec",
+   "metal": 0.05,
+   "rough": 0.28,
+   "clearcoat": 1.0,
+   "sw": "#ecebe6",
+   "glow": "#ffffff"
+  },
+  {
+   "id": "silver",
+   "zh": "太空银",
+   "pl": "Kosmiczne srebro",
+   "en": "Space Silver",
+   "color": "#9ea3aa",
+   "metal": 0.75,
+   "rough": 0.26,
+   "clearcoat": 1.0,
+   "sw": "#9fa4ab",
+   "glow": "#d4dce8"
+  },
+  {
+   "id": "green",
+   "zh": "鹦鹉绿",
+   "pl": "Papuzia zieleń",
+   "en": "Parrot Green",
+   "color": "#0b8f8a",
+   "metal": 0.1,
+   "rough": 0.24,
+   "clearcoat": 1.0,
+   "sw": "#0e8c88",
+   "glow": "#45e2d2"
+  }
+ ],
+ "credit": {
+  "zh": "3D 模型：「2025 Xiaomi SU7 Ultra」by Dave Love SketchFab，CC BY 4.0（Sketchfab）；去掉了原模型的赛车涂装。纽北原型赛车，非在售车型。",
+  "pl": "Model 3D: „2025 Xiaomi SU7 Ultra” — Dave Love SketchFab, CC BY 4.0 (Sketchfab); malowanie wyścigowe usunięte. Prototyp torowy z Nürburgringu, nie model w sprzedaży.",
+  "en": "3D model: “2025 Xiaomi SU7 Ultra” by Dave Love SketchFab, CC BY 4.0 (Sketchfab); racing livery removed. Nürburgring track prototype, not a car on sale."
+ },
+ "source": "https://sketchfab.com/3d-models/2025-xiaomi-su7-ultra-7b5feac3e32940b1a66b9a46fbb7122e"
+}
