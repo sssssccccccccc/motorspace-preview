@@ -3,7 +3,7 @@
    The car is a glTF model (site/windtunnel3d/model/su7u.glb: "2025 Xiaomi SU7 Ultra" by Dave Love SketchFab, CC BY 4.0, livery removed,
    see dev/windtunnel/su7u-3d/), drawn with three.js (site/vendor/three/, loaded only when the section comes near; the page's
    <script type="importmap"> maps "three" and "three/addons/" to it). What stays from the 2D piece: the streamlines on a 2D canvas
-   over the car (its silhouette now comes from a small mask render of the model, so the air follows the car as it turns), the light
+   over the car (its silhouette comes from CPU projection of the model's outer-shell height maps, so the air follows it as it turns), the light
    under the pointer that shows the next paint, the click that floods the car with it, the chips and the readout.
    What is new: the body paint is a real material (clear coat; chrome is metal 1 / roughness 0.05 mirroring the studio), the light is a
    screen-space mix inside the paint shader (uLens), and the floor shows a soft shadow and a fading reflection (a mirrored copy of the
@@ -11,6 +11,8 @@
    also tilts the view a little), keeps spinning a moment after a flick, and some seconds after the pointer has gone it comes back to
    the side view and sways again. The reflections come from a small studio built here (a dark room, a softbox overhead, long strip
    lights along both sides), so the paint reads like the old configurator pictures rather than the flat grey of a generic room.
+   GPU mask readback used to stall the page for 40–90 ms each time it waited for the GPU (主人 2026-10-24:
+   「用鼠标去拖动那个小米汽车 3D 模型的时候，也有点卡顿」); the CPU silhouette avoids that wait.
    MSWind3D.mount(root, { base, lang }) works inside root; destroy() takes everything down. base = URL of site/windtunnel3d/. */
 (function () {
   'use strict';
@@ -35,7 +37,7 @@
 
   /* ---------- state ---------- */
   var T = null, renderer = null, scene = null, cam = null, grp = null, car = null, mirror = null, floorShadow = null, fade = null;
-  var paintMat = null, mirrorPaints = [], lensU = null, maskRT = null, maskMat = null, maskBuf = null;
+  var paintMat = null, mirrorPaints = [], lensU = null, hull = null, hullPV = null;
   var paints = [], base = 0, lens = 1, chips = [];
   var W = 0, H = 0, DPR = 1, cx = 0, cy = 0, cw = 0, ch = 0, s = 1, sc = 1, R = 100, GROUND = 0, IW = 1974;
   var roof = null, sill = null, MASKW = 0, MASKH = 0, maskDue = true, lastMaskYaw = 1e9, lastMaskT = 0;
@@ -191,9 +193,6 @@
     if (STILL && mirror) { mirror.userData.holder.visible = false; fade.visible = false; }   // the poster: car and shadow on nothing
     scene.add(new T.HemisphereLight(0xcfd8ea, 0x15161a, 0.35));
 
-    // the silhouette mask: the car alone, flat white, on a small render target
-    maskMat = new T.MeshBasicMaterial({ color: 0xffffff });
-    maskRT = new T.WebGLRenderTarget(4, 4, { depthBuffer: true });
     applyPaint(base); setLensPaint(lens);
   }
   function applyPaint(i) {
@@ -209,26 +208,112 @@
     lensU.uColB.value.set(p.color); lensU.uMetB.value = p.metal; lensU.uRouB.value = p.rough; lensU.uCcB.value = p.clearcoat;
   }
 
-  /* ---------- the silhouette -> streamlines (as in wind.js, the profile read from the mask render) ---------- */
+  /* ---------- the silhouette -> streamlines (as in wind.js: the car's profile, column by column) ---------- */
+  // The profile is worked out on the CPU from the model itself: over the floor plan, in 2 cm cells, the highest and the lowest point
+  // of the car (buildHull, once), projected through the camera at every update (renderMask). A point straight above another always
+  // lands higher on the screen, so nothing between the two can be the roof or the sill. It used to come from a mask render read back
+  // from the GPU, and every read made the page wait for the GPU to finish: 40–90 ms a time while the GPU was busy.
+  // runs fn over list a few milliseconds at a time (one mesh at least), so a long job never holds the page up in one piece
+  function inSlices(list, fn) {
+    return new Promise(function (done) {
+      var i = 0;
+      (function run() {
+        var t0 = performance.now();
+        while (i < list.length && !dead && performance.now() - t0 < 10) fn(list[i++]);
+        if (i < list.length && !dead) setTimeout(run, 0); else done();
+      })();
+    });
+  }
+  // the height maps, built in slices (about 55 ms of work on a desktop, a lot more on a phone); resolves when hull is ready
+  function buildHull() {
+    var start = performance.now(), HCELL = 0.02;
+    hullPV = new T.Matrix4();
+    grp.updateMatrixWorld(true);
+    var inv = new T.Matrix4().copy(grp.matrixWorld).invert(), M = new T.Matrix4(), v = new T.Vector3();
+    var box = new T.Box3(), list = [], meshes = [], nx, nz, cells, hiY, hiX, hiZ, loY, loX, loZ;
+    car.traverseVisible(function (m) { if (m.isMesh) list.push(m); });
+    return inSlices(list, function (m) {
+      var pos = m.geometry.getAttribute('position'), pts = new Float32Array(pos.count * 3);
+      M.multiplyMatrices(inv, m.matrixWorld);
+      for (var i = 0; i < pos.count; i++) {
+        v.fromBufferAttribute(pos, i).applyMatrix4(M); box.expandByPoint(v);
+        pts[i * 3] = v.x; pts[i * 3 + 1] = v.y; pts[i * 3 + 2] = v.z;
+      }
+      meshes.push({ pts: pts, index: m.geometry.index });
+    }).then(function () {
+      nx = Math.floor((box.max.x - box.min.x) / HCELL) + 1; nz = Math.floor((box.max.z - box.min.z) / HCELL) + 1; cells = nx * nz;
+      hiY = new Float32Array(cells); hiX = new Float32Array(cells); hiZ = new Float32Array(cells);
+      loY = new Float32Array(cells); loX = new Float32Array(cells); loZ = new Float32Array(cells);
+      hiY.fill(-Infinity); loY.fill(Infinity);
+      return inSlices(meshes, triangles);
+    }).then(function () {
+      var count = 0, c;
+      for (c = 0; c < cells; c++) if (hiY[c] !== -Infinity) count += hiY[c] - loY[c] > 0.0001 ? 2 : 1;
+      hull = new Float32Array(count * 3);
+      for (var p = 0, c = 0; c < cells; c++) if (hiY[c] !== -Infinity) {
+        hull[p++] = hiX[c]; hull[p++] = hiY[c]; hull[p++] = hiZ[c];
+        if (hiY[c] - loY[c] > 0.0001) { hull[p++] = loX[c]; hull[p++] = loY[c]; hull[p++] = loZ[c]; }
+      }
+      if (/[?&]wt3debug/.test(location.search)) console.info('[wind3d] hull', count, 'points', (performance.now() - start).toFixed(1), 'ms');
+    });
+    function sample(x, y, z) {
+      var ix = clamp(Math.floor((x - box.min.x) / HCELL), 0, nx - 1), iz = clamp(Math.floor((z - box.min.z) / HCELL), 0, nz - 1), c = iz * nx + ix;
+      if (y > hiY[c]) { hiY[c] = y; hiX[c] = x; hiZ[c] = z; }
+      if (y < loY[c]) { loY[c] = y; loX[c] = x; loZ[c] = z; }
+    }
+    function triangles(m) {
+      var pts = m.pts, index = m.index ? m.index.array : null, count = index ? index.length : pts.length / 3, t;
+      // every corner once (only the ones this mesh's triangles use: parts of the file share one vertex buffer); only the bigger
+      // triangles need more
+      if (index) { var used = new Uint8Array(pts.length / 3); for (t = 0; t < count; t++) { var q = index[t]; if (!used[q]) { used[q] = 1; sample(pts[q * 3], pts[q * 3 + 1], pts[q * 3 + 2]); } } }
+      else for (t = 0; t < pts.length; t += 3) sample(pts[t], pts[t + 1], pts[t + 2]);
+      for (t = 0; t + 2 < count; t += 3) {
+        var ai = (index ? index[t] : t) * 3, bi = (index ? index[t + 1] : t + 1) * 3, ci = (index ? index[t + 2] : t + 2) * 3;
+        var ax = pts[ai], ay = pts[ai + 1], az = pts[ai + 2];
+        var bx = pts[bi] - ax, by = pts[bi + 1] - ay, bz = pts[bi + 2] - az;
+        var cx_ = pts[ci] - ax, cy_ = pts[ci + 1] - ay, cz = pts[ci + 2] - az;
+        var e2 = Math.max(bx * bx + by * by + bz * bz, cx_ * cx_ + cy_ * cy_ + cz * cz, (cx_ - bx) * (cx_ - bx) + (cy_ - by) * (cy_ - by) + (cz - bz) * (cz - bz));
+        if (e2 <= HCELL * HCELL * 0.49) continue;
+        var n = clamp(Math.ceil(Math.sqrt(e2) / (HCELL * 0.7)), 2, 200);
+        for (var i = 0; i <= n; i++) for (var j = 0; j <= n - i; j++) {
+          var u = i / n, w = j / n;
+          sample(ax + bx * u + cx_ * w, ay + by * u + cy_ * w, az + bz * u + cz * w);
+        }
+      }
+    }
+  }
   function renderMask() {
     MASKW = Math.max(64, Math.round(W / 4)); MASKH = Math.max(32, Math.round(H / 4));
-    if (maskRT.width !== MASKW || maskRT.height !== MASKH) { maskRT.setSize(MASKW, MASKH); maskBuf = new Uint8Array(MASKW * MASKH * 4); }
-    var hid = [floorShadow, fade, mirror && mirror.userData.holder].filter(Boolean), vis = hid.map(function (m) { return m.visible; });
-    hid.forEach(function (m) { m.visible = false; });
-    var bg = scene.background, env = scene.environment; scene.environment = null;
-    scene.overrideMaterial = maskMat;
-    var oldTM = renderer.toneMapping; renderer.toneMapping = T.NoToneMapping;
-    renderer.setRenderTarget(maskRT); renderer.setClearColor(0x000000, 0); renderer.clear(); renderer.render(scene, cam);
-    renderer.readRenderTargetPixels(maskRT, 0, 0, MASKW, MASKH, maskBuf);
-    renderer.setRenderTarget(null); scene.overrideMaterial = null; scene.environment = env; scene.background = bg; renderer.toneMapping = oldTM;
-    hid.forEach(function (m, i) { m.visible = vis[i]; });
-    // columns -> roof (first opaque row from the top) and sill (last), in stage px; the target's rows run bottom-up
-    roof = new Float32Array(MASKW); sill = new Float32Array(MASKW);
-    var k = W / MASKW, first = -1, lastCol = -1, minY = 1e9, maxY = -1;
+    if (!roof || roof.length !== MASKW) { roof = new Float32Array(MASKW); sill = new Float32Array(MASKW); }
+    roof.fill(Infinity); sill.fill(-Infinity);
+    cam.updateMatrixWorld(); grp.updateMatrixWorld();
+    hullPV.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse).multiply(grp.matrixWorld);
+    var e = hullPV.elements;
+    var k = W / MASKW, first = -1, lastCol = -1, minY = 1e9, maxY = -1, sx0 = 1e9, sx1 = -1e9;
+    for (var p = 0; p < hull.length; p += 3) {
+      var hx = hull[p], hy = hull[p + 1], hz = hull[p + 2], w = e[3] * hx + e[7] * hy + e[11] * hz + e[15];
+      if (w <= 0) continue;
+      var sx = ((e[0] * hx + e[4] * hy + e[8] * hz + e[12]) / w * 0.5 + 0.5) * W;
+      var sy = (0.5 - (e[1] * hx + e[5] * hy + e[9] * hz + e[13]) / w * 0.5) * H, c = Math.floor(sx / k);
+      if (c < 0 || c >= MASKW) continue;
+      roof[c] = Math.min(roof[c], sy); sill[c] = Math.max(sill[c], sy);
+      if (sx < sx0) sx0 = sx; if (sx > sx1) sx1 = sx;
+    }
+    // Match the old mask's pixel-centre coverage and top-down row numbers, in stage px: a column counts once the car reaches
+    // its centre (so the nose and tail columns come out as on the render, not one wider)
+    var prev = -1, c0 = Math.ceil(sx0 / k - 0.5), c1 = Math.floor(sx1 / k - 0.5);
     for (var x = 0; x < MASKW; x++) {
-      roof[x] = sill[x] = -1;
-      for (var y = 0; y < MASKH; y++) { var row = MASKH - 1 - y; if (maskBuf[(row * MASKW + x) * 4 + 3] > 100) { roof[x] = y * k; break; } }
-      for (y = MASKH - 1; y >= 0; y--) { row = MASKH - 1 - y; if (maskBuf[(row * MASKW + x) * 4 + 3] > 100) { sill[x] = y * k; break; } }
+      if (roof[x] === Infinity || x < c0 || x > c1) { roof[x] = sill[x] = -1; continue; }
+      var rowTop = clamp(Math.ceil(roof[x] / k - 0.5), 0, MASKH - 1), rowBot = clamp(Math.floor(sill[x] / k - 0.5), 0, MASKH - 1);
+      if (rowBot < rowTop) rowBot = rowTop;
+      roof[x] = rowTop * k; sill[x] = rowBot * k;
+      if (prev >= 0) for (var gap = prev + 1; gap < x; gap++) {
+        var f = (gap - prev) / (x - prev);
+        roof[gap] = roof[prev] + (roof[x] - roof[prev]) * f; sill[gap] = sill[prev] + (sill[x] - sill[prev]) * f;
+      }
+      prev = x;
+    }
+    for (var x = 0; x < MASKW; x++) {
       if (roof[x] >= 0) { if (first < 0) first = x; lastCol = x; minY = Math.min(minY, roof[x]); maxY = Math.max(maxY, sill[x]); }
     }
     if (first < 0) return;
@@ -571,20 +656,25 @@
       var loader = new mods.GLTFLoader(); loader.setMeshoptDecoder(mods.MeshoptDecoder);
       return loader.loadAsync(BASE + (HD ? 'model/su7u-hd.glb' : 'model/su7u.glb')).then(function (gltf) {
         if (dead) return;
-        setupScene(mods, gltf); buildChips(); syncUI(); layout(); placeCamera(); renderMask();
-        root.classList.add('is-ready'); running = true; play();
+        setupScene(mods, gltf); buildChips(); syncUI(); layout(); placeCamera();
+        // the shaders compile in parallel (KHR_parallel_shader_compile) while the silhouette's height maps are built in slices;
+        // compiling them on the first frame instead stalled the scroll for 0.4–3 s
+        return Promise.all([renderer.compileAsync(scene, cam), buildHull()]).then(function () {
+          if (dead) return;
+          renderMask(); root.classList.add('is-ready'); running = true; play();
+        });
       });
     }).catch(function (err) { try { console.warn('[wind3d]', err); } catch (x) {} root.classList.add('is-static'); });
   }, { rootMargin: '900px 0px' });
   near.observe(root);
 
-  root.__wt3 = { dbg: function () { return { T: T, scene: scene, cam: cam, car: car, W: W, H: H }; }, onBody: onBody, state: function () { return { base: base, lens: lens, cx: cx, cw: cw, cy: cy, ch: ch, R: R, yaw: yaw, spin: spin, tilt: tilt, Ls: Ls, splash: !!splash, hd: HD }; } };
+  root.__wt3 = { dbg: function () { return { T: T, scene: scene, cam: cam, car: car, W: W, H: H, hull: hull ? hull.length / 3 : 0 }; }, onBody: onBody, state: function () { return { base: base, lens: lens, cx: cx, cw: cw, cy: cy, ch: ch, R: R, yaw: yaw, spin: spin, tilt: tilt, Ls: Ls, splash: !!splash, hd: HD }; } };
   return { destroy: function () {
     dead = true; running = false; if (raf) cancelAnimationFrame(raf);
     near.disconnect(); seen.disconnect(); if (ro) ro.disconnect();
     offs.forEach(function (f) { f(); });
     chipsEl.innerHTML = '';
-    if (renderer) { renderer.dispose(); if (maskRT) maskRT.dispose(); }
+    if (renderer) renderer.dispose();
   } };
   }
 
