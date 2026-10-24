@@ -280,10 +280,10 @@
     if (!renderer) return;
     renderer.setPixelRatio(DPR); renderer.setSize(W, H, false);
     cam.aspect = W / H; cam.updateProjectionMatrix();
-    // side-on, the car (5.3 m) fills about 84% of the stage width (97% on phones; at most 1260 px), and never more
-    // than half of its height, so the air above it and the reflection below keep their room
-    var tn = Math.tan(cam.fov * Math.PI / 360), frac = W < 700 ? 0.97 : Math.min(0.84, 1260 / W);
-    camD = Math.max(3.0 / (frac * tn * cam.aspect), 1.3 / (0.5 * 2 * tn));   // 3.0: half the length, plus the near corners' perspective
+    // side-on, the car (5.3 m) fills about 76% of the stage width (94% on phones; at most 1120 px), and never more
+    // than 45% of its height, so the air above it and the reflection below keep their room (主人 10-24: 「稍微太大了，缩小一点点」)
+    var tn = Math.tan(cam.fov * Math.PI / 360), frac = W < 700 ? 0.94 : Math.min(0.76, 1120 / W);
+    camD = Math.max(3.0 / (frac * tn * cam.aspect), 1.3 / (0.45 * 2 * tn));   // 3.0: half the length, plus the near corners' perspective
     maskDue = true;
   }
   function placeCamera() {

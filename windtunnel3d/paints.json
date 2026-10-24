@@ -1,18 +1,18 @@
 {
- "_readme": "风洞 3D 车漆表（wind3d.js 读）。color 是 sRGB 车漆色；metal/rough/clearcoat 给 three.js 的 MeshPhysicalMaterial；spec 是底漆自己的反光强弱（深色漆主要靠清漆层反光，调低免得发灰）；glow 是这色在光圈里时风线的颜色；sw 是色片的 CSS 背景。",
+ "_readme": "风洞 3D 车漆表（wind3d.js 读）。color 是 sRGB 车漆色；metal/rough/clearcoat 给 three.js 的 MeshPhysicalMaterial；spec 是底漆自己的反光强弱（深色漆主要靠清漆层反光，调低免得发灰）；glow 是这色在光圈里时风线的颜色；sw 是色片的 CSS 背景。 第一个是默认车漆。主人 2026-10-24 去掉了闪电黄（「不要那个黄色」），默认改鹦鹉绿。",
  "paints": [
   {
-   "id": "yellow",
-   "zh": "闪电黄",
-   "pl": "Żółć błyskawicy",
-   "en": "Lightning Yellow",
-   "color": "#f0b400",
-   "metal": 0.05,
-   "rough": 0.3,
+   "id": "green",
+   "zh": "鹦鹉绿",
+   "pl": "Papuzia zieleń",
+   "en": "Parrot Green",
+   "color": "#06857f",
+   "metal": 0.25,
+   "rough": 0.28,
    "clearcoat": 1,
-   "sw": "#f1c40f",
-   "glow": "#ffd84a",
-   "spec": 0.6
+   "sw": "#0e8c88",
+   "glow": "#45e2d2",
+   "spec": 0.5
   },
   {
    "id": "chrome",
@@ -65,19 +65,6 @@
    "sw": "#9fa4ab",
    "glow": "#d4dce8",
    "spec": 1
-  },
-  {
-   "id": "green",
-   "zh": "鹦鹉绿",
-   "pl": "Papuzia zieleń",
-   "en": "Parrot Green",
-   "color": "#06857f",
-   "metal": 0.25,
-   "rough": 0.28,
-   "clearcoat": 1,
-   "sw": "#0e8c88",
-   "glow": "#45e2d2",
-   "spec": 0.5
   }
  ],
  "credit": {
