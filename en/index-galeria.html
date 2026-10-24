@@ -34,6 +34,7 @@
 <link rel="stylesheet" href="../corridor/motion.css?v=0f369f55">
 <link rel="stylesheet" href="../corridor/wind.css?v=8c9a8278">
 <link rel="stylesheet" href="../corridor/wind3d.css?v=e0551733">
+<link rel="stylesheet" href="../corridor/catalog.css?v=2f0fbd75">
 <link rel="stylesheet" href="../corridor/report.css?v=ae830a7b">
 <link rel="stylesheet" href="../corridor/flow.css?v=84817739">
 <script>(function(){var d=document.documentElement,t='dark';try{var m=/[?&]theme=(light|dark|auto)/.exec(location.search);if(m){t=m[1];localStorage.setItem('kt-theme',t);}else{t=localStorage.getItem('kt-theme')||'dark';}}catch(e){}if(t==='auto'){d.removeAttribute('data-theme');}else{d.setAttribute('data-theme',t);}})();</script>
@@ -94,6 +95,8 @@
   var MSC_ANGLE = (/[?&]angle=(\d+)/.exec(location.search) || [])[1];
   // real cars instead of the line drawings on the order cases and stock cards (主人 2026-10-17); make_cutouts.py
   var MSC_CUT = {"cars": {"s1": "cut/s1.webp", "s2": "cut/s2.webp", "s3": "cut/s3.webp", "zeekr-9x": "car/box-titanium.svg", "xiaomi-su7": "car/box-pearl.svg", "denza-z9gt": "car/box-champagne.svg", "li-auto-l9": "car/box-sage.svg", "lynk-900": "car/box-silver.svg", "mercedes-eqs-53": "car/box-ice.svg"}, "paints": ["car/box-pearl.svg", "car/box-obsidian.svg", "car/box-graphite.svg", "car/box-silver.svg"], "freight": {"ppm": 15, "terrain": {"w": 2400, "h": 480}, "train": {"w": 2955, "h": 150}, "mist": {"w": 1600, "h": 320}, "note": "ground 160 x 32 m with the track along the middle; the train image is the train plus 1 m, nose at the right"}}, MSC_CARS = {"zeekr-9x": "zeekr-9x", "xiaomi-su7": "xiaomi-su7", "denza-z9gt": "denza-z9gt", "li-auto-l9": "li-auto-l9", "mercedes-eqs-53": "mercedes-eqs-53", "xiaomi-yu7": "xiaomi-yu7", "lynk-900": "lynk-900", "zeekr-001": "zeekr-001", "bmw-i5": "bmw-i5", "xpeng-p7-plus": "xpeng-p7-plus", "denza-n9": "denza-n9", "audi-q6l-etron": "audi-q6l-etron", "zeekr-7x": "zeekr-7x", "mercedes-eqe": "mercedes-eqe", "fangchengbao-bao5": "fangchengbao-bao5", "bmw-ix3": "bmw-ix3", "li-auto-l7": "li-auto-l7", "xpeng-g6": "xpeng-g6", "denza-d9": "denza-d9", "fangchengbao-tai3": "fangchengbao-tai3", "s1": "byd-seal-u-dm-i-warszawa", "s2": "zeekr-7x-gdansk", "s3": "xiaomi-su7-pro-poznan", "60f67553-52be-4b8f-bd52-f389f7242a0d": "geely-galaxy-starship-7-2026-60f675", "510f808a-54fd-44b4-ba3c-0c33fa039218": "mercedes-benz-eqe-500-4matic-2025-510f80", "5a1a00d5-9bda-49a4-9c8c-0f8ae3886933": "bmw-ix1-xdrive30l-2025-5a1a00", "2fc43ec1-f3d7-44ab-abb2-306d472a2ba8": "mercedes-amg-eqs-53-4matic-2022-2fc43e", "bb6f50b3-53e8-430a-b237-38d293264472": "mercedes-benz-eqb-260-2025-bb6f50", "5bb86522-0b5e-476f-b9f1-8a393b3ae9c8": "mercedes-benz-eqe-suv-500-4matic-2024-5bb865", "79290b29-983e-4701-9953-33f7d7d50c00": "xiaomi-yu7-2025-79290b", "412dab60-52ce-433d-a7df-698bd0e52245": "mercedes-benz-eqe-suv-500-4matic-2024-412dab", "023dde6a-d67a-443a-89ba-eba266aa3204": "mercedes-benz-eqe-suv-500-4matic-2024-023dde", "f194a771-9c7c-400e-83a8-3352be002276": "xiaomi-yu7-2025-f194a7", "e3c5c94a-be4c-454d-a106-161a56f9a14e": "mercedes-benz-eqe-500-4matic-2025-e3c5c9", "7e56bf45-848d-4915-bb0a-cb58ebf5c31c": "xiaomi-yu7-2025-7e56bf", "a08a6129-0951-4cef-9442-d41da5923d22": "xiaomi-su7-2024-a08a61", "ebcfab3c-7f77-43fb-860f-05a83eebd010": "audi-q6l-e-tron-2025-ebcfab", "2c127859-2e0f-4109-a295-82e8bd517a88": "audi-q4-e-tron-40-2024-2c1278", "e3e50b7b-656f-436b-8fcd-43b60fc33ca5": "audi-q4-e-tron-40-2024-e3e50b", "0c1c49ee-93e0-4113-bc6e-d12c99f6d64f": "bmw-i5-edrive40l-2025-0c1c49", "4c56b94c-8c0a-4009-9ed6-42b8ca9a2e59": "bmw-i5-edrive35l-2025-4c56b9", "2e2bdbf1-8017-4c2d-8d54-89c98b4a171d": "xiaomi-su7-2024-2e2bdb", "adb1b054-5650-4254-b3d9-886a37849a4b": "bmw-i3-edrive40l-2024-adb1b0", "f2d63029-f206-49cc-9046-90b285b8d888": "mercedes-benz-eqe-500-4matic-2025-f2d630", "961feecc-bde2-432e-a7fa-e901ac25e84f": "bmw-ix3-2024-961fee", "306dba51-7bcf-4b3c-8f8d-23c0d5df5866": "xiaomi-su7-2024-306dba", "730866d1-a79d-472c-b536-07191eadfe8b": "gac-trumpchi-emkoo-2022-730866", "47515f93-7503-45c5-ad7a-b586ded16590": "gac-trumpchi-empow-2023-47515f", "5a0286cf-26c9-4256-a7d5-29f793124cab": "volkswagen-lamando-l-2023-5a0286", "7d39da3e-b85d-4569-ae81-f4ace513720a": "chery-tiggo-3x-plus-2022-7d39da", "1a59a6f6-5628-4702-a630-0dd553b0581f": "beijing-mofang-2022-1a59a6", "cd6d01a2-0bda-410f-ac45-68523afcc7cd": "peugeot-408-2022-cd6d01", "7b4c11cf-2c6a-45a7-abae-01d5207026d5": "kia-seltos-2023-7b4c11", "f19995b7-cc1c-4015-8988-26aa995af281": "buick-regal-2023-f19995", "dad07277-e685-4372-a173-1d404fff58b7": "ford-focus-hatchback-2022-dad072", "0a7c198a-47dc-4587-ac92-904a6d488a36": "honda-vezel-2022-0a7c19", "613025df-7439-42a7-828d-89f1822a14fb": "chery-arrizo-8-2022-613025", "d880fa62-fcfe-4c11-b570-346bd517f31e": "volkswagen-lavida-2023-d880fa", "84e285b1-5f2b-4e32-bb3c-b7815597bb7b": "haval-m6-plus-2022-84e285", "d3a43391-84bb-46fd-bf6a-fe302c386790": "changan-uni-v-2022-d3a433", "453f4b28-7943-4fee-b8d5-6b2c5405ba7a": "changan-cs55-plus-2022-453f4b", "2e790a2d-d180-4534-85a2-e15ac3174372": "jetta-vs5-2022-2e790a", "bd2eb599-1b6e-4566-ab31-5567f74e3dcd": "haval-dargo-2022-bd2eb5", "26ffdce9-e377-46e3-b963-f94155b0f3d3": "changan-cs55-plus-2022-26ffdc", "297b3d36-da85-4b47-a695-1c54eaa50dea": "changan-oshan-x7-plus-2022-297b3d", "feebbd9a-2ef4-41b2-82dc-86b7b6d2deff": "geely-boyue-l-2023-feebbd", "0f29bbe4-d311-4658-924d-7dd4a74432dd": "soueast-dx8s-2022-0f29bb", "e63e8e1c-9d0b-421b-9248-ec3237f75aba": "nissan-sylphy-2022-e63e8e", "848bf3d5-4984-4f0b-9feb-abd8a3c1cdac": "toyota-yaris-l-zhixuan-2022-848bf3", "9d6329b6-7788-466e-baa8-ebe6b2d6fc31": "honda-accord-2022-9d6329", "fb1fcadc-fdb9-4e48-a41a-6e0ffa38c0b9": "audi-q2l-2022-fb1fca", "3c560b88-cc51-4bec-8951-2c8d1d294648": "volkswagen-sagitar-2023-3c560b", "c374b162-5217-4943-87ae-2ad05274d817": "toyota-levin-2022-c374b1", "ba624c3f-de69-4bb0-a5ee-1a4ced93a21f": "honda-integra-2022-ba624c", "88a55e65-fcb0-4564-80cd-ad87b802ccce": "nissan-sylphy-classic-2022-88a55e", "2919dc80-5418-4079-8a7d-667e6d6cc981": "volkswagen-golf-8-2023-2919dc", "50a897c7-3f4c-420d-b966-dcc133ea633f": "mercedes-benz-glb-2022-50a897", "0553b720-27ec-4808-ab0f-6be48fe0b380": "audi-q3-2023-0553b7", "cb125867-19bc-4fac-8696-c994666c5713": "skoda-kamiq-gt-2023-cb1258", "e2b22198-cd5f-4987-bebe-d3bc1dd0191c": "chevrolet-orlando-2020-e2b221", "b51b930e-6d21-418c-b32d-617d65408a3a": "chevrolet-monza-2023-b51b93", "c116f656-5082-43a0-8803-f6d73834ff50": "gac-trumpchi-m6-pro-2023-c116f6", "2a0c374f-7638-4fe1-8428-7a189f9cdbea": "volkswagen-polo-plus-2023-2a0c37", "4e9d5095-54be-44ab-a289-fdd31757a8f3": "geely-vision-x3-pro-2021-4e9d50", "775d21e3-695c-4514-a55b-39adc6d7d55a": "mercedes-benz-c-class-2022-775d21", "06daab87-97a0-4662-9981-5dbb504ccb16": "ford-escort-2021-06daab", "32ca2fae-0aec-43e9-a922-13f200f18a48": "honda-civic-2022-32ca2f", "fc1d9395-eafc-4a4c-a34c-4057993f3d25": "volkswagen-t-roc-2023-fc1d93", "7da0425a-3ee8-4713-a5ba-4495e087431a": "buick-verano-pro-2022-7da042", "53f798bc-086b-43b6-8bbb-0f13f32ccab7": "honda-fit-2023-53f798", "cc985b68-04fd-42c5-8bdb-81505a8fcf71": "audi-a3-sportback-2022-cc985b", "d44aaa2b-da91-43f6-b564-f8a7e15c9c47": "geely-emgrand-sedan-2022-d44aaa", "b974f4a8-3f26-435a-87c1-a24b486544bc": "nissan-kicks-2022-b974f4", "8a387fc1-4c43-477f-8b55-360e6c49f25a": "li-auto-l7-2023-8a387f", "0d3430d0-8166-4c42-8b36-87eb96fd9977": "bmw-x1-2022-0d3430", "bbc6bfdf-fb55-48c7-8a36-05d83c39c139": "dongfeng-citroen-c5-aircross-2026-bbc6bf", "833c2811-ce69-41d8-9ca4-1eed2ab77a0f": "dongfeng-citroen-c3xr-2026-833c28", "ad1d80da-ec8a-48b6-bb2e-e3ed62df9afc": "mitsubishi-outlander-2023-ad1d80", "d8753b07-5abd-4c44-abbf-0c2fd74af67c": "jetour-dashing-2024-d8753b", "7636ecde-c9c8-43d3-9ee5-e7b79d2dd827": "jetour-x70-plus-2023-7636ec", "22ee01e4-f65f-498e-a597-0a61eba27cfd": "haval-m6-plus-2023-22ee01", "2750af60-f7bf-4e61-8d82-d3a3da5431f0": "haval-chitu-2023-2750af", "eaa232b9-d2e8-480d-af74-e3828b93f0db": "haval-h6-2023-eaa232", "d6a7fe1d-37b6-4f78-9ad9-3ca5d8b52f34": "mercedes-benz-a-class-2023-d6a7fe", "8b939917-f894-4f2b-8d9f-4c737962e17c": "bmw-3-series-2023-8b9399", "face4ee8-4739-4ff8-a44b-1b5ed49d20b1": "nissan-x-trail-classic-2023-face4e", "bea7e6b1-07c0-4994-94c4-f0d7dda19ec7": "nissan-qashqai-2022-bea7e6", "3d6d3372-3c22-4896-bf7d-cc2cc596c58d": "bmw-1-series-2023-3d6d33", "f7965490-4cc4-4574-9a33-777d56da5c10": "bmw-x2-2023-f79654", "ff8f4733-7062-464e-9c48-afb206d97612": "bmw-x1-2024-ff8f47", "cac33eb1-2d20-4c8d-b698-674b76bbf9ae": "hyundai-ix25-2020-cac33e", "04138a48-6d6e-490a-bbdb-41bbf1d9d6da": "hyundai-ix35-2021-04138a", "4420d8c0-686c-40e6-bf06-e16ca0669dc8": "kia-k3-2023-4420d8", "8fceb04f-6c12-4aca-96aa-3c67eac2141e": "kia-kx3-seltos-2021-8fceb0", "5d086eeb-206a-4632-b130-5c4dbcfce520": "audi-q3-2022-5d086e", "e5ec0dc2-d00b-4e47-b979-7f3d263520ed": "audi-a3-sportback-2022-e5ec0d", "b619c32f-2f46-4d25-956c-22faffc06482": "audi-q2l-2022-b619c3", "2930e052-35a8-49f2-b711-be92f178456d": "skoda-kamiq-gt-2021-2930e0", "62ca3a75-6a55-4fb2-ae7e-ba9f2fedaf8e": "jetta-vs7-2023-62ca3a", "ba4635b3-3775-4a2e-a440-f40ef1b6134b": "jetta-vs5-2022-ba4635", "dd21a719-a355-4be0-97bf-f2914bac005b": "volkswagen-lamando-l-2023-dd21a7", "fff0ca54-897f-425d-972c-396c9795dc7a": "volkswagen-passat-2023-fff0ca", "4ce55557-7a85-49c3-8a7d-e9272f88bf92": "volkswagen-tiguan-l-2023-4ce555", "26196127-7e5e-45f4-872c-6ea80745a273": "volkswagen-touran-l-2021-261961", "f17b4eab-61b5-4e2c-9e35-b87ea9eae2e0": "volkswagen-sagitar-2023-f17b4e", "0b77ce0b-a972-42d3-8929-287adfa2ff4c": "volkswagen-tacqua-2021-0b77ce", "1add76f6-2a83-4aca-b04b-de1c7978ca06": "volkswagen-lavida-2023-1add76", "29079698-31e8-476c-9cd3-7d2a32875a92": "volkswagen-tharu-2021-290796", "06ed1918-69dd-4903-a47a-b0dd32440823": "volkswagen-tayron-2023-06ed19", "ed6214db-57f8-4afe-adb5-d2d38c2a43ab": "volkswagen-t-roc-2022-ed6214", "2f40c9a6-2a03-4ec3-a0a8-97d107401c96": "volkswagen-golf-8-2023-2f40c9", "d9a1d3f4-2eee-422a-ab28-2e077a94a06e": "honda-civic-2023-d9a1d3", "bfb76d8b-0108-4c98-b6d1-1cb7491acf7f": "honda-fit-2022-bfb76d", "ef2d140c-7afa-43c6-8d57-84fde50d6071": "mazda-cx-30-2021-ef2d14", "6fdf6c8a-745a-4ccb-8baa-7dc9e87c2fb3": "mazda-cx-4-2021-6fdf6c", "596800d4-e412-4766-bdc9-c57cdca1d9f5": "honda-xr-v-2023-596800", "f5ee50b1-baf9-4878-bbdc-67bef859da61": "honda-vezel-2020-f5ee50", "b4ac2a7f-0464-4fbb-9874-0bbaeadc65b6": "toyota-levin-2022-b4ac2a", "cbd944dd-c511-46c6-bcc3-b995c451c486": "toyota-corolla-2021-cbd944", "0455225d-26b6-44da-bc30-13687e85f72e": "toyota-corolla-2022-045522", "686de1ff-4d95-4210-b18c-d16b35f36a04": "skoda-karoq-2022-686de1", "19dab95b-8481-4cf3-8116-31db2c7a32c1": "skoda-kodiaq-2022-19dab9", "1a03b5f8-0197-48b7-b019-917adc25e61a": "skoda-octavia-2021-1a03b5", "b755580a-777f-4fee-8322-2e89def3fe20": "kia-k5-2021-b75558", "24bc7679-c7b9-4180-9486-4ef8a19380cb": "kia-sportage-2023-24bc76", "e4107af3-9dc1-45c1-91d2-0936f5c52d04": "kia-seltos-2023-e4107a", "2201d741-edf2-4da6-93c5-c8f42b201040": "hyundai-tucson-l-2021-2201d7", "772ae7c9-a5ea-4695-9ca7-81f2ab5f58d9": "hyundai-sonata-2022-772ae7", "357e1f76-9cce-4561-bd4e-19cfbb1d0ac3": "hyundai-santa-fe-2023-357e1f", "6c1edd8d-c747-4afd-9bb1-21d8f1a2bf05": "hyundai-elantra-2022-6c1edd", "3e7c2be6-1371-4bfb-a80c-5c140ded1b46": "volvo-xc40-2022-3e7c2b", "9f67ea14-b028-47b5-837e-117d641a26ed": "volvo-xc60-2022-9f67ea", "0a2f63d6-f0a1-46e2-b0f0-3af2636e23ba": "mazda-3-axela-2021-0a2f63", "3c51732c-d02c-49c1-9764-4dc2f7b7b014": "mazda-cx-5-2022-3c5173", "13441e06-cdf8-440a-a206-61333134b960": "honda-ur-v-2020-13441e", "974ec753-5e55-4a7d-8bd4-6dd6d607a581": "honda-hr-v-2023-974ec7", "e342466e-b244-4078-b4db-b16644624320": "honda-avancier-2020-e34246", "6323097d-2020-45d4-b8d6-790d4a6baae6": "honda-breeze-2021-632309", "1fb502a7-6bf5-472b-a93f-af88697ec982": "honda-cr-v-2023-1fb502", "0ad215f6-6ea4-4eec-b3df-390d0ecb6c22": "honda-civic-2022-0ad215", "98db1762-90a2-4200-b55f-d9e15796f5a4": "honda-accord-2022-98db17", "fe96246d-1c32-4039-934a-2fd3965b89a0": "toyota-c-hr-2021-fe9624", "ecf1ee43-3a40-44c6-9826-a94ab3f2c87a": "toyota-highlander-2021-ecf1ee", "1a51bb5d-a2e9-4444-ba75-476b8285b56e": "toyota-rav4-2022-1a51bb", "22e54e79-0100-4149-a7e9-f75f2d9e705b": "toyota-camry-2021-22e54e", "6aea5407-ef52-4c83-b7e0-0e058a4353bd": "buick-envision-s-2023-6aea54", "81d2b3da-75a2-4921-aade-029c5d0b7eee": "buick-encore-gx-2022-81d2b3", "fdab43a3-aa60-4d65-bf62-ba3cb80c6536": "aion-i60-2026-fdab43", "7da33fee-8333-43d0-b623-53c592e760dc": "aion-i60-2026-7da33f", "22b4d7ef-6f00-41f8-8b74-dc66a2033fda": "aion-s-plus-2026-22b4d7", "d0a79718-662a-4d50-87db-22355fc50456": "aion-v-home-2026-d0a797", "76d42454-53d4-480f-9058-29c2d482bd34": "aion-v-home-2026-76d424", "cec49022-4ecc-49be-b271-8846f29db9b1": "aion-y-plus-2025-cec490"}, MSC_CARDIR = 'cars/';
+  // the CRM writes colours in English ("Gray", "White/Silver"); the same word list as the car pages' texts (dev/crm/desc_template.json)
+  var MSC_COLORS = {"gray": "grey"};
   // 主人 2026-10-18: 「那个订单跟踪有点奇怪我觉得可以放到主页然后就在大家问的问题最多那里列出来 说如果一旦订车后发车我们会发送链接
   // 您可以实时追踪你的车辆状态你可以用那种比较文艺的口吻来说」: a question of the transport group in the FAQ, in that voice
   // (the tracking page itself stays: it is the link a customer gets)
@@ -323,6 +326,154 @@
           pop.map(function (c, i) { return h(React.Fragment, { key: c[0] }, i ? h('i', null, '·') : null, h('button', { type: 'button', onClick: function () { p.onSearch({ query: c[1], filters: {} }); } }, c[0])); })) : null));
   }
 
+  // ---- CRM order catalog: one entry per model, with each real car selectable in the panel ----
+  var MSC_CATALOG_COPY = {
+    pl: {
+      hint: '{cars} aut do zamówienia · {models} modeli · Ceny CIP (do portu w Polsce, z frachtem morskim i ubezpieczeniem)',
+      all: 'Wszystkie', brands: 'Filtruj według marki', sort: 'Sortowanie', high: 'Cena: od najwyższej', low: 'Cena: od najniższej',
+      from: 'CIP od', landed: 'Szac. cena w Polsce', variants: 'Wersje',
+      more: 'Zobacz kolejne 12 modeli (pozostało {n})', offers: 'Filtruj wszystkie {n} aut na stronie ofert →',
+      details: 'Zobacz szczegóły tego auta →', inquiry: 'Zapytaj o to auto', close: 'Zamknij', photo: 'Zdjęcie',
+      note: 'CIP = cena auta + fracht morski + ubezpieczenie, do portu w Polsce. Cena w Polsce obejmuje cło, akcyzę, VAT, odprawę i opłaty stałe; szacunek według dzisiejszego kursu.'
+    },
+    en: {
+      hint: '{cars} cars available to order · {models} models · CIP prices (to a Polish port, including sea freight and insurance)',
+      all: 'All', brands: 'Filter by brand', sort: 'Sort by', high: 'Price: high to low', low: 'Price: low to high',
+      from: 'CIP from', landed: 'Est. landed in Poland', variants: 'Versions',
+      more: 'See 12 more models ({n} remaining)', offers: 'Filter all {n} cars on the offers page →',
+      details: 'View this car’s details →', inquiry: 'Ask about this car', close: 'Close', photo: 'Photo',
+      note: 'CIP = car price + sea freight + insurance, to a Polish port. The landed price includes customs duty, excise duty, VAT, customs clearance and fixed fees, estimated at today’s exchange rate.'
+    },
+    zh: {
+      hint: '{cars} 台现可订购 · {models} 款车型 · 价格为 CIP（运到波兰港口，含海运和保险）',
+      all: '全部', brands: '按品牌筛选', sort: '排序', high: '价格从高到低', low: '价格从低到高',
+      from: 'CIP 从', landed: '波兰落地约', variants: '版本',
+      more: '再看 12 款（还剩 {n} 款）', offers: '到车源页筛选全部 {n} 台 →',
+      details: '查看这台车的详情 →', inquiry: '咨询这台车', close: '关闭', photo: '照片',
+      note: 'CIP = 车价 + 海运 + 保险，到波兰港口；落地价含关税、消费税、增值税、清关和固定费用，按今日汇率估算。'
+    }
+  };
+  function catalogColor(c) {
+    return String(c || '').split('/').map(function (w) { var k = w.trim().toLowerCase(); return MSC_COLORS[k] || w.trim(); }).filter(Boolean).join(' / ');
+  }
+  function catalogImage(path) { return new URL(MSC_BASE + '../' + path, location.href).href; }
+  function catalogUSD(car) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(car.priceCip); }
+  function catalogVersions(n, lang) {
+    if (lang === 'zh') return n + ' 个版本';
+    if (lang === 'en') return n + (n === 1 ? ' version' : ' versions');
+    return n + (n === 1 ? ' wersja' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? ' wersje' : ' wersji');
+  }
+  function OrderCatalogPanel(p) {
+    var lang = p.lang, t = MSC_CATALOG_COPY[lang] || MSC_CATALOG_COPY.pl, s = K.copy[lang] || K.copy.pl;
+    var st = React.useState(p.group.cars[0]), car = st[0], setCar = st[1];
+    var ph = React.useState(0), photo = ph[0], setPhoto = ph[1];
+    var panelRef = React.useRef(null), closeRef = React.useRef(null);
+    var photos = car.images.slice(0, 6), result = K.calcImport(K.pricingInput(car));
+    React.useLayoutEffect(function () {
+      var root = document.getElementById('root'), inert = root && root.inert;
+      var bodyOverflow = document.body.style.overflow, htmlOverflow = document.documentElement.style.overflow;
+      document.body.style.overflow = 'hidden'; document.documentElement.style.overflow = 'hidden';
+      if (root) root.inert = true;
+      closeRef.current.focus({ preventScroll: true });
+      function key(e) {
+        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); p.onClose(); }
+        if (e.key === 'Tab') {
+          var items = Array.prototype.slice.call(panelRef.current.querySelectorAll('button, a[href], input:checked'));
+          var first = items[0], last = items[items.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+      }
+      document.addEventListener('keydown', key);
+      return function () {
+        document.removeEventListener('keydown', key);
+        document.body.style.overflow = bodyOverflow; document.documentElement.style.overflow = htmlOverflow;
+        if (root) root.inert = inert;
+        if (p.returnFocus && p.returnFocus.isConnected) p.returnFocus.focus({ preventScroll: true });
+      };
+    }, []);
+    return ReactDOM.createPortal(h('div', { className: 'kt kt-dark msc-catalog-backdrop', lang: lang,
+      onClick: function (e) { if (e.target === e.currentTarget) p.onClose(); } },
+      h('section', { ref: panelRef, className: 'msc-catalog-panel', role: 'dialog', 'aria-modal': true, 'aria-labelledby': 'msc-catalog-title' },
+        h('header', { className: 'msc-catalog-panel-head' },
+          h('h2', { id: 'msc-catalog-title' }, car.brand + ' ' + car.model),
+          h('button', { ref: closeRef, type: 'button', className: 'msc-catalog-close', onClick: p.onClose, 'aria-label': t.close }, '×')),
+        h('div', { className: 'msc-catalog-panel-body' },
+          h('div', { className: 'msc-catalog-selection' },
+            h('img', { className: 'msc-catalog-main', src: catalogImage(photos[photo]), width: 1280, height: 960, alt: car.brand + ' ' + car.model + ' ' + car.year + ' · ' + t.photo + ' ' + (photo + 1) }),
+            h('div', { className: 'msc-catalog-thumbs', role: 'group', 'aria-label': t.photo }, photos.map(function (path, i) {
+              return h('button', { key: path, type: 'button', 'aria-pressed': photo === i, 'aria-label': t.photo + ' ' + (i + 1), onClick: function () { setPhoto(i); } },
+                h('img', { src: catalogImage(car.imagesSmall[i] || path), width: 120, height: 90, alt: '', loading: 'lazy' }));
+            })),
+            h('fieldset', { className: 'msc-catalog-versions' }, h('legend', null, t.variants + ' · ' + p.group.cars.length),
+              p.group.cars.map(function (c) {
+                var meta = [c.year, catalogColor(c.color), c.km > 0 ? new Intl.NumberFormat({ pl: 'pl-PL', en: 'en-GB', zh: 'zh-CN' }[lang]).format(c.km) + (lang === 'zh' ? ' 公里' : ' km') : null].filter(Boolean).join(' · ');
+                return h('label', { key: c.id, className: 'msc-catalog-version' + (car.id === c.id ? ' is-selected' : '') },
+                  h('input', { type: 'radio', name: 'msc-catalog-version', value: c.id, checked: car.id === c.id, onChange: function () { setCar(c); setPhoto(0); } }),
+                  h('span', null, h('b', null, c.trim || c.model), h('small', null, meta),
+                    h('span', { className: 'msc-catalog-version-price' }, K.money(K.cipOf(c), lang), h('small', null, catalogUSD(c)))));
+              }))),
+          h('div', { className: 'msc-catalog-cost' },
+            h('dl', null, K.pricingRows(result, lang).map(function (row, i) {
+              return h('div', { key: i, className: 'msc-catalog-cost-row' }, h('dt', null, row[0]), h('dd', null, K.money(row[1], lang)));
+            })),
+            h('div', { className: 'msc-catalog-total', 'aria-live': 'polite' }, h('span', null, s.calc.total), h('strong', null, K.money(result.total, lang))),
+            h('p', { className: 'msc-catalog-note' }, t.note),
+            h('div', { className: 'msc-catalog-actions' },
+              h('a', { className: 'kt-btn kt-btn-outline', href: MSC_CARDIR + car.slug + '.html' }, t.details),
+              h('button', { type: 'button', className: 'kt-btn kt-btn-primary', onClick: function () {
+                p.onInquiry([car.brand, car.model, car.trim, car.year].filter(Boolean).join(' ')); p.onClose();
+              } }, t.inquiry)))))), document.body);
+  }
+  function OrderCatalog(p) {
+    var lang = p.lang, t = MSC_CATALOG_COPY[lang] || MSC_CATALOG_COPY.pl, s = K.copy[lang] || K.copy.pl;
+    var catalog = K.SAMPLE_CATALOG, groups = new Map(), counts = new Map();
+    catalog.forEach(function (c) {
+      var key = JSON.stringify([c.brand, c.model]);
+      if (!groups.has(key)) groups.set(key, { key: key, brand: c.brand, model: c.model, cars: [] });
+      groups.get(key).cars.push(c); counts.set(c.brand, (counts.get(c.brand) || 0) + 1);
+    });
+    groups.forEach(function (g) { g.cars.sort(function (a, b) { return a.priceCip - b.priceCip || a.id.localeCompare(b.id); }); });
+    var bs = React.useState(''), brand = bs[0], setBrand = bs[1];
+    var ss = React.useState('high'), sort = ss[0], setSort = ss[1];
+    var vs = React.useState(8), visible = vs[0], setVisible = vs[1];
+    var ps = React.useState(null), panel = ps[0], setPanel = ps[1];
+    var brands = Array.from(counts.keys()).sort(function (a, b) { return counts.get(b) - counts.get(a) || a.localeCompare(b); });
+    var filtered = Array.from(groups.values()).filter(function (g) { return !brand || g.brand === brand; }).sort(function (a, b) {
+      return (K.cipOf(a.cars[0]) - K.cipOf(b.cars[0])) * (sort === 'high' ? -1 : 1) || a.key.localeCompare(b.key);
+    });
+    var remaining = Math.max(0, filtered.length - visible);
+    return h('section', { className: 'kt kt-dark msc-catalog', 'aria-label': s.sec.order[0] },
+      h('div', { className: 'msc-catalog-hint kt-rack-hint' },
+        h('p', null, t.hint.replace('{cars}', catalog.length).replace('{models}', groups.size)),
+        h('button', { type: 'button', className: 'kt-link kt-rack-calc', onClick: p.onCalc }, h(K.CalcIcon, null), s.rackCalc)),
+      h('div', { className: 'msc-catalog-tools' },
+        h('div', { className: 'msc-catalog-brands', role: 'group', 'aria-label': t.brands }, [''].concat(brands).map(function (b) {
+          return h('button', { key: b, type: 'button', 'aria-pressed': brand === b, 'data-brand': b, onClick: function () { setBrand(b); setVisible(8); } },
+            b || t.all, h('span', null, b ? counts.get(b) : catalog.length));
+        })),
+        h('label', { className: 'msc-catalog-sort' }, h('span', null, t.sort),
+          h('select', { value: sort, onChange: function (e) { setSort(e.target.value); setVisible(8); } }, h('option', { value: 'high' }, t.high), h('option', { value: 'low' }, t.low)))),
+      h('div', { className: 'msc-catalog-grid' }, filtered.slice(0, visible).map(function (g) {
+        var c = g.cars[0], meta = [c.year, (c.drive === 'ev' || c.drive === 'erev') && c.range ? s.range + ' ' + c.range + ' km' : null].filter(Boolean).join(' · ');
+        return h('button', { key: g.key, type: 'button', className: 'msc-catalog-card', 'data-brand': c.brand, 'data-model': c.model, 'aria-haspopup': 'dialog',
+          onClick: function (e) { setPanel({ group: g, trigger: e.currentTarget }); } },
+          h('span', { className: 'msc-catalog-photo' },
+            h('img', { src: catalogImage(c.imagesSmall[0]), width: 480, height: 360, loading: 'lazy', alt: c.brand + ' ' + c.model + ' ' + c.year }),
+            h('span', { className: 'msc-catalog-drive' }, h(K.DriveTag, { drive: c.drive, lang: lang })),
+            g.cars.length > 1 ? h('span', { className: 'msc-catalog-count' }, catalogVersions(g.cars.length, lang)) : null),
+          h('span', { className: 'msc-catalog-card-body' },
+            h('span', { className: 'msc-catalog-brand' }, c.brand), h('h3', null, c.model), h('span', { className: 'msc-catalog-meta' }, meta),
+            h('span', { className: 'msc-catalog-price-label' }, t.from),
+            h('span', { className: 'msc-catalog-price' }, h('strong', null, K.money(K.cipOf(c), lang)), h('small', null, catalogUSD(c))),
+            h('span', { className: 'msc-catalog-landed' }, t.landed + ' ' + K.money(K.landedOf(c), lang))));
+      })),
+      h('div', { className: 'msc-catalog-footer' },
+        remaining ? h('button', { type: 'button', className: 'kt-btn kt-btn-outline msc-catalog-more', onClick: function () { setVisible(visible + 12); } }, t.more.replace('{n}', remaining)) : null,
+        h('a', { className: 'kt-link msc-catalog-offers', href: (lang === 'pl' ? 'oferty.html' : 'offers.html') + (brand ? '?q=' + encodeURIComponent(brand) : '') }, t.offers.replace('{n}', catalog.length))),
+      panel ? h(OrderCatalogPanel, { lang: lang, group: panel.group, returnFocus: panel.trigger, onClose: function () { setPanel(null); }, onInquiry: p.onInquiry }) : null);
+  }
+
   // ---- wind tunnel, 3D (主人 2026-10-24: 「把它变成 3D 的，从网上下免费的 3D 模型，加风的感觉，同时也有变色的效果，点到哪颜色会变一下」): wind3d.js ----
   // the car is a glTF model (site/windtunnel3d/model/su7u.glb: "2025 Xiaomi SU7 Ultra" by Dave Love SketchFab, CC BY 4.0, racing livery
   // removed — a Nürburgring track prototype, so the credit says it is not a car on sale) drawn with three.js, loaded when the section
@@ -529,7 +680,7 @@
             // 2 · the cases: click one and it zooms open right there, with trims, colours and the landed price
             h('div', { className: 'sec sec-first', id: 'zamow', ref: casesRef },
               h('div', { 'data-reveal': '' }, h(K.SectionHeader, { kind: 'order', index: '01', lang: lang, action: false })),
-              h(K.CarBoxGarage, { lang: lang, openIndex: 0, openKey: openKey, onDeposit: deposit, onCalc: quote })),
+              h(OrderCatalog, { lang: lang, onCalc: quote, onInquiry: function (sum) { setLead({ kind: 'inquiry', summary: sum }); } })),
             // 3 · China → Poland, whichever way the car travels
             h(ReportBand, { lang: lang }),
             h('div', { id: 'jak-to-dziala' }, h(K.ImportJourney, { lang: lang, top: 60, still: full })),
