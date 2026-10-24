@@ -111,7 +111,7 @@
           '<p class="msc-info-note"></p><button type="button" class="msc-info-close" data-act="close"></button></div>' +
       '</aside>' +
       '<div class="msc-bar"><span class="msc-bar-hint"></span><span class="msc-bar-mid"><i></i><span class="msc-mode"></span></span>' +
-        '<span class="msc-bar-end"><span class="msc-dist"></span><button type="button" class="msc-credits-btn" data-act="credits"></button></span></div>';
+        '<span class="msc-bar-end"><span class="msc-dist"></span>' + (opts.credits && opts.credits.length ? '<button type="button" class="msc-credits-btn" data-act="credits"></button>' : '') + '</span></div>';
     var view = root.querySelector('.msc-view'), stage = root.querySelector('.msc-stage'), world = root.querySelector('.msc-world');
     var info = root.querySelector('.msc-info');
     function q(s) { return root.querySelector(s); }
@@ -350,10 +350,11 @@
       var a = S.active.find(function (x) { return x.phase !== 'push'; }) || S.active[0];
       var it = a ? itemAt(a.info.pi) : null;
       if (b.dataset.act === 'close') { e.preventDefault(); pushAll(); S.lastInput = S.t; }
-      else if (b.dataset.act === 'ask' && it) { e.preventDefault(); if (opts.onInquiry) opts.onInquiry(it); }
+      else if ((b.dataset.act === 'ask' || (b.dataset.act === 'details' && it && it.inquiry)) && it) { e.preventDefault(); if (opts.onInquiry) opts.onInquiry(it); }
     });
     var creditsEl = null;
     function openCredits(open) {
+      if (!opts.credits || !opts.credits.length) return;
       if (!creditsEl) {
         creditsEl = document.createElement('div');
         creditsEl.className = 'msc-credits'; creditsEl.setAttribute('role', 'dialog'); creditsEl.setAttribute('aria-modal', 'true');
@@ -446,7 +447,7 @@
     function fbPx() { return parseFloat(root.style.getPropertyValue('--frame-bottom')) || VH * 0.52; }
     function applyLabels() {
       q('.msc-bar-hint').textContent = L.hint || ''; hintBack = null;
-      q('.msc-credits-btn').textContent = L.credits || '';
+      var creditButton = q('.msc-credits-btn'); if (creditButton) creditButton.textContent = L.credits || '';
       q('[data-act="ask"]').textContent = L.ask || '';
       q('[data-act="close"]').textContent = (L.close || '') + ' ✕';
       q('.msc-info-note').textContent = L.photoNote || '';

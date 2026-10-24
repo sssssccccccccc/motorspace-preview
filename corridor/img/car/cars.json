@@ -1,11 +1,11 @@
 {
  "cars": {
-  "9x": "car/box-titanium.svg",
-  "su7": "car/box-pearl.svg",
-  "001": "car/box-champagne.svg",
-  "seal": "car/box-sage.svg",
-  "l9": "car/box-silver.svg",
-  "d9": "car/box-ice.svg"
+  "zeekr-9x": "car/box-titanium.svg",
+  "xiaomi-su7": "car/box-pearl.svg",
+  "denza-z9gt": "car/box-champagne.svg",
+  "li-auto-l9": "car/box-sage.svg",
+  "lynk-900": "car/box-silver.svg",
+  "mercedes-eqs-53": "car/box-ice.svg"
  },
  "view": {
   "w": 5.25,

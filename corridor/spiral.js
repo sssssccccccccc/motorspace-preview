@@ -23,9 +23,7 @@
     perspective: 1000, cardsPerTurn: 7, rotation: 0, cardTilt: 0, cardRadius: 10, centerScale: 1.2, edgeFade: 0.3,
     edgeBlur: 6, pauseOnHover: true, imageFit: 'cover', grayscale: 0
   };
-  var CARS = [['s3', 'xiaomi-su7-pro-poznan', 'Xiaomi SU7 Pro'], ['l5', 'zeekr-001', 'Zeekr 001'], ['l8', 'li-auto-l9', 'Li Auto L9'],
-    ['s1', 'byd-seal-u-dm-i-warszawa', 'BYD Seal U DM-i'], ['l11', 'geely-galaxy-l7', 'Geely Galaxy L7'], ['l17', 'yangwang-u8', 'Yangwang U8'],
-    ['l1', 'byd-seal', 'BYD Seal'], ['s2', 'zeekr-7x-gdansk', 'Zeekr 7X'], ['l18', 'nio-et5-touring', 'NIO ET5 Touring'], ['l21', 'zeekr-9x-max', 'Zeekr 9X']];
+  var CARS = [["xiaomi-su7", "xiaomi-su7", "Xiaomi SU7"], ["zeekr-9x", "zeekr-9x", "Zeekr 9X"], ["denza-z9gt", "denza-z9gt", "Denza Z9GT"], ["li-auto-l9", "li-auto-l9", "Li Auto L9"], ["xiaomi-yu7", "xiaomi-yu7", "Xiaomi YU7"], ["lynk-900", "lynk-900", "Lynk & Co 900"], ["xpeng-p7-plus", "xpeng-p7-plus", "Xpeng P7+"], ["mercedes-eqs-53", "mercedes-eqs-53", "Mercedes-AMG EQS 53 4MATIC+"], ["zeekr-001", "zeekr-001", "Zeekr 001"], ["fangchengbao-bao5", "fangchengbao-bao5", "Fang Cheng Bao (BYD) Bao 5"]];
 
   var css = document.createElement('style');
   css.textContent =
@@ -59,7 +57,8 @@
     stage.setAttribute('aria-label', document.documentElement.lang === 'zh' ? '我们的车' : document.documentElement.lang === 'en' ? 'Our cars' : 'Nasze auta');
     var cards = CARS.map(function (c, i) {
       var li = document.createElement('li'); li.style.display = 'contents';
-      var a = document.createElement('a'); a.className = 'msp-item'; a.href = DIR + c[1] + '.html';
+      var a = document.createElement('a'); a.className = 'msp-item'; var K = window.Kontener, car = K && K.SAMPLE_LISTINGS.find(function (x) { return x.id === c[0]; });
+      a.href = car ? K.effectHref(car, document.documentElement.lang || 'pl') : DIR + c[1] + '.html';
       a.setAttribute('aria-label', c[2]); a.title = c[2]; a.draggable = false;
       a.style.width = O.cardWidth + 'px'; a.style.height = O.cardHeight + 'px'; a.style.borderRadius = O.cardRadius + 'px';
       var im = document.createElement('img'); im.src = IMG + c[0] + '.webp'; im.alt = c[2]; im.draggable = false;

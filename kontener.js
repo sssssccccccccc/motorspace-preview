@@ -66,7 +66,7 @@
   var SAMPLE_CATALOG = DATA.catalog || [];
   if (!SAMPLE_CATALOG.length) SAMPLE_CATALOG = SAMPLE_LISTINGS;
   function t(lang) { return T[lang] || T.pl; }
-  function money(n, lang) { return new Intl.NumberFormat(LOCALE[lang] || 'pl-PL').format(n) + ' PLN'; }
+  function money(n, lang) { if (n == null || !Number.isFinite(n)) return t(lang).askPrice; return new Intl.NumberFormat(LOCALE[lang] || 'pl-PL').format(n) + ' PLN'; }
   // Landed-cost estimate for a car, from the full import calculation (calcImport below).
   function estimate(car, rules) {
     var r = calcImport(pricingInput(car), rules);
@@ -76,12 +76,17 @@
     var prefix = (box.cipFrom || '').trim().toLowerCase();
     if (!prefix) return null;
     return SAMPLE_CATALOG.filter(function (c) {
-      return c.priceCip != null && (c.brand + ' ' + c.model).toLowerCase().indexOf(prefix) === 0;
+      return Number.isFinite(c.priceCip) && c.priceCip > 0 && (c.brand + ' ' + c.model).toLowerCase().indexOf(prefix) === 0;
     }).sort(function (a, b) { return a.priceCip - b.priceCip; })[0] || null;
   }
   function boxPrice(box, rules) { var c = boxOffer(box); return c ? landedOf(c, rules) : null; }
   function isBox(c) { return Object.prototype.hasOwnProperty.call(c, 'cipFrom'); }
-  function landed(c) { return isBox(c) ? boxPrice(c) : (c.priceFinal || c.pricePL || landedOf(c)); }
+  function landed(c) { return landedOf(c); }
+  function effectHref(c, lang) {
+    var base = (window.KT_ASSETS || 'assets/').replace(/assets\/$/, '') + (lang === 'pl' ? '' : lang + '/');
+    return boxOffer(c) ? base + (lang === 'pl' ? 'oferty.html' : 'offers.html') + '?q=' + encodeURIComponent(c.cipFrom)
+      : base + 'index-galeria.html?car=' + encodeURIComponent(c.brand + ' ' + c.model) + '#kontakt';
+  }
   function pricingRows(r, lang) {
     var s = t(lang), cs = s.calc.rows;
     return (r.basis === 'cip' ? [[s.cip, r.car], [s.freightExtra, r.freightExtra]] :
@@ -574,8 +579,10 @@
     if (!c) return null;
     var multi = c.images && c.images.length > 1;
     var photo = multi ? (c.images[photoIndex] || c.images[0]) : null;
-    var r = calcImport(pricingInput(c));
-    if (c.priceFinal != null) r.total = c.priceFinal;
+    var pricedCar = isBox(c) ? boxOffer(c) : c;
+    var r = pricedCar ? calcImport(pricingInput(pricedCar)) : null;
+    var total = landedOf(c);
+    if (r && total != null) r.total = total;
     var nf = new Intl.NumberFormat(LOCALE[lang]);
     var specs = [[s.year, c.year], [s.mileageL, typeof c.km === 'number' ? nf.format(c.km) + ' km' : (c.km || '—')],
       [s.range, c.range ? (typeof c.range === 'number' ? c.range + ' km' : c.range) : '—'], [s.seats, c.seats || '—'],
@@ -600,14 +607,14 @@
           h('dl', { className: 'kt-specs kt-specs-3' }, specs.map(function (x) { return h('div', { key: x[0] }, h('dt', { className: 'kt-label' }, x[0]), h('dd', null, x[1])); })),
           h('div', null,
             h('div', { className: 'kt-label' }, s.landed),
-            h('div', { className: 'kt-price' }, h(RollingNumber, { value: r.total, lang: lang, suffix: ' PLN', rollIn: true })),
-            c.priceFinal != null ? null : h('dl', { className: 'kt-cost' }, pricingRows(r, lang).concat([[s.calc.total, r.total]]).map(function (row) {
+            h('div', { className: 'kt-price' }, total == null ? s.askPrice : h(RollingNumber, { value: total, lang: lang, suffix: ' PLN', rollIn: true })),
+            c.priceFinal != null || total == null ? null : h('dl', { className: 'kt-cost' }, pricingRows(r, lang).concat([[s.calc.total, r.total]]).map(function (row) {
               return h('div', { key: row[0] }, h('dt', null, row[0]), h('dd', null, money(row[1], lang)));
             }))),
           h('div', { className: 'kt-stage-actions' },
             h(Button, { variant: 'primary', arrow: true, onClick: function () { p.onOrder && p.onOrder(c); } }, s.orderThis),
-            h(Button, { variant: 'outline', onClick: function () { p.onCalc && p.onCalc(c); } }, s.calcCost))),
-        h(StickyBuy, { label: s.landed, total: r.total, lang: lang, cta: s.orderShort, watch: '.kt-stage-actions', onClick: function () { p.onOrder && p.onOrder(c); } }))));
+            total == null ? null : h(Button, { variant: 'outline', onClick: function () { p.onCalc && p.onCalc(c); } }, s.calcCost))),
+        h(StickyBuy, { label: s.landed, total: total, lang: lang, cta: s.orderShort, watch: '.kt-stage-actions', onClick: function () { p.onOrder && p.onOrder(c); } }))));
   }
 
   function StickyBuy(p) {
@@ -1422,7 +1429,7 @@
         h('div', { className: 'kt-offer-body' }, h('span', { className: 'kt-skel', style: { width: '62%', height: 18 } }), h('span', { className: 'kt-skel', style: { width: '44%', height: 12 } }),
           h('span', { className: 'kt-skel', style: { width: '52%', height: 24, marginTop: 14 } })));
     }
-    var href = p.href || (c.source === 'crm' && c.slug ? (window.KT_ASSETS || 'assets/').replace(/assets\/$/, '') + (lang === 'pl' ? 'auta/' : lang + '/cars/') + c.slug + '.html' : '#');
+    var href = p.href || (isBox(c) ? effectHref(c, lang) : null) || (c.source === 'crm' && c.slug ? (window.KT_ASSETS || 'assets/').replace(/assets\/$/, '') + (lang === 'pl' ? 'auta/' : lang + '/cars/') + c.slug + '.html' : '#');
     function open(e) { if (href !== '#' && e.target.closest && e.target.closest('a')) return; if (!p.onOpen) return; e.preventDefault(); p.onOpen(c); }
     return h('article', Object.assign({ className: cx('kt kt-offer', p.onOpen && 'is-clickable'), style: p.vtCard ? { viewTransitionName: p.vtCard } : null, onClick: open }, glare(3)),
       c.status === 'stock' ? h('div', { className: 'kt-stock-band' }, h('span', null, s.inPoland), h('span', null, c.location || '')) : null,
@@ -1436,7 +1443,7 @@
             h('div', { style: { display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' } },
               h('div', { className: 'kt-price' }, money(c.priceCip != null ? cipOf(c) : landedOf(c), lang)),
               c.priceCip != null ? h('small', { className: 'kt-offer-meta' }, '$' + nf.format(c.priceCip)) : null),
-            h('div', { className: 'kt-offer-meta', style: { marginTop: 4 } }, c.priceCip != null ? s.landed + ' ' + nf.format(landedOf(c)) + ' zł' : s.cnPrice + ' ' + money(c.priceCN, lang))),
+            h('div', { className: 'kt-offer-meta', style: { marginTop: 4 } }, c.priceCip != null ? s.landed + ' ' + nf.format(landedOf(c)) + ' zł' : isBox(c) ? '' : s.cnPrice + ' ' + money(c.priceCN, lang))),
           h('a', { href: href }, s.details + ' →'))));
   }
 
@@ -1619,14 +1626,20 @@
       fees: fees, total: total, net: total - back, vatBack: back, markup: total - car, asOf: r.asOf };
   }
   function pricingInput(c) {
+    if (isBox(c)) { var offer = boxOffer(c); if (offer) return pricingInput(offer); }
     if (c.priceCip != null) return { price: c.priceCip, currency: 'USD', basis: 'cip', drive: c.drive, cc: ccBucket(c.cc),
       condition: c.isNew ? 'new' : 'used', maker: c.makerKey || 'other', imported: !!c.imported, coc: c.coc };
     return { price: c.priceCN, currency: 'PLN', basis: 'cn', drive: c.drive, cc: ccBucket(c.cc), condition: c.condition || 'used', coc: c.coc };
   }
   function landedOf(c, rules) {
-    return c.priceFinal != null ? c.priceFinal : calcImport(pricingInput(c), rules).total;
+    if (isBox(c)) return boxPrice(c, rules);
+    if (c.priceFinal != null) return c.priceFinal;
+    if (c.pricePL != null) return c.pricePL;
+    if (c.priceCip == null && c.priceCN == null) return null;
+    var total = calcImport(pricingInput(c), rules).total;
+    return Number.isFinite(total) && total > 0 ? total : null;
   }
-  function cipOf(c) { return c.priceCip != null ? Math.round(c.priceCip * RULES.fx.USD) : null; }
+  function cipOf(c) { if (isBox(c)) { var offer = boxOffer(c); return offer ? cipOf(offer) : null; } return c.priceCip != null ? Math.round(c.priceCip * RULES.fx.USD) : null; }
 
   // ---------- search and filtering (pure functions) ----------
   var KEYWORDS = { body: { suv: 'suv', sedan: 'sedan', kombi: ['wagon', 'hatch'], estate: ['wagon', 'hatch'], hatch: 'hatch', van: 'van', mpv: ['mpv', 'van'], 轿车: 'sedan', 跑车: 'sport', sport: 'sport', coupe: ['coupe', 'sport'] },
@@ -1641,7 +1654,7 @@
       return wordStart(c.brand + ' ' + c.model, tok);
     });
   }
-  function wordStart(text, tok) { return (' ' + text.toLowerCase().replace(/[-_/]/g, ' ')).indexOf(' ' + tok) >= 0; }
+  function wordStart(text, tok) { return (' ' + text.toLowerCase().replace(/[-_/]/g, ' ')).indexOf(' ' + tok.replace(/[-_/]/g, ' ')) >= 0; }
   var EMPTY_FILTERS = { status: [], drive: [], body: [], brand: [], priceMin: '', priceMax: '', yearMin: '', yearMax: '', kmMax: 0, rangeMin: 0, seats: 0, noExcise: false };
   function filterCars(cars, f, q, skip) {
     f = Object.assign({}, EMPTY_FILTERS, f);
@@ -1919,7 +1932,8 @@
   // ---------- photos: a car with a `photo` shows it instead of the drawn silhouette (cut-out, nose to the left) ----------
   function photoSrc(c) { var ph = c && c.photo; if (!ph) return null; return /^(https?:)?\//.test(ph) ? ph : ((typeof window !== 'undefined' && window.KT_ASSETS) || '') + ph; }
   function CarImage(p) {
-    var ph = p.image || (p.catalog && ((p.car.imagesSmall || [])[0] || (p.car.images || [])[0]));
+    var effectPhoto = isBox(p.car) && SAMPLE_LISTINGS.some(function (c) { return c.id === p.car.id; }) ? 'corridor/img/hd/' + p.car.id + '.jpg' : null;
+    var ph = p.image || (!p.car.photo && effectPhoto) || (p.catalog && ((p.car.imagesSmall || [])[0] || (p.car.images || [])[0]));
     var src = ph ? (((window.KT_ASSETS || 'assets/').replace(/assets\/$/, '')) + ph) : photoSrc(p.car);
     if (src) return h('img', { className: cx('kt-car-photo', p.className), src: src, alt: p.alt == null ? (p.car.brand + ' ' + p.car.model) : p.alt, loading: 'lazy', decoding: 'async', draggable: false });
     return h(CarSilhouette, { body: p.car.body, title: p.alt == null ? undefined : p.alt, ghost: p.ghost, sheen: p.sheen });
@@ -2209,7 +2223,7 @@
     pl: { heroEyebrow: 'MotorSpace · import samochodów z Chin', heroTitle: ['Samochody z Chin.', 'Sprowadzone pod klucz.'],
       heroSub: 'Kupujemy u producentów i dealerów w Chinach, sami sprawdzamy każde auto i sami odprawiamy je w Polsce. Do każdego dostajesz raport z niezależnej inspekcji z tłumaczeniem na polski.',
       tabs: ['Na zamówienie z Chin', 'Od ręki w Polsce'], budget: 'Budżet', anyBody: 'Każde', anyBudget: 'Bez limitu', upTo: 'do', offersWord: ['oferta', 'oferty', 'ofert'], popular: 'Popularne',
-      chips: [['Zeekr 9X', 'Zeekr 9X'], ['Li Auto L9', 'Li Auto L9'], ['BYD Seal', 'BYD Seal'], ['Xiaomi SU7', 'Xiaomi SU7'], ['SUV 7 miejsc', 'suv 7 miejsc'], ['Elektryczne', 'ev']],
+      chips: [['Xiaomi SU7', 'Xiaomi SU7'], ['Xiaomi YU7', 'Xiaomi YU7'], ['BMW i5', 'BMW i5'], ['Mercedes EQE', 'Mercedes EQE'], ['SUV 7 miejsc', 'suv 7 miejsc'], ['Elektryczne', 'ev']],
       trust: ['Pełna cena z cłem i VAT od razu', 'Własna odprawa celna w Polsce', 'Raport z niezależnej inspekcji'], scroll: 'Przewiń',
       about: 'O nas', aboutText: 'MotorSpace to polsko-chiński zespół, który sprowadza samochody prosto od producentów i dealerów. Sami kupujemy, sami sprawdzamy, sami odprawiamy. Do każdego auta dostajesz raport z niezależnej inspekcji w Chinach wraz z tłumaczeniem na polski.',
       stats: [{ v: 12, suffix: '–16', l: 'tygodni od umowy do odbioru' }, { v: 100, suffix: '%', l: 'aut z raportem z niezależnej inspekcji' }, { v: 8, l: 'etapów zamówienia do śledzenia online' }, { v: 3, l: 'języki obsługi: polski, angielski, chiński' }],
@@ -2227,7 +2241,7 @@
     en: { heroEyebrow: 'MotorSpace · car imports from China', heroTitle: ['Cars from China.', 'Delivered turnkey.'],
       heroSub: 'We buy from manufacturers and dealers in China, inspect every car on site, clear it through customs in Poland ourselves. Every car comes with an independent inspection report translated into Polish.',
       tabs: ['To order from China', 'In stock in Poland'], budget: 'Budget', anyBody: 'Any', anyBudget: 'No limit', upTo: 'up to', offersWord: ['offer', 'offers'], popular: 'Popular',
-      chips: [['Zeekr 9X', 'Zeekr 9X'], ['Li Auto L9', 'Li Auto L9'], ['BYD Seal', 'BYD Seal'], ['Xiaomi SU7', 'Xiaomi SU7'], ['7-seat SUV', 'suv 7 seat'], ['Electric', 'ev']],
+      chips: [['Xiaomi SU7', 'Xiaomi SU7'], ['Xiaomi YU7', 'Xiaomi YU7'], ['BMW i5', 'BMW i5'], ['Mercedes EQE', 'Mercedes EQE'], ['7-seat SUV', 'suv 7 seat'], ['Electric', 'ev']],
       trust: ['Full price with duty and VAT, up front', 'Our own customs clearance in Poland', 'Independent inspection report'], scroll: 'Scroll',
       about: 'About us', aboutText: 'MotorSpace is a Polish–Chinese team that brings cars straight from manufacturers and dealers. We buy, we inspect, we clear customs. Every car comes with an independent inspection report from China, translated into Polish.',
       stats: [{ v: 12, suffix: '–16', l: 'weeks from contract to collection' }, { v: 100, suffix: '%', l: 'of cars with an independent inspection report' }, { v: 8, l: 'order stages you can track online' }, { v: 3, l: 'languages: Polish, English, Chinese' }],
@@ -2245,7 +2259,7 @@
     zh: { heroEyebrow: 'MotorSpace · 中国汽车进口', heroTitle: ['中国好车，', '一站式进口到波兰。'],
       heroSub: '我们直接向中国的厂家和经销商采购，自己验车，自己在波兰清关。每台车都附第三方检测报告和它的波兰语译本。',
       tabs: ['从中国预订', '波兰现车'], budget: '预算', anyBody: '不限', anyBudget: '不限', upTo: '最高', offersWord: '个车源', popular: '热门搜索',
-      chips: [['极氪 9X', 'Zeekr 9X'], ['理想 L9', 'Li Auto L9'], ['比亚迪 海豹', 'BYD Seal'], ['小米 SU7', 'Xiaomi SU7'], ['7 座 SUV', 'suv 7座'], ['纯电', 'ev']],
+      chips: [['小米 SU7', 'Xiaomi SU7'], ['小米 YU7', 'Xiaomi YU7'], ['宝马 i5', 'BMW i5'], ['奔驰 EQE', 'Mercedes EQE'], ['7 座 SUV', 'suv 7座'], ['纯电', 'ev']],
       trust: ['立即显示含关税和增值税的完整价格', '自己在波兰清关', '第三方检测报告'], scroll: '向下滚动',
       about: '关于我们', aboutText: 'MotorSpace 是一支中波团队，直接从厂家和经销商把车带到波兰。我们自己采购、自己验车、自己清关。每台车都附第三方检测报告和它的波兰语翻译件。',
       stats: [{ v: 12, suffix: '–16', l: '周，从签约到提车' }, { v: 100, suffix: '%', l: '的车附第三方检测报告' }, { v: 8, l: '个订单环节可在线追踪' }, { v: 3, l: '种服务语言：波兰语、英语、中文' }],
@@ -2572,6 +2586,6 @@
     HomeHero: HomeHero, HomeSearch: HomeSearch, ScrollWords: ScrollWords, StatRow: StatRow, OfficeClocks: OfficeClocks, WhyUs: WhyUs, ModelSpotlight: ModelSpotlight,
     motion: { viewTransition: viewTransition, useReveal: useReveal, glare: glare, scrollParent: scrollParent, reduced: reduced, can3D: can3D },
     SAMPLE_CARS: SAMPLE_CARS, SAMPLE_STOCK: SAMPLE_STOCK, SAMPLE_LISTINGS: SAMPLE_LISTINGS, SAMPLE_CATALOG: SAMPLE_CATALOG, SAMPLE_ORDERS: SAMPLE_ORDERS, COMPANY: COMPANY, DATA: DATA, EMPTY_FILTERS: EMPTY_FILTERS, copy: T, money: money, estimate: estimate,
-    RULES: RULES, calcImport: calcImport, pricingInput: pricingInput, pricingRows: pricingRows, cipOf: cipOf, boxPrice: boxPrice, landedOf: landedOf, filterCars: filterCars, sortCars: sortCars, ccBucket: ccBucket
+    RULES: RULES, calcImport: calcImport, pricingInput: pricingInput, pricingRows: pricingRows, cipOf: cipOf, boxOffer: boxOffer, boxPrice: boxPrice, landed: landed, effectHref: effectHref, landedOf: landedOf, filterCars: filterCars, sortCars: sortCars, ccBucket: ccBucket
   });
 })();

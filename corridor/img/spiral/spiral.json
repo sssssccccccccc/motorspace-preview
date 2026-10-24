@@ -1,52 +1,52 @@
 [
  {
-  "id": "s3",
-  "slug": "xiaomi-su7-pro-poznan",
-  "name": "Xiaomi SU7 Pro"
+  "id": "xiaomi-su7",
+  "slug": "xiaomi-su7",
+  "name": "Xiaomi SU7"
  },
  {
-  "id": "l5",
-  "slug": "zeekr-001",
-  "name": "Zeekr 001"
+  "id": "zeekr-9x",
+  "slug": "zeekr-9x",
+  "name": "Zeekr 9X"
  },
  {
-  "id": "l8",
+  "id": "denza-z9gt",
+  "slug": "denza-z9gt",
+  "name": "Denza Z9GT"
+ },
+ {
+  "id": "li-auto-l9",
   "slug": "li-auto-l9",
   "name": "Li Auto L9"
  },
  {
-  "id": "s1",
-  "slug": "byd-seal-u-dm-i-warszawa",
-  "name": "BYD Seal U DM-i"
+  "id": "xiaomi-yu7",
+  "slug": "xiaomi-yu7",
+  "name": "Xiaomi YU7"
  },
  {
-  "id": "l11",
-  "slug": "geely-galaxy-l7",
-  "name": "Geely Galaxy L7"
+  "id": "lynk-900",
+  "slug": "lynk-900",
+  "name": "Lynk & Co 900"
  },
  {
-  "id": "l17",
-  "slug": "yangwang-u8",
-  "name": "Yangwang U8"
+  "id": "xpeng-p7-plus",
+  "slug": "xpeng-p7-plus",
+  "name": "Xpeng P7+"
  },
  {
-  "id": "l1",
-  "slug": "byd-seal",
-  "name": "BYD Seal"
+  "id": "mercedes-eqs-53",
+  "slug": "mercedes-eqs-53",
+  "name": "Mercedes-AMG EQS 53 4MATIC+"
  },
  {
-  "id": "s2",
-  "slug": "zeekr-7x-gdansk",
-  "name": "Zeekr 7X"
+  "id": "zeekr-001",
+  "slug": "zeekr-001",
+  "name": "Zeekr 001"
  },
  {
-  "id": "l18",
-  "slug": "nio-et5-touring",
-  "name": "NIO ET5 Touring"
- },
- {
-  "id": "l21",
-  "slug": "zeekr-9x-max",
-  "name": "Zeekr 9X"
+  "id": "fangchengbao-bao5",
+  "slug": "fangchengbao-bao5",
+  "name": "Fang Cheng Bao (BYD) Bao 5"
  }
 ]
