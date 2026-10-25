@@ -34,12 +34,14 @@
     '.kt-footer[data-mbr] .kt-footer-mark{display:none}' +
     // 主人 2026-10-18: 「最下面字可以大一点重新排版尤其是那个motorspace to the future 可以大一点然后那个岩石和字重叠可以更多点」
     // the wordmark and "To the Future" as the footer's headline, the links a size up, all of it on the rock
-    '.kt-footer[data-mbr] .kt-logo{flex-wrap:wrap;align-items:flex-start;column-gap:14px;row-gap:clamp(8px,1vw,16px)}' +
+    // 主人 2026-10-25: 「Moto Space 小一点 To the Future 大一点 但不要太大」: one lockup, the logo exactly as wide as the
+    // line under it (5.86em of the line's size), so "To the Future" carries the weight and the coloured mark sits on it
+    '.kt-footer[data-mbr] .kt-logo{--tff:clamp(40px,5.6vw,84px);flex-wrap:wrap;align-items:flex-start;column-gap:14px;row-gap:calc(var(--tff)*.2)}' +
     '.kt-footer[data-mbr] .kt-logo b{font-size:clamp(34px,6vw,104px);line-height:.92;letter-spacing:.12em}' +
-    '.kt-footer[data-mbr] .kt-logo .kt-brand-reveal{width:min(1050px,calc(100% - 86px));flex:none}' +
+    '.kt-footer[data-mbr] .kt-logo .kt-brand-reveal{width:min(calc(var(--tff)*5.72),calc(100% - 86px));flex:none}' +
     '.kt-footer[data-mbr] .kt-logo>span:last-child{font-size:clamp(12px,1vw,16px);margin-top:.35em;color:var(--ink)}' +
     '.kt-footer .kt-logo::after{content:"To the Future";flex-basis:100%;font:500 15px/1.2 var(--font-display);letter-spacing:.01em;color:var(--ink)}' +
-    '.kt-footer[data-mbr] .kt-logo::after{font:500 clamp(24px,3.6vw,62px)/1.04 var(--font-display);letter-spacing:-.01em}' +
+    '.kt-footer[data-mbr] .kt-logo::after{font:500 var(--tff)/.95 var(--font-display);letter-spacing:-.03em}' +
     '.kt-footer[data-mbr] .kt-footer-brand p{margin-top:clamp(16px,1.6vw,26px);font-size:14px;color:rgba(245,245,247,.72)}' +
     '.kt-footer[data-mbr] nav{gap:10px}' +
     '.kt-footer[data-mbr] nav .kt-label{font-size:14px;margin-bottom:4px}' +
@@ -66,7 +68,7 @@
     // phones: a little room under the last line, where the glowing foot of the rock shows unveiled
     '@media (max-width:860px){.kt-footer[data-mbr]{min-height:0;row-gap:var(--space-8);padding-bottom:calc(var(--space-8) + 26vw)}' +
     '.kt-footer[data-mbr] .kt-logo{position:relative;padding-top:22px}' +
-    '.kt-footer[data-mbr] .kt-logo .kt-brand-reveal{width:100%}' +
+    '.kt-footer[data-mbr] .kt-logo .kt-brand-reveal{width:min(calc(var(--tff)*5.72),100%)}' +
     '.kt-footer[data-mbr] .kt-logo>span:last-child{position:absolute;top:0;right:0;margin:0}}';
   document.head.appendChild(css);
 
