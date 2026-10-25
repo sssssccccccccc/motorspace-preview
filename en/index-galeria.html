@@ -32,7 +32,7 @@
 <link rel="stylesheet" href="../corridor/touch.css?v=8e6fec71">
 <link rel="stylesheet" href="../corridor/texture.css?v=b91ead7c">
 <link rel="stylesheet" href="../corridor/motion.css?v=0f369f55">
-<link rel="stylesheet" href="../corridor/wind.css?v=8c9a8278">
+<link rel="stylesheet" href="../corridor/wind.css?v=800d5ee5">
 <link rel="stylesheet" href="../corridor/wind3d.css?v=e0551733">
 <link rel="stylesheet" href="../corridor/catalog.css?v=2f0fbd75">
 <link rel="stylesheet" href="../corridor/report.css?v=ae830a7b">
@@ -507,7 +507,10 @@
       h('div', { className: 'msw-foot' },
         h('div', { className: 'wt-paints', role: 'group' }),
         h('p', { className: 'wt-readout', 'aria-live': 'polite' })),
-      h('p', { className: 'msw-credit' }, h('a', { href: MSW_SOURCE, target: '_blank', rel: 'noopener' }, t.credit)));
+      // 主人 2026-10-25: 「这个先去掉，我先看看去掉效果如何」: the credit line is off the page for now. The model is CC BY 4.0,
+      // so before going live the attribution has to come back somewhere (a small ⓘ, the footer or the legal page); until then it
+      // stays in the markup for screen readers and the model's licence, invisible.
+      h('p', { className: 'msw-credit is-hidden' }, h('a', { href: MSW_SOURCE, target: '_blank', rel: 'noopener', tabIndex: -1 }, t.credit)));
   }
 
   // ---- inspection report band (主人 2026-10-20: 瓜子检测报告「放到网站哪个地方最好…还有一个波兰版本…说明所有的车都会有
