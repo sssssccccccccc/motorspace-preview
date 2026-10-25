@@ -169,6 +169,15 @@
       h('path', { d: 'M16 5v22M6 10v12M26 10v12M11 10v12M21 10v12' }),
       h('path', { className: 'kt-mark-door', d: 'M16 5l8 3v16l-8 3' }));
   }
+  function BrandLogo(p) {
+    p = p || {};
+    var base = (window.KT_ASSETS || 'assets/') + 'brand/motorspace-pl-';
+    var src = base + (p.print ? 'light' : 'dark') + (p.large ? '-wide.png' : '-nav.png');
+    var props = { className: 'kt-brand-img', src: src, alt: 'MotorSpace.pl', width: p.large ? 2133 : 480, height: p.large ? 366 : 82, decoding: 'async' };
+    if (!p.reveal) return h('img', props);
+    return h('span', { className: 'kt-brand-reveal' }, h('img', props),
+      h('img', Object.assign({}, props, { className: 'kt-brand-img kt-brand-fill', alt: '', 'aria-hidden': true })));
+  }
   // a small calculator glyph for the nav button, so the calculator reads as one
   function CalcIcon() {
     return h('svg', { className: 'kt-calc-ico', width: 14, height: 14, viewBox: '0 0 14 14', 'aria-hidden': true },
@@ -200,7 +209,7 @@
     var ms = useState(false), menu = ms[0], setMenu = ms[1];
     useCJK(p.lang);
     return h('header', { ref: ref, className: 'kt kt-nav' },
-      h('a', { className: 'kt-logo', href: p.home || '#' }, h(LogoMark, null), h('b', null, p.name || 'MOTORSPACE'), h('span', null, 'CN → PL')),
+      h('a', { className: 'kt-logo', href: p.home || '#', 'aria-label': 'MotorSpace' }, h(BrandLogo), h('span', null, 'CN → PL')),
       h('nav', { className: 'kt-nav-links' }, s.nav.map(function (n, i) {
         var l = p.links && p.links[i];
         return h('a', { key: i, href: typeof l === 'string' ? l : '#', onClick: typeof l === 'function' ? function (e) { e.preventDefault(); l(); } : undefined, 'aria-current': i === p.active ? 'page' : undefined }, n);
@@ -241,7 +250,7 @@
       h('div', { className: 'kt kt-dark kt-menu-wrap', onMouseDown: function (e) { if (e.target === e.currentTarget) p.onClose(); } },
         h('nav', { ref: ref, className: 'kt-menu', role: 'dialog', 'aria-modal': true, 'aria-label': s.menu },
           h('div', { className: 'kt-menu-top' },
-            h('a', { className: 'kt-logo', href: p.home || '#', onClick: go(p.home || '#') }, h(LogoMark, null), h('b', null, p.name || 'MOTORSPACE')),
+            h('a', { className: 'kt-logo', href: p.home || '#', onClick: go(p.home || '#'), 'aria-label': 'MotorSpace' }, h(BrandLogo)),
             h('button', { type: 'button', className: 'kt-sheet-close', 'aria-label': s.menuClose, onClick: p.onClose }, '×')),
           h('ul', { className: 'kt-menu-links' }, s.nav.map(function (n, i) {
             var l = p.links && p.links[i];
@@ -2043,11 +2052,17 @@
     var el = useRef(null);
     if (!el.current && typeof document !== 'undefined') { el.current = document.createElement('div'); el.current.className = 'kt kt-quote'; document.body.appendChild(el.current); }
     useEffect(function () {
-      var node = el.current;
+      var node = el.current, cancelled = false;
       function after() { p.onDone && p.onDone(); }
       window.addEventListener('afterprint', after);
-      var id = setTimeout(function () { window.print(); }, 80);
-      return function () { clearTimeout(id); window.removeEventListener('afterprint', after); if (node && node.parentNode) node.parentNode.removeChild(node); el.current = null; };
+      var id = setTimeout(function () {
+        // Printing must wait for the newly mounted bitmap logo, including on a
+        // cold cache. decode() is also safe for an already loaded image.
+        Promise.all(Array.prototype.map.call(node.querySelectorAll('img'), function (img) {
+          return img.decode ? img.decode().catch(function () {}) : Promise.resolve();
+        })).then(function () { if (!cancelled) window.print(); });
+      }, 80);
+      return function () { cancelled = true; clearTimeout(id); window.removeEventListener('afterprint', after); if (node && node.parentNode) node.parentNode.removeChild(node); el.current = null; };
     }, []);
     var today = new Intl.DateTimeFormat(LOCALE[lang], { dateStyle: 'long' }).format(new Date());
     var quoteCurrency = e.basis === 'cip' ? 'USD' : 'PLN';
@@ -2055,7 +2070,7 @@
     return ReactDOM.createPortal(
       h('article', { className: 'kt-quote-page', lang: lang },
         h('header', { className: 'kt-quote-head' },
-          h('div', null, h('div', { className: 'kt-quote-logo' }, company.name || 'MOTORSPACE', h('span', null, ' CN → PL')), h('div', { className: 'kt-quote-legal' }, company.legal || '')),
+          h('div', null, h('div', { className: 'kt-quote-logo', 'aria-label': 'MotorSpace' }, h(BrandLogo, { print: true, large: true }), h('span', null, ' CN → PL')), h('div', { className: 'kt-quote-legal' }, company.legal || '')),
           h('div', { className: 'kt-quote-meta' }, h('h1', null, Q.title), h('div', null, Q.no + ' ' + quoteNumber()), h('div', null, Q.date + ' ' + today), h('div', null, Q.valid))),
         h('section', { className: 'kt-quote-car' },
           h('div', null, h('span', null, Q.car), h('b', null, c.brand + ' ' + c.model + ' · ' + c.year)),
@@ -2208,14 +2223,14 @@
   function Footer(p) {
     var lang = p.lang || 'pl', s = t(lang);
     return h('footer', { className: 'kt kt-footer' },
-      h('div', { className: 'kt-footer-brand' }, h('div', { className: 'kt-logo' }, h('b', null, p.name || 'MOTORSPACE'), h('span', null, 'CN → PL')),
+      h('div', { className: 'kt-footer-brand' }, h('div', { className: 'kt-logo', 'aria-label': 'MotorSpace' }, h(BrandLogo, { large: true, reveal: true }), h('span', null, 'CN → PL')),
         h('p', null, p.company || COMPANY.legal || '[Nazwa firmy] · NIP — · KRS —')),
       s.footer.map(function (col) {
         return h('nav', { key: col[0] }, h('div', { className: 'kt-label' }, col[0]), col[1].map(function (l) { var lab = Array.isArray(l) ? l[0] : l, href = Array.isArray(l) ? l[1] : '#'; if (href === 'mailto:') href = 'mailto:' + (COMPANY.email || ''); return h('a', { key: lab, href: href }, lab); }));
       }),
       h('div', { className: 'kt-footer-end' }, h(LangSwitch, { value: lang, onChange: p.onLang }), h('span', { className: 'kt-label' }, '© ' + new Date().getFullYear())),
       // the wordmark set large and fading into the page: the last thing you see
-      h('div', { className: 'kt-footer-mark', 'aria-hidden': true }, p.name || 'MOTORSPACE'));
+      h('div', { className: 'kt-footer-mark', 'aria-hidden': true }, h(BrandLogo, { large: true, reveal: true }), h('span', null, 'CN → PL')));
   }
 
   // ---------- home page: the search hero, the company story and the model spotlight ----------
@@ -2577,7 +2592,7 @@
 
   window.Kontener = Object.assign(window.Kontener || {}, {
     nWord: nWord, fromPrice: fromPrice, LegalPage: LegalPage, MobileBar: MobileBar, MobileMenu: MobileMenu, CalcIcon: CalcIcon, FAQ: FAQ, loadRates: loadRates, useRates: useRates, rateNote: rateNote, CalcDrawer: CalcDrawer, calcSummary: calcSummary, OrderTracker: OrderTracker, LeadForm: LeadForm, leadSummary: leadSummary, QuoteSheet: QuoteSheet, CarImage: CarImage,
-    CarBoxGarage: CarBoxGarage, CarSilhouette: CarSilhouette, Viewer3D: Viewer3D, NavBar: NavBar, LangSwitch: LangSwitch,
+    CarBoxGarage: CarBoxGarage, CarSilhouette: CarSilhouette, Viewer3D: Viewer3D, NavBar: NavBar, LangSwitch: LangSwitch, BrandLogo: BrandLogo,
     SearchBar: SearchBar, OfferCard: OfferCard, ImportSteps: ImportSteps, Button: Button, DriveTag: DriveTag,
     OrderBuilder: OrderBuilder, StockCard: StockCard, SectionHeader: SectionHeader, ReservedSection: ReservedSection, Footer: Footer,
     ImportCalculator: ImportCalculator, SearchField: SearchField, FilterPanel: FilterPanel, ActiveFilters: ActiveFilters,

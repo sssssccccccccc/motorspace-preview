@@ -11,6 +11,7 @@ body.cp { margin: 0; background: var(--paper); color: var(--ink); font-family: v
 .cp-logo { display: inline-flex; flex: none; align-items: center; gap: 10px; text-decoration: none; }
 .cp-logo svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; }
 .cp-logo b { font: 600 13px/1 var(--font-sans); letter-spacing: .18em; }
+.cp-logo .kt-brand-img { width: 190px; }
 .cp-crumbs { display: flex; gap: 8px; min-width: 0; font-size: 13px; color: var(--ink-muted); white-space: nowrap; }
 .cp-crumbs a { text-decoration: none; transition: color .2s; }
 .cp-crumbs a:hover { color: var(--ink); }
@@ -98,6 +99,7 @@ body.cp { margin: 0; background: var(--paper); color: var(--ink); font-family: v
   .cp-related ul { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 600px) {
+  .cp-logo .kt-brand-img { width: 180px; }
   .cp-nav { gap: 14px; height: 56px; }
   .cp-crumbs { display: none; }
   .cp-hero { width: calc(100% - 24px); margin-top: 12px; }

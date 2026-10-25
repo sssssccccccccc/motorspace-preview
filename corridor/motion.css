@@ -91,10 +91,12 @@ html.mfx-has-torch body { background: transparent; }
 
 /* ---- 5 · the wordmark: an outline that fills with light as the page ends ---- */
 /* the word fits the page now (it used to run off the right edge), so the fill can reach the last letter */
-.kt-footer-mark.mfx-mark { position: relative; background: none; color: transparent; -webkit-text-stroke: 1px rgba(236, 240, 255, .16); font-size: clamp(56px, 14.4vw, 280px); }
-.kt-footer-mark.mfx-mark::after { content: attr(data-word); position: absolute; inset: 0; pointer-events: none; text-align: center; white-space: nowrap; -webkit-text-stroke: 0;
+.kt-footer-mark.mfx-mark:not(.mfx-image) { position: relative; background: none; color: transparent; -webkit-text-stroke: 1px rgba(236, 240, 255, .16); font-size: clamp(56px, 14.4vw, 280px); }
+.kt-footer-mark.mfx-mark:not(.mfx-image)::after { content: attr(data-word); position: absolute; inset: 0; pointer-events: none; text-align: center; white-space: nowrap; -webkit-text-stroke: 0;
   background: linear-gradient(180deg, rgba(240, 242, 248, .78) 0%, rgba(206, 212, 226, .42) 46%, rgba(255, 226, 196, .08) 90%); -webkit-background-clip: text; background-clip: text; color: transparent;
   clip-path: inset(0 calc((1 - var(--fill, 0)) * 100%) 0 0); }
+.mfx-image .kt-brand-reveal > .kt-brand-img:first-child { visibility: visible; opacity: .18; filter: grayscale(1); }
+.mfx-image .kt-brand-fill { clip-path: inset(0 calc((1 - var(--fill, 1)) * 100%) 0 0); }
 
 /* ---- 6 · a car's photo grows into its page ---- */
 ::view-transition-group(ms-car) { animation-duration: .62s; animation-timing-function: cubic-bezier(.2, .8, .2, 1); }

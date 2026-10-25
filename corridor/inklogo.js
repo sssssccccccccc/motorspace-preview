@@ -3,14 +3,14 @@
    draw back once it moves on. Inside the ink the logo shows in another material (dark chrome, champagne, blue steel;
    the next one each time the pointer comes back). The ink is the page's warm white, so on the dark nav it reads the way
    the black ink reads on the reference's white page.
-   Self-starting on .msc-nav-logo (gallery) and .cp-logo (car pages); only with a fine pointer that can hover, and not
+   Self-starting on gallery, car-page and standard navigation logos; only with a fine pointer that can hover, and not
    when the visitor asked for reduced motion. One canvas over the logo, drawn only while some ink is alive. */
 (function () {
   'use strict';
   var mm = function (q) { return window.matchMedia ? window.matchMedia(q).matches : false; };
   if (mm('(prefers-reduced-motion: reduce)') || !mm('(hover: hover) and (pointer: fine)')) return;
 
-  var SEL = '.msc-nav-logo, .cp-logo';
+  var SEL = '.msc-nav-logo, .cp-logo, .kt-nav > .kt-logo, .kt-menu .kt-logo';
   var INK = '#f3eee6';
   var LIFE = 1150, GROW = 150, HOLD = 380;    // ms: a blob blooms, holds, then draws back
   // vertical bands of each material over the glyph height (a horizon line, like chrome reflecting the sky and the road)
@@ -32,16 +32,30 @@
     var self = this;
     a.addEventListener('pointerenter', function (e) { self.enter(e); });
     a.addEventListener('pointermove', function (e) { self.move(e); });
-    a.addEventListener('pointerleave', function () { self.last = null; });
+    a.addEventListener('pointerleave', function () { self.last = self.pointer = null; });
+    // A first hover can arrive before the PNG finishes loading. Retry on load;
+    // resize also covers responsive nav layouts and changes of screen/DPR.
+    Array.prototype.forEach.call(a.querySelectorAll('img'), function (img) {
+      img.addEventListener('load', function () { self.layout(); });
+    });
+    if (window.ResizeObserver) {
+      this.ro = new ResizeObserver(function () { self.layout(); }); this.ro.observe(a);
+    }
+    window.addEventListener('resize', function () { self.layout(); });
   }
 
-  // measure the logo and draw its glyphs (the mark and the word) into a white mask, in canvas pixels
+  // Draw the image's alpha at its rendered position, in device pixels. Its RGB
+  // is irrelevant: paint() uses destination-in to cut each metal to this shape.
+  // Inline SVG alone and the old SVG + <b> word remain supported.
   Ink.prototype.layout = function () {
-    var a = this.a, svg = a.querySelector('svg'), b = a.querySelector('b');
-    if (!svg || !b || !b.firstChild) return false;
-    var ar = a.getBoundingClientRect(), sr = svg.getBoundingClientRect(), br = b.getBoundingClientRect();
+    var a = this.a, bitmap = a.querySelector('img'), svg = a.querySelector('svg'), b = bitmap ? null : a.querySelector('b');
+    this.ready = false; this.laying = false;
+    var revision = this.revision = (this.revision || 0) + 1;
+    if (bitmap ? !bitmap.complete || !bitmap.naturalWidth : !svg) return false;
+    var art = bitmap || svg, ar = a.getBoundingClientRect(), sr = art.getBoundingClientRect(), br = b ? b.getBoundingClientRect() : sr;
+    if (!sr.width || !sr.height) return false;
     var gx = Math.min(sr.left, br.left), gy = Math.min(sr.top, br.top), gw = Math.max(sr.right, br.right) - gx, gh = Math.max(sr.bottom, br.bottom) - gy;
-    var R = this.R = Math.max(12, sr.height * 0.66), PAD = this.PAD = Math.ceil(R * 2.1), dpr = this.dpr = Math.min(2, window.devicePixelRatio || 1);
+    var R = this.R = Math.max(12, sr.height * 0.66), PAD = this.PAD = Math.ceil(R * 2.1), dpr = this.dpr = Math.max(1, window.devicePixelRatio || 1);
     var W = gw + PAD * 2, H = gh + PAD * 2;
     this.W = W; this.H = H; this.gy = PAD; this.gh = gh;
     var c = this.c;
@@ -51,7 +65,20 @@
     var ox = gx - PAD, oy = gy - PAD;
     var g = document.createElement('canvas'); g.width = c.width; g.height = c.height;
     var gc = g.getContext('2d'); gc.scale(dpr, dpr); gc.fillStyle = '#fff';
+    gc.imageSmoothingQuality = 'high';
+    var self = this;
+    function finish() {
+      if (self.revision !== revision) return;
+      self.glyphs = g; self.paint(); self.ready = true; self.laying = false;
+      self.pts = []; self.last = null;
+      if (self.pointer) self.move(self.pointer);
+    }
+    if (bitmap) {
+      gc.drawImage(bitmap, sr.left - ox, sr.top - oy, sr.width, sr.height);
+      finish(); return true;
+    }
     // the word, letter by letter where the browser put each one (keeps the letter-spacing exact)
+    if (b && b.firstChild && b.firstChild.nodeType === 3) {
     var cs = getComputedStyle(b), node = b.firstChild, text = node.textContent, range = document.createRange();
     gc.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
     var m = gc.measureText(text), asc = m.fontBoundingBoxAscent || parseFloat(cs.fontSize) * 0.8, desc = m.fontBoundingBoxDescent || parseFloat(cs.fontSize) * 0.2;
@@ -61,13 +88,16 @@
       var r = range.getBoundingClientRect();
       gc.fillText(text[i], r.left - ox, r.top - oy + (r.height - asc - desc) / 2 + asc);
     }
+    }
     // the mark: the inline svg drawn white at its size
     var ss = getComputedStyle(svg), clone = svg.cloneNode(true);
     clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); clone.setAttribute('width', sr.width); clone.setAttribute('height', sr.height);
-    clone.setAttribute('fill', 'none'); clone.setAttribute('stroke', '#fff'); clone.setAttribute('stroke-width', parseFloat(ss.strokeWidth) || 1.6);
+    clone.setAttribute('fill', b ? 'none' : ss.fill); clone.setAttribute('stroke', b ? '#fff' : ss.stroke); clone.setAttribute('color', ss.color);
+    clone.setAttribute('stroke-width', parseFloat(ss.strokeWidth) || 1.6);
     clone.setAttribute('stroke-linejoin', 'round'); clone.setAttribute('stroke-linecap', 'round');
-    var img = new Image(), self = this;
-    img.onload = function () { gc.drawImage(img, sr.left - ox, sr.top - oy, sr.width, sr.height); self.glyphs = g; self.paint(); self.ready = true; };
+    var img = new Image();
+    img.onload = function () { gc.drawImage(img, sr.left - ox, sr.top - oy, sr.width, sr.height); finish(); };
+    img.onerror = function () { if (self.revision === revision) self.laying = false; };
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(clone));
     return true;
   };
@@ -96,13 +126,15 @@
     var now = performance.now();
     if (now - (this.entered || -1e4) > 60) { this.mat = nextMaterial; nextMaterial = (nextMaterial + 1) % MATERIALS.length; }   // pointerover and pointerenter of one move count once
     this.entered = now;
+    this.pointer = { clientX: e.clientX, clientY: e.clientY };
     if (!this.ready && !this.laying) { this.laying = true; var self = this; (document.fonts ? document.fonts.ready : Promise.resolve()).then(function () { self.layout(); }); }
     else if (this.ready && !this.pts.length) this.layout();   // the nav may have changed size since the last time
     this.last = null; this.move(e);
   };
 
   Ink.prototype.move = function (e) {
-    if (!this.R) return;
+    this.pointer = { clientX: e.clientX, clientY: e.clientY };
+    if (!this.ready) return;
     var r = this.c.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, now = performance.now(), R = this.R;
     var from = this.last || { x: x, y: y }, dx = x - from.x, dy = y - from.y, dist = Math.hypot(dx, dy), step = R * 0.32;
     var n = Math.max(1, Math.floor(dist / step));

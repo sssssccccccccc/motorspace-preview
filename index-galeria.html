@@ -24,14 +24,14 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
-<link rel="stylesheet" href="kontener.css?v=32f36541">
+<link rel="stylesheet" href="kontener.css?v=f4ccbfc8">
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/"}}</script>
 <style>.mstk-pre .msc-title{clip-path:inset(0 100% 0 0)}</style>
 <script>(function(d){try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches){d.classList.add("mstk-pre");setTimeout(function(){d.classList.remove("mstk-pre")},4000)}}catch(e){}})(document.documentElement)</script>
-<link rel="stylesheet" href="corridor/corridor.css?v=8f388c73">
+<link rel="stylesheet" href="corridor/corridor.css?v=a0e2ffae">
 <link rel="stylesheet" href="corridor/touch.css?v=8e6fec71">
 <link rel="stylesheet" href="corridor/texture.css?v=b91ead7c">
-<link rel="stylesheet" href="corridor/motion.css?v=0f369f55">
+<link rel="stylesheet" href="corridor/motion.css?v=aa995824">
 <link rel="stylesheet" href="corridor/wind.css?v=800d5ee5">
 <link rel="stylesheet" href="corridor/wind3d.css?v=e0551733">
 <link rel="stylesheet" href="corridor/catalog.css?v=2f0fbd75">
@@ -59,21 +59,21 @@
 </style>
 <script src="vendor/react.production.min.js"></script>
 <script src="vendor/react-dom.production.min.js"></script>
-<script src="kontener-data.js?v=32f36541"></script>
-<script src="kontener.js?v=32f36541"></script>
+<script src="kontener-data.js?v=f4ccbfc8"></script>
+<script src="kontener.js?v=f4ccbfc8"></script>
 <script src="corridor/corridor.js?v=b3cbafb4"></script>
 <script src="corridor/ui.js?v=015fb58b"></script>
 <script src="corridor/touch.js?v=727b55df"></script>
-<script src="corridor/motion.js?v=c3ca3f04"></script>
-<script src="corridor/inklogo.js?v=5fae32cf"></script>
+<script src="corridor/motion.js?v=9e357c13"></script>
 <script src="corridor/stroketext.js?v=237b5661"></script>
 <script src="corridor/particletext.js?v=f0e73c92"></script>
 <script src="corridor/clock.js?v=24c2a7b4"></script>
 <script src="corridor/reveal.js?v=59cd2a53"></script>
-<script src="corridor/branchfoot.js?v=0298b89a"></script>
+<script src="corridor/branchfoot.js?v=df986795"></script>
 <script src="corridor/spiral.js?v=52cce317"></script>
 <script src="corridor/wind3d.js?v=bcbf7785"></script>
 <script type="speculationrules">{"prerender": [{"where": {"selector_matches": "a[data-car-link]"}, "eagerness": "moderate"}]}</script>
+<script defer src="corridor/inklogo.js?v=89b21df2"></script>
 <script>window.KT_DOC = "home"; window.KT_PRIVACY_URL = "polityka-prywatnosci.html"; window.KT_LEAD_URL = ""; window.KT_LEAD_EXTRA = {};</script>
 <script>window.KT_LOCAL_FONTS = true; window.KT_LANG = "pl"; window.KT_LANG_URLS = {"pl": "index-galeria.html", "en": "en/index-galeria.html", "zh": "zh/index-galeria.html"}; window.KT_ASSETS = 'assets/'; window.KT_HOME_URL = 'index.html'; window.KT_OFFERS_URL = 'oferty.html'; window.KT_TRACK_URL = 'sledzenie.html';</script>
 
@@ -294,8 +294,7 @@
     if (s.track) items.push({ label: s.track, link: '#track', go: function () { mscGoTrack(true); try { history.replaceState(null, '', '#track'); } catch (x) {} } });
     return h('header', { ref: ref, className: 'kt kt-dark msc-nav' },
       h('a', { className: 'msc-nav-logo', href: p.home || '#', 'aria-label': 'MotorSpace' },
-        h('svg', { viewBox: '0 0 32 32', 'aria-hidden': true }, h('rect', { x: 2, y: 5, width: 28, height: 22, rx: 4 }), h('path', { d: 'M16 5v22M6 10v12M26 10v12M11 10v12M21 10v12' }), h('path', { d: 'M16 5l8 3v16l-8 3' })),
-        h('b', null, 'MOTORSPACE')),
+        h(K.BrandLogo)),
       h('nav', { className: 'msc-nav-links', 'aria-label': s.menu || 'Menu' },
         h('span', { className: 'msc-nav-pill', 'aria-hidden': true }),
         items.map(function (it, i) {

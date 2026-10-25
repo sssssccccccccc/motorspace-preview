@@ -164,6 +164,7 @@
 .msc-nav-logo { flex: none; display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; }
 .msc-nav-logo svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
 .msc-nav-logo b { font: 600 18px/1 var(--font-display, var(--font-sans, sans-serif)); letter-spacing: .16em; }
+.msc-nav-logo .kt-brand-img { width: 210px; }
 .msc-nav-links { position: relative; display: flex; align-items: center; gap: 2px; flex: 1; min-width: 0; }
 .msc-nav-links a { position: relative; z-index: 1; display: inline-flex; align-items: center; height: 38px; padding: 0 15px; border-radius: 999px; color: var(--ink); opacity: .8; text-decoration: none;
   font: 500 14.5px/1 var(--font-sans, sans-serif); white-space: nowrap; transition: opacity .2s ease, color .25s ease; }
@@ -204,6 +205,7 @@ html.msc-nav-wrap { --msc-nav-h: 106px; }
 .msc-nav-wrap .msc-nav-links a { height: 36px; padding: 0 13px; font-size: 14px; }
 .msc-nav-wrap .msc-nav-pill { height: 36px; margin-top: -23px; }
 @media (max-width: 760px) {
+  .msc-nav-logo .kt-brand-img { width: 190px; }
   .msc-nav-logo svg { width: 24px; height: 24px; }
   .msc-nav-logo b { font-size: 15px; letter-spacing: .14em; }
   .msc-nav-end .kt-lang button { min-width: 32px; padding: 0 8px; }

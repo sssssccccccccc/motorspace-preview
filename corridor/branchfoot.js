@@ -36,7 +36,8 @@
     // the wordmark and "To the Future" as the footer's headline, the links a size up, all of it on the rock
     '.kt-footer[data-mbr] .kt-logo{flex-wrap:wrap;align-items:flex-start;column-gap:14px;row-gap:clamp(8px,1vw,16px)}' +
     '.kt-footer[data-mbr] .kt-logo b{font-size:clamp(34px,6vw,104px);line-height:.92;letter-spacing:.12em}' +
-    '.kt-footer[data-mbr] .kt-logo span{font-size:clamp(12px,1vw,16px);margin-top:.35em;color:var(--ink)}' +
+    '.kt-footer[data-mbr] .kt-logo .kt-brand-reveal{width:min(1050px,calc(100% - 86px));flex:none}' +
+    '.kt-footer[data-mbr] .kt-logo>span:last-child{font-size:clamp(12px,1vw,16px);margin-top:.35em;color:var(--ink)}' +
     '.kt-footer .kt-logo::after{content:"To the Future";flex-basis:100%;font:500 15px/1.2 var(--font-display);letter-spacing:.01em;color:var(--ink)}' +
     '.kt-footer[data-mbr] .kt-logo::after{font:500 clamp(24px,3.6vw,62px)/1.04 var(--font-display);letter-spacing:-.01em}' +
     '.kt-footer[data-mbr] .kt-footer-brand p{margin-top:clamp(16px,1.6vw,26px);font-size:14px;color:rgba(245,245,247,.72)}' +
@@ -63,7 +64,10 @@
       return '.mbr-on[data-size="' + z + '"] .mbr-rock{background-image:' + u('rock', z) + '}.mbr-on[data-size="' + z + '"] .mbr-moss{background-image:' + u('moss', z) + '}';
     }).join('') +
     // phones: a little room under the last line, where the glowing foot of the rock shows unveiled
-    '@media (max-width:860px){.kt-footer[data-mbr]{min-height:0;row-gap:var(--space-8);padding-bottom:calc(var(--space-8) + 26vw)}}';
+    '@media (max-width:860px){.kt-footer[data-mbr]{min-height:0;row-gap:var(--space-8);padding-bottom:calc(var(--space-8) + 26vw)}' +
+    '.kt-footer[data-mbr] .kt-logo{position:relative;padding-top:22px}' +
+    '.kt-footer[data-mbr] .kt-logo .kt-brand-reveal{width:100%}' +
+    '.kt-footer[data-mbr] .kt-logo>span:last-child{position:absolute;top:0;right:0;margin:0}}';
   document.head.appendChild(css);
 
   function make(f) {

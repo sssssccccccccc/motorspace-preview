@@ -178,22 +178,27 @@
 
   // ---- 5 · the wordmark at the bottom fills in as the page ends ----
   function wordmark(root) {
-    var mark = root.querySelector('.kt-footer-mark'); if (!mark) return noop;
-    mark.setAttribute('data-word', mark.textContent);
-    mark.classList.add('mfx-mark');
-    if (REDUCE) { mark.style.setProperty('--fill', 1); return noop; }
+    var marks = Array.prototype.slice.call(root.querySelectorAll('.kt-footer-mark'));
+    if (!marks.length) return noop;
+    marks.forEach(function (mark) {
+      mark.classList.add('mfx-mark');
+      if (mark.querySelector('img')) mark.classList.add('mfx-image');
+      else mark.setAttribute('data-word', mark.textContent);
+    });
+    function fill(p) { marks.forEach(function (mark) { mark.style.setProperty('--fill', p); }); }
+    if (REDUCE) { fill(1); return noop; }
     var raf = 0;
     function frame() {
       raf = 0;
-      var r = (mark.closest('footer') || mark).getBoundingClientRect(), vh = window.innerHeight || 800, y = window.scrollY;
+      var r = (marks[0].closest('footer') || marks[0]).getBoundingClientRect(), vh = window.innerHeight || 800, y = window.scrollY;
       // 0 when the footer comes up from the bottom of the screen, 1 when the page can scroll no further
       var start = y + r.top - vh, end = document.documentElement.scrollHeight - vh;
       var p = end > start + 1 ? clamp((y - start) / (end - start), 0, 1) : 1;
-      mark.style.setProperty('--fill', p.toFixed(3));
+      fill(p.toFixed(3));
     }
     function on() { if (!raf) raf = requestAnimationFrame(frame); }
     window.addEventListener('scroll', on, { passive: true }); window.addEventListener('resize', on); frame();
-    return function () { window.removeEventListener('scroll', on); window.removeEventListener('resize', on); if (raf) cancelAnimationFrame(raf); mark.classList.remove('mfx-mark'); };
+    return function () { window.removeEventListener('scroll', on); window.removeEventListener('resize', on); if (raf) cancelAnimationFrame(raf); marks.forEach(function (mark) { mark.classList.remove('mfx-mark', 'mfx-image'); }); };
   }
 
   // ---- 6 · the photo a car link came from grows into the car page (cross-document View Transitions) ----

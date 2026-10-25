@@ -169,6 +169,19 @@
 .kt-logo { display: flex; align-items: baseline; gap: var(--space-2); text-decoration: none; color: var(--ink); }
 .kt-logo b { font: 700 19px/1 var(--font-display); letter-spacing: .14em; }
 .kt-logo span { font: 500 11px/1 var(--font-sans); color: var(--ink-muted); }
+.kt-brand-img { display: block; width: 200px; max-width: 100%; height: auto; flex: none; }
+.kt-logo { min-width: 0; }
+.kt-nav > .kt-logo { flex: none; gap: 8px; }
+.kt-nav > .kt-logo > span { align-self: flex-start; margin-top: 2px; }
+.kt-brand-reveal { position: relative; display: block; width: 100%; }
+.kt-brand-reveal > .kt-brand-img { width: 100%; }
+.kt-brand-reveal > .kt-brand-img:first-child { visibility: hidden; }
+.kt-brand-reveal > .kt-brand-fill { position: absolute; inset: 0; }
+@media (max-width: 760px) {
+  .kt-nav > .kt-logo { flex: 1; }
+  .kt-nav > .kt-logo > .kt-brand-img, .kt-menu .kt-brand-img { width: 168px; }
+  .kt-nav > .kt-logo > span { display: none; }
+}
 .kt-nav-links { display: flex; gap: var(--space-6); flex: 1; }
 .kt-nav-links a { color: var(--ink); opacity: .8; text-decoration: none; font-size: 13px; font-weight: 400; }
 .kt-nav-links a:hover, .kt-nav-links a[aria-current] { opacity: 1; }
@@ -377,6 +390,9 @@
 /* Footer */
 .kt-footer { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr) auto; gap: var(--space-8); padding: var(--space-12); border-top: 1px solid var(--line); background: var(--paper); font-size: 13px; }
 .kt-footer-brand p { margin: var(--space-3) 0 0; color: var(--ink-muted); }
+.kt-footer-brand { min-width: 0; }
+.kt-footer-brand .kt-logo { width: 100%; align-items: flex-start; }
+.kt-footer-brand .kt-brand-reveal { width: min(200px, 100%); min-width: 0; }
 .kt-footer nav { display: flex; flex-direction: column; gap: var(--space-2); }
 .kt-footer nav .kt-label { margin-bottom: var(--space-1); color: var(--ink); font-weight: 600; }
 .kt-footer nav a { color: var(--ink-muted); text-decoration: none; }
@@ -1127,6 +1143,7 @@
 
 /* tablets and phones: the five links do not fit beside the calculator button below ~1080px (Polish is the longest) */
 @media (max-width: 1080px) {
+  .kt-nav > .kt-logo { flex: 1; }
   .kt-nav-links, .kt-nav-end .kt-nav-calc { display: none; }
   .kt-logo { flex: 1; }
   .kt-nav-ico { display: inline-grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--ink); cursor: pointer; }
@@ -1283,6 +1300,11 @@ body::after { content: ""; position: fixed; inset: 0; z-index: 2147483000; point
 .kt-footer-mark { grid-column: 1 / -1; margin: 40px 0 calc(-1 * var(--space-12)); overflow: hidden; white-space: nowrap; text-align: center; user-select: none; pointer-events: none;
   font: 700 clamp(72px, 16.8vw, 320px)/.78 var(--font-display); letter-spacing: -.06em;
   background: linear-gradient(180deg, color-mix(in srgb, var(--ink) 15%, transparent) 0%, transparent 92%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.kt-footer-mark:has(.kt-brand-reveal) { position: relative; margin: 32px 0 0; padding-top: 18px; background: none; font-size: inherit; line-height: normal; }
+.kt-footer-mark .kt-brand-reveal { width: min(100%, 1060px); margin: 0 auto; }
+.kt-footer-mark > span:last-child { position: absolute; top: 0; right: 0; color: var(--ink-muted); font: 500 12px/1 var(--font-sans); letter-spacing: 0; }
+.kt-quote-logo { display: flex; align-items: flex-start; gap: 10px; }
+.kt-quote-logo .kt-brand-img { width: 52mm; max-width: none; }
 
 /* page to page (home, offers, tracking, another language): a soft cross-fade instead of a hard cut, where the browser supports it */
 @view-transition { navigation: auto; }
