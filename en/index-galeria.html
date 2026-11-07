@@ -24,7 +24,7 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="../assets/brand/apple-touch-icon.png">
-<link rel="stylesheet" href="../kontener.css?v=215f5279">
+<link rel="stylesheet" href="../kontener.css?v=d2030b5a">
 <script type="importmap">{"imports":{"three":"../vendor/three/three.module.min.js","three/addons/":"../vendor/three/"}}</script>
 <style>.mstk-pre .msc-title{clip-path:inset(0 100% 0 0)}</style>
 <script>(function(d){try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches){d.classList.add("mstk-pre");setTimeout(function(){d.classList.remove("mstk-pre")},4000)}}catch(e){}})(document.documentElement)</script>
@@ -32,9 +32,9 @@
 <link rel="stylesheet" href="../corridor/touch.css?v=8e6fec71">
 <link rel="stylesheet" href="../corridor/texture.css?v=b91ead7c">
 <link rel="stylesheet" href="../corridor/motion.css?v=aa995824">
-<link rel="stylesheet" href="../corridor/wind.css?v=800d5ee5">
+<link rel="stylesheet" href="../corridor/wind.css?v=4429fd97">
 <link rel="stylesheet" href="../corridor/wind3d.css?v=e0551733">
-<link rel="stylesheet" href="../corridor/catalog.css?v=2f0fbd75">
+<link rel="stylesheet" href="../corridor/catalog.css?v=7ae293e7">
 <link rel="stylesheet" href="../corridor/report.css?v=ae830a7b">
 <link rel="stylesheet" href="../corridor/flow.css?v=84817739">
 <script>(function(){var d=document.documentElement,t='dark';try{var m=/[?&]theme=(light|dark|auto)/.exec(location.search);if(m){t=m[1];localStorage.setItem('kt-theme',t);}else{t=localStorage.getItem('kt-theme')||'dark';}}catch(e){}if(t==='auto'){d.removeAttribute('data-theme');}else{d.setAttribute('data-theme',t);}})();</script>
@@ -59,8 +59,8 @@
 </style>
 <script src="../vendor/react.production.min.js"></script>
 <script src="../vendor/react-dom.production.min.js"></script>
-<script src="../kontener-data.js?v=215f5279"></script>
-<script src="../kontener.js?v=215f5279"></script>
+<script src="../kontener-data.js?v=d2030b5a"></script>
+<script src="../kontener.js?v=d2030b5a"></script>
 <script src="../corridor/corridor.js?v=b3cbafb4"></script>
 <script src="../corridor/ui.js?v=015fb58b"></script>
 <script src="../corridor/touch.js?v=727b55df"></script>
@@ -424,36 +424,247 @@
                 p.onInquiry([car.brand, car.model, car.trim, car.year].filter(Boolean).join(' ')); p.onClose();
               } }, t.inquiry)))))), document.body);
   }
+  // ---- the catalog's search console (主人 2026-11-07: 「那个搜索栏我觉得做的不够好…只能价格从高到低排…你得重新做一下」):
+  // keyword search (brand names also in Chinese, 「7 座 SUV」, 「纯电」), brand / body / power / budget / year / mileage / seats / EV range,
+  // five sorts, live counts on every option, removable chips, quick picks; one bar on a computer, a search box + one 「筛选」 sheet on a phone ----
+  var MSC_FIND = {
+    zh: { ph: '搜品牌、车型，或「7 座 SUV」「纯电」', search: '搜索', brand: '品牌', body: '车身', drive: '动力', budget: '预算', more: '更多条件', sort: '排序', filters: '筛选',
+      sorts: [['high', '价格从高到低'], ['low', '价格从低到高'], ['year', '年份最新'], ['km', '里程最少'], ['range', '续航最长']],
+      budgets: [[0, 100000, '10 万以内'], [100000, 120000, '10–12 万'], [120000, 150000, '12–15 万'], [150000, 200000, '15–20 万'], [200000, 0, '20 万以上']],
+      budgetNote: '按波兰落地价算（含关税和增值税），单位 PLN', min: '最低', max: '最高', any: '不限', all: '全部',
+      year: '年份不早于', km: '里程', kms: [[0, '不限'], [-1, '新车'], [10000, '1 万公里内'], [30000, '3 万公里内'], [50000, '5 万公里内']],
+      seats: '座位', seatOpts: [[0, '不限'], [7, '7 座']], range: '纯电续航', ranges: [[0, '不限'], [500, '500 km 以上'], [600, '600 km 以上']],
+      yearChip: '{y} 年及以后', cip: '价格为 CIP（运到波兰港口，含海运和保险）', clear: '清除全部', quick: '常用：',
+      quicks: [['纯电', { drive: ['ev'] }], ['7 座', { seats: 7 }], ['SUV', { body: ['suv'] }], ['10 万 PLN 以内', { priceMax: '100000' }], ['2024 年及以后', { yearMin: '2024' }], ['新车', { km: -1 }]],
+      empty: '没有符合条件的车。放宽一点条件试试，或者告诉我们想要什么车，我们去中国帮你找。', emptyAsk: '帮我找这种车', show: '显示 {n} 台', done: '完成', close: '关闭' },
+    pl: { ph: 'Marka, model albo np. „SUV 7 miejsc”, „elektryk”', search: 'Szukaj', brand: 'Marka', body: 'Nadwozie', drive: 'Napęd', budget: 'Budżet', more: 'Więcej', sort: 'Sortuj', filters: 'Filtry',
+      sorts: [['high', 'Cena: od najwyższej'], ['low', 'Cena: od najniższej'], ['year', 'Najnowsze roczniki'], ['km', 'Najmniejszy przebieg'], ['range', 'Największy zasięg']],
+      budgets: [[0, 100000, 'do 100 tys. zł'], [100000, 120000, '100–120 tys. zł'], [120000, 150000, '120–150 tys. zł'], [150000, 200000, '150–200 tys. zł'], [200000, 0, 'ponad 200 tys. zł']],
+      budgetNote: 'Według szacowanej ceny w Polsce (z cłem i VAT), w PLN', min: 'od', max: 'do', any: 'Dowolne', all: 'Wszystkie',
+      year: 'Rocznik od', km: 'Przebieg', kms: [[0, 'Dowolny'], [-1, 'Nowe'], [10000, 'do 10 tys. km'], [30000, 'do 30 tys. km'], [50000, 'do 50 tys. km']],
+      seats: 'Miejsca', seatOpts: [[0, 'Dowolnie'], [7, '7 miejsc']], range: 'Zasięg EV', ranges: [[0, 'Dowolny'], [500, 'ponad 500 km'], [600, 'ponad 600 km']],
+      yearChip: 'od {y} r.', cip: 'Ceny CIP (do portu w Polsce, z frachtem morskim i ubezpieczeniem)', clear: 'Wyczyść wszystko', quick: 'Popularne:',
+      quicks: [['Elektryczne', { drive: ['ev'] }], ['7 miejsc', { seats: 7 }], ['SUV', { body: ['suv'] }], ['do 100 tys. zł', { priceMax: '100000' }], ['od 2024 r.', { yearMin: '2024' }], ['Nowe', { km: -1 }]],
+      empty: 'Żadne auto nie spełnia tych warunków. Poluzuj filtry albo napisz, czego szukasz — znajdziemy je w Chinach.', emptyAsk: 'Znajdźcie mi takie auto', show: 'Pokaż {n}', done: 'Gotowe', close: 'Zamknij' },
+    en: { ph: 'Brand, model, or e.g. “7-seat SUV”, “electric”', search: 'Search', brand: 'Brand', body: 'Body', drive: 'Power', budget: 'Budget', more: 'More', sort: 'Sort', filters: 'Filters',
+      sorts: [['high', 'Price: high to low'], ['low', 'Price: low to high'], ['year', 'Newest first'], ['km', 'Lowest mileage'], ['range', 'Longest range']],
+      budgets: [[0, 100000, 'up to PLN 100k'], [100000, 120000, 'PLN 100–120k'], [120000, 150000, 'PLN 120–150k'], [150000, 200000, 'PLN 150–200k'], [200000, 0, 'over PLN 200k']],
+      budgetNote: 'By estimated landed price in Poland (duty and VAT included), in PLN', min: 'min', max: 'max', any: 'Any', all: 'All',
+      year: 'Year from', km: 'Mileage', kms: [[0, 'Any'], [-1, 'New'], [10000, 'up to 10,000 km'], [30000, 'up to 30,000 km'], [50000, 'up to 50,000 km']],
+      seats: 'Seats', seatOpts: [[0, 'Any'], [7, '7 seats']], range: 'EV range', ranges: [[0, 'Any'], [500, 'over 500 km'], [600, 'over 600 km']],
+      yearChip: '{y} or newer', cip: 'CIP prices (to a Polish port, sea freight and insurance included)', clear: 'Clear all', quick: 'Popular:',
+      quicks: [['Electric', { drive: ['ev'] }], ['7 seats', { seats: 7 }], ['SUV', { body: ['suv'] }], ['up to PLN 100k', { priceMax: '100000' }], ['2024 or newer', { yearMin: '2024' }], ['New', { km: -1 }]],
+      empty: 'No car matches these filters. Loosen them a little, or tell us what you are after and we will find it in China.', emptyAsk: 'Find me a car like this', show: 'Show {n}', done: 'Done', close: 'Close' }
+  };
+  // what Chinese visitors type → the catalog's brand names / the search keywords
+  var MSC_ALIAS = [['奔驰', 'mercedes'], ['宝马', 'bmw'], ['奥迪', 'audi'], ['大众', 'volkswagen'], ['丰田', 'toyota'], ['本田', 'honda'], ['小米', 'xiaomi'], ['吉利', 'geely'],
+    ['银河', 'galaxy'], ['埃安', 'aion'], ['广汽', 'gac'], ['传祺', 'trumpchi'], ['奇瑞', 'chery'], ['北京', 'beijing'], ['标致', 'peugeot'], ['起亚', 'kia'], ['别克', 'buick'], ['福特', 'ford'],
+    ['哈弗', 'haval'], ['长安', 'changan'], ['捷达', 'jetta'], ['欧尚', 'oshan'], ['东南', 'soueast'], ['日产', 'nissan'], ['尼桑', 'nissan'], ['斯柯达', 'skoda'], ['雪佛兰', 'chevrolet'],
+    ['理想', 'li'], ['东风', 'dongfeng'], ['三菱', 'mitsubishi'], ['捷途', 'jetour'], ['现代', 'hyundai'], ['马自达', 'mazda'], ['沃尔沃', 'volvo'], ['比亚迪', 'byd'], ['特斯拉', 'tesla'],
+    ['蔚来', 'nio'], ['小鹏', 'xpeng'], ['极氪', 'zeekr'], ['领克', 'lynk'], ['坦克', 'tank'], ['七座', '7座'], ['两厢', 'hatch'], ['越野', 'suv'], ['电动', '纯电'], ['电车', '纯电'], ['混动', 'hybrid']];
+  function mscQuery(q) {
+    var s = String(q || '').trim();
+    MSC_ALIAS.forEach(function (a) { s = s.split(a[0]).join(' ' + a[1] + ' '); });
+    return s.replace(/\s+/g, ' ').trim();
+  }
+  var MSC_NOFILTER = { brand: [], body: [], drive: [], priceMin: '', priceMax: '', yearMin: '', km: 0, seats: 0, rangeMin: 0 };
+  // K.filterCars does the matching; mileage is ours so that 「新车」 means new, not 0 km
+  function mscFind(cars, f, q, skip) {
+    var kf = Object.assign({}, K.EMPTY_FILTERS, { brand: f.brand, body: f.body, drive: f.drive, priceMin: f.priceMin, priceMax: f.priceMax, yearMin: f.yearMin,
+      seats: f.seats, rangeMin: f.rangeMin, kmMax: f.km > 0 && skip !== 'km' ? f.km : 0 });
+    return K.filterCars(cars, kf, mscQuery(q), skip).filter(function (c) { return skip === 'km' || f.km !== -1 || c.isNew; });
+  }
+  function mscCount(cars, key) { var o = {}; cars.forEach(function (c) { o[c[key]] = (o[c[key]] || 0) + 1; }); return o; }
+  function mscPlural(n, one, few, many) { return n === 1 ? one : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? few : many; }
+  function mscFound(lang, models, cars) {
+    if (lang === 'zh') return '找到 ' + models + ' 款车型 · ' + cars + ' 台';
+    if (lang === 'en') return models + (models === 1 ? ' model' : ' models') + ' · ' + cars + (cars === 1 ? ' car' : ' cars');
+    return models + ' ' + mscPlural(models, 'model', 'modele', 'modeli') + ' · ' + cars + ' ' + mscPlural(cars, 'auto', 'auta', 'aut');
+  }
+  function mscKfmt(n, lang) { return new Intl.NumberFormat({ pl: 'pl-PL', en: 'en-GB', zh: 'zh-CN' }[lang] || 'pl-PL').format(n); }
+  function mscBudgetLabel(f, F, lang) {
+    if (f.priceMin === '' && f.priceMax === '') return '';
+    var hit = F.budgets.filter(function (b) { return String(b[0] || '') === String(f.priceMin) && String(b[1] || '') === String(f.priceMax); })[0];
+    if (hit) return hit[2];
+    if (f.priceMin !== '' && f.priceMax !== '') return mscKfmt(+f.priceMin, lang) + '–' + mscKfmt(+f.priceMax, lang) + ' PLN';
+    return (f.priceMin !== '' ? F.min + ' ' + mscKfmt(+f.priceMin, lang) : F.max + ' ' + mscKfmt(+f.priceMax, lang)) + ' PLN';
+  }
+  function useMscPhone() {
+    var mq = window.matchMedia ? matchMedia('(max-width: 760px)') : null;
+    var st = React.useState(!!(mq && mq.matches)), phone = st[0], setPhone = st[1];
+    React.useEffect(function () {
+      if (!mq) return;
+      function on() { setPhone(mq.matches); }
+      mq.addEventListener ? mq.addEventListener('change', on) : mq.addListener(on);
+      return function () { mq.removeEventListener ? mq.removeEventListener('change', on) : mq.removeListener(on); };
+    }, []);
+    return phone;
+  }
+  function MscOpt(p) {
+    return h('button', { type: 'button', className: 'msc-find-opt' + (p.on ? ' is-on' : '') + (!p.on && p.n === 0 ? ' is-empty' : ''), 'aria-pressed': !!p.on, onClick: p.onClick },
+      h('span', null, p.label), p.n != null ? h('small', null, p.n) : null);
+  }
+  function MscDrop(p) {
+    var id = 'msc-find-' + p.id;
+    return h('div', { className: 'msc-find-drop' + (p.open ? ' is-open' : '') + (p.value ? ' has-value' : '') },
+      h('button', { type: 'button', className: 'msc-find-seg', 'aria-expanded': !!p.open, 'aria-controls': id, onClick: p.onToggle },
+        h('span', { className: 'msc-find-seg-label' }, p.label),
+        h('span', { className: 'msc-find-seg-val' }, p.value || p.any),
+        h('i', { 'aria-hidden': true })),
+      p.open ? h('div', { id: id, className: 'msc-find-pop' + (p.wide ? ' is-wide' : ''), role: 'group', 'aria-label': p.label }, p.children) : null);
+  }
   function OrderCatalog(p) {
-    var lang = p.lang, t = MSC_CATALOG_COPY[lang] || MSC_CATALOG_COPY.pl, s = K.copy[lang] || K.copy.pl;
-    var catalog = K.SAMPLE_CATALOG, groups = new Map(), counts = new Map();
-    catalog.forEach(function (c) {
-      var key = JSON.stringify([c.brand, c.model]);
-      if (!groups.has(key)) groups.set(key, { key: key, brand: c.brand, model: c.model, cars: [] });
-      groups.get(key).cars.push(c); counts.set(c.brand, (counts.get(c.brand) || 0) + 1);
-    });
-    groups.forEach(function (g) { g.cars.sort(function (a, b) { return a.priceCip - b.priceCip || a.id.localeCompare(b.id); }); });
-    var bs = React.useState(''), brand = bs[0], setBrand = bs[1];
+    var lang = p.lang, t = MSC_CATALOG_COPY[lang] || MSC_CATALOG_COPY.pl, F = MSC_FIND[lang] || MSC_FIND.pl, s = K.copy[lang] || K.copy.pl;
+    var catalog = K.SAMPLE_CATALOG;
+    var qs = React.useState(''), q = qs[0], setQ = qs[1];
+    var fs = React.useState(MSC_NOFILTER), f = fs[0], setF = fs[1];
     var ss = React.useState('high'), sort = ss[0], setSort = ss[1];
     var vs = React.useState(8), visible = vs[0], setVisible = vs[1];
     var ps = React.useState(null), panel = ps[0], setPanel = ps[1];
-    var brands = Array.from(counts.keys()).sort(function (a, b) { return counts.get(b) - counts.get(a) || a.localeCompare(b); });
-    var filtered = Array.from(groups.values()).filter(function (g) { return !brand || g.brand === brand; }).sort(function (a, b) {
-      return (K.cipOf(a.cars[0]) - K.cipOf(b.cars[0])) * (sort === 'high' ? -1 : 1) || a.key.localeCompare(b.key);
+    var os = React.useState(null), open = os[0], setOpen = os[1];
+    var phone = useMscPhone(), rootRef = React.useRef(null), gridRef = React.useRef(null);
+    function upd(patch) { setF(Object.assign({}, f, patch)); setVisible(8); }
+    function tog(key, v) { var a = f[key].indexOf(v) >= 0 ? f[key].filter(function (x) { return x !== v; }) : f[key].concat([v]); var o = {}; o[key] = a; upd(o); }
+    function clearAll() { setF(MSC_NOFILTER); setQ(''); setVisible(8); }
+    // desktop pop-overs close on a click elsewhere or Esc; the phone sheet has its own scrim
+    React.useEffect(function () {
+      if (!open || phone) return;
+      function down(e) { if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(null); }
+      function key(e) { if (e.key === 'Escape') setOpen(null); }
+      document.addEventListener('pointerdown', down); document.addEventListener('keydown', key);
+      return function () { document.removeEventListener('pointerdown', down); document.removeEventListener('keydown', key); };
+    }, [open, phone]);
+    React.useEffect(function () {
+      if (open !== 'sheet') return;
+      var b = document.body.style.overflow; document.body.style.overflow = 'hidden';
+      function key(e) { if (e.key === 'Escape') setOpen(null); }
+      document.addEventListener('keydown', key);
+      return function () { document.body.style.overflow = b; document.removeEventListener('keydown', key); };
+    }, [open]);
+    React.useEffect(function () { if (phone && open && open !== 'sheet') setOpen(null); }, [phone]);
+
+    var hits = mscFind(catalog, f, q);
+    var groups = new Map();
+    hits.forEach(function (c) {
+      var key = JSON.stringify([c.brand, c.model]);
+      if (!groups.has(key)) groups.set(key, { key: key, brand: c.brand, model: c.model, cars: [] });
+      groups.get(key).cars.push(c);
     });
+    groups.forEach(function (g) { g.cars.sort(function (a, b) { return a.priceCip - b.priceCip || a.id.localeCompare(b.id); }); });
+    function maxOf(g, k) { return Math.max.apply(null, g.cars.map(function (c) { return c[k] || 0; })); }
+    function minKm(g) { return Math.min.apply(null, g.cars.map(function (c) { return c.km || 0; })); }
+    var by = { high: function (a, b) { return K.cipOf(b.cars[0]) - K.cipOf(a.cars[0]); }, low: function (a, b) { return K.cipOf(a.cars[0]) - K.cipOf(b.cars[0]); },
+      year: function (a, b) { return maxOf(b, 'year') - maxOf(a, 'year') || K.cipOf(a.cars[0]) - K.cipOf(b.cars[0]); },
+      km: function (a, b) { return minKm(a) - minKm(b) || K.cipOf(a.cars[0]) - K.cipOf(b.cars[0]); },
+      range: function (a, b) { return maxOf(b, 'range') - maxOf(a, 'range') || K.cipOf(a.cars[0]) - K.cipOf(b.cars[0]); } }[sort];
+    var filtered = Array.from(groups.values()).sort(function (a, b) { return by(a, b) || a.key.localeCompare(b.key); });
     var remaining = Math.max(0, filtered.length - visible);
+
+    // live counts: each group counts what it would show with every other filter applied
+    function counts(key) { return mscCount(mscFind(catalog, f, q, key), key); }
+    var bc = counts('brand'), bodyc = counts('body'), dc = counts('drive');
+    var brandsAll = Object.keys(mscCount(catalog, 'brand')).sort(function (a, b) { return (bc[b] || 0) - (bc[a] || 0) || a.localeCompare(b); });
+    var bodiesAll = ['suv', 'sedan', 'hatch', 'mpv'].filter(function (b) { return catalog.some(function (c) { return c.body === b; }); });
+    var drivesAll = ['ev', 'erev', 'phev', 'hev', 'ice'].filter(function (d) { return catalog.some(function (c) { return c.drive === d; }); });
+    var priceBase = mscFind(catalog, Object.assign({}, f, { priceMin: '', priceMax: '' }), q);
+    function nIn(lo, hi) { return priceBase.filter(function (c) { var v = K.landedOf(c); return (!lo || v >= lo) && (!hi || v <= hi); }).length; }
+    function nWith(patch, skip) { return mscFind(catalog, Object.assign({}, f, patch), q).length; }
+    var hasEV = catalog.some(function (c) { return c.range; });
+
+    var brandBody = h('div', { className: 'msc-find-opts is-brands' }, brandsAll.map(function (b) {
+      return h(MscOpt, { key: b, label: b, n: bc[b] || 0, on: f.brand.indexOf(b) >= 0, onClick: function () { tog('brand', b); } });
+    }));
+    var bodyBody = h('div', { className: 'msc-find-opts is-bodies' }, bodiesAll.map(function (b) {
+      return h('button', { key: b, type: 'button', className: 'msc-find-body' + (f.body.indexOf(b) >= 0 ? ' is-on' : '') + (!(bodyc[b]) && f.body.indexOf(b) < 0 ? ' is-empty' : ''),
+        'aria-pressed': f.body.indexOf(b) >= 0, onClick: function () { tog('body', b); } },
+        h('img', { className: 'msc-find-body-img', src: MSC_BASE + 'body/' + b + '.webp', alt: '', width: 400, height: 184, decoding: 'async' }), h('span', null, s.bodies[b] || b), h('small', null, bodyc[b] || 0));
+    }));
+    var driveBody = h('div', { className: 'msc-find-opts' }, drivesAll.map(function (d) {
+      return h(MscOpt, { key: d, label: s[d] || d.toUpperCase(), n: dc[d] || 0, on: f.drive.indexOf(d) >= 0, onClick: function () { tog('drive', d); } });
+    }));
+    var budgetBody = h('div', null,
+      h('div', { className: 'msc-find-opts' }, F.budgets.map(function (b) {
+        var on = String(f.priceMin) === String(b[0] || '') && String(f.priceMax) === String(b[1] || '');
+        return h(MscOpt, { key: b[2], label: b[2], n: nIn(b[0], b[1]), on: on, onClick: function () { upd(on ? { priceMin: '', priceMax: '' } : { priceMin: b[0] ? String(b[0]) : '', priceMax: b[1] ? String(b[1]) : '' }); } });
+      })),
+      h('div', { className: 'msc-find-range' },
+        h('label', null, h('span', null, F.min), h('input', { type: 'number', inputMode: 'numeric', min: 0, step: 5000, placeholder: '0', value: f.priceMin, onChange: function (e) { upd({ priceMin: e.target.value }); } })),
+        h('i', { 'aria-hidden': true }, '—'),
+        h('label', null, h('span', null, F.max), h('input', { type: 'number', inputMode: 'numeric', min: 0, step: 5000, placeholder: '∞', value: f.priceMax, onChange: function (e) { upd({ priceMax: e.target.value }); } })),
+        h('b', null, 'PLN')),
+      h('p', { className: 'msc-find-note' }, F.budgetNote));
+    function row(label, opts, cur, patchOf) {
+      return h('div', { className: 'msc-find-row' }, h('span', { className: 'msc-find-row-label' }, label),
+        h('div', { className: 'msc-find-opts' }, opts.map(function (o) {
+          var on = String(cur) === String(o[0]);
+          return h(MscOpt, { key: String(o[0]), label: o[1], n: o[0] ? nWith(patchOf(o[0])) : null, on: on, onClick: function () { upd(patchOf(on ? MSC_NOFILTER[Object.keys(patchOf(o[0]))[0]] : o[0])); } });
+        })));
+    }
+    var years = [[0, F.any]].concat([2022, 2023, 2024, 2025].map(function (y) { return [y, F.yearChip.replace('{y}', y)]; }));
+    var moreBody = h('div', { className: 'msc-find-rows' },
+      row(F.year, years, f.yearMin || 0, function (v) { return { yearMin: v ? String(v) : '' }; }),
+      row(F.km, F.kms, f.km, function (v) { return { km: v }; }),
+      row(F.seats, F.seatOpts, f.seats, function (v) { return { seats: v }; }),
+      hasEV ? row(F.range, F.ranges, f.rangeMin, function (v) { return { rangeMin: v }; }) : null);
+
+    var nMore = (f.yearMin ? 1 : 0) + (f.km ? 1 : 0) + (f.seats ? 1 : 0) + (f.rangeMin ? 1 : 0);
+    function listVal(arr, name) { return arr.length ? name(arr[0]) + (arr.length > 1 ? ' +' + (arr.length - 1) : '') : ''; }
+    var vals = { brand: listVal(f.brand, function (x) { return x; }), body: listVal(f.body, function (x) { return s.bodies[x] || x; }),
+      drive: listVal(f.drive, function (x) { return s[x] || x; }), budget: mscBudgetLabel(f, F, lang), more: nMore ? String(nMore) : '' };
+
+    // chips for what is on, quick picks when nothing is
+    var chips = [];
+    if (q.trim()) chips.push([(lang === 'pl' ? '„' : '“') + q.trim() + '”', function () { setQ(''); setVisible(8); }]);
+    f.brand.forEach(function (b) { chips.push([b, function () { tog('brand', b); }]); });
+    f.body.forEach(function (b) { chips.push([s.bodies[b] || b, function () { tog('body', b); }]); });
+    f.drive.forEach(function (d) { chips.push([s[d] || d, function () { tog('drive', d); }]); });
+    if (vals.budget) chips.push([vals.budget, function () { upd({ priceMin: '', priceMax: '' }); }]);
+    if (f.yearMin) chips.push([F.yearChip.replace('{y}', f.yearMin), function () { upd({ yearMin: '' }); }]);
+    if (f.km) chips.push([F.kms.filter(function (k) { return k[0] === f.km; })[0][1], function () { upd({ km: 0 }); }]);
+    if (f.seats) chips.push([F.seatOpts[1][1], function () { upd({ seats: 0 }); }]);
+    if (f.rangeMin) chips.push([F.ranges.filter(function (k) { return k[0] === f.rangeMin; })[0][1], function () { upd({ rangeMin: 0 }); }]);
+    var nOn = chips.length - (q.trim() ? 1 : 0);
+
+    function drop(id, label, body, wide) {
+      return h(MscDrop, { id: id, label: label, value: vals[id], any: id === 'more' ? F.any : F.all, wide: wide, open: open === id,
+        onToggle: function () { setOpen(open === id ? null : id); } }, body);
+    }
+    var search = h(K.SearchField, { lang: lang, cars: catalog, value: q, className: 'msc-find-q',
+      onChange: function (v) { setQ(v); setVisible(8); }, onSubmit: function (v) { setQ(v); setVisible(8); },
+      onBrand: function (b) { setQ(''); if (f.brand.indexOf(b) < 0) tog('brand', b); } });
+    var sortSel = h('label', { className: 'msc-find-sort' }, h('span', null, F.sort),
+      h('select', { value: sort, onChange: function (e) { setSort(e.target.value); setVisible(8); } }, F.sorts.map(function (o) { return h('option', { key: o[0], value: o[0] }, o[1]); })));
+    var sheet = phone && open === 'sheet' ? ReactDOM.createPortal(h('div', { className: 'kt kt-dark msc-find-sheet-wrap', lang: lang },
+      h('div', { className: 'msc-find-scrim', onClick: function () { setOpen(null); } }),
+      h('section', { className: 'msc-find-sheet', role: 'dialog', 'aria-modal': true, 'aria-label': F.filters },
+        h('header', null, h('b', null, F.filters), nOn ? h('button', { type: 'button', className: 'msc-find-clear', onClick: function () { setF(MSC_NOFILTER); setVisible(8); } }, F.clear) : null,
+          h('button', { type: 'button', className: 'msc-find-x', 'aria-label': F.close, onClick: function () { setOpen(null); } }, '×')),
+        h('div', { className: 'msc-find-sheet-body' },
+          h('h4', null, F.budget), budgetBody, h('h4', null, F.body), bodyBody, h('h4', null, F.drive), driveBody,
+          h('h4', null, F.more), moreBody, h('h4', null, F.brand), brandBody),
+        h('footer', null, h('button', { type: 'button', className: 'kt-btn kt-btn-primary', onClick: function () { setOpen(null); var g = gridRef.current; g && g.scrollIntoView({ block: 'start', behavior: 'smooth' }); } },
+          F.show.replace('{n}', hits.length))))), document.body) : null;
+
     return h('section', { className: 'kt kt-dark msc-catalog', 'aria-label': s.sec.order[0] },
-      h('div', { className: 'msc-catalog-hint kt-rack-hint' },
-        h('p', null, t.hint.replace('{cars}', catalog.length).replace('{models}', groups.size)),
-        h('button', { type: 'button', className: 'kt-link kt-rack-calc', onClick: p.onCalc }, h(K.CalcIcon, null), s.rackCalc)),
-      h('div', { className: 'msc-catalog-tools' },
-        h('div', { className: 'msc-catalog-brands', role: 'group', 'aria-label': t.brands }, [''].concat(brands).map(function (b) {
-          return h('button', { key: b, type: 'button', 'aria-pressed': brand === b, 'data-brand': b, onClick: function () { setBrand(b); setVisible(8); } },
-            b || t.all, h('span', null, b ? counts.get(b) : catalog.length));
-        })),
-        h('label', { className: 'msc-catalog-sort' }, h('span', null, t.sort),
-          h('select', { value: sort, onChange: function (e) { setSort(e.target.value); setVisible(8); } }, h('option', { value: 'high' }, t.high), h('option', { value: 'low' }, t.low)))),
-      h('div', { className: 'msc-catalog-grid' }, filtered.slice(0, visible).map(function (g) {
+      h('div', { ref: rootRef, className: 'msc-find' + (open && !phone ? ' has-open' : '') },
+        phone
+          ? h('div', { className: 'msc-find-bar is-phone' }, search,
+              h('button', { type: 'button', className: 'msc-find-filters', 'aria-haspopup': 'dialog', onClick: function () { setOpen('sheet'); } },
+                h('svg', { viewBox: '0 0 20 20', width: 18, height: 18, 'aria-hidden': true }, h('path', { d: 'M3 5h14M6 10h8M8.5 15h3', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', fill: 'none' })),
+                h('span', null, F.filters), nOn ? h('b', null, nOn) : null))
+          : h('div', { className: 'msc-find-bar' }, search,
+              drop('brand', F.brand, brandBody, true), drop('body', F.body, bodyBody), drop('drive', F.drive, driveBody),
+              drop('budget', F.budget, budgetBody), drop('more', F.more, moreBody, true)),
+        h('div', { className: 'msc-find-status' },
+          h('p', { className: 'msc-find-count', 'aria-live': 'polite' }, h('b', null, mscFound(lang, filtered.length, hits.length)), h('span', null, F.cip)),
+          sortSel),
+        h('div', { className: 'msc-find-chips' }, chips.length
+          ? chips.map(function (c, i) { return h('button', { key: i + c[0], type: 'button', className: 'msc-find-chip', onClick: c[1] }, c[0], h('span', { 'aria-hidden': true }, '×')); })
+              .concat([h('button', { key: '_clear', type: 'button', className: 'msc-find-clear', onClick: clearAll }, F.clear)])
+          : [h('span', { key: '_q', className: 'msc-find-quick-label' }, F.quick)].concat(F.quicks.map(function (k) {
+              return h('button', { key: k[0], type: 'button', className: 'msc-find-quick', onClick: function () { upd(k[1]); } }, k[0]);
+            })))),
+      filtered.length ? h('div', { ref: gridRef, className: 'msc-catalog-grid' }, filtered.slice(0, visible).map(function (g) {
         var c = g.cars[0], meta = [c.year, (c.drive === 'ev' || c.drive === 'erev') && c.range ? s.range + ' ' + c.range + ' km' : null].filter(Boolean).join(' · ');
         return h('button', { key: g.key, type: 'button', className: 'msc-catalog-card', 'data-brand': c.brand, 'data-model': c.model, 'aria-haspopup': 'dialog',
           onClick: function (e) { setPanel({ group: g, trigger: e.currentTarget }); } },
@@ -466,10 +677,16 @@
             h('span', { className: 'msc-catalog-price-label' }, t.from),
             h('span', { className: 'msc-catalog-price' }, h('strong', null, K.money(K.cipOf(c), lang)), h('small', null, catalogUSD(c))),
             h('span', { className: 'msc-catalog-landed' }, t.landed + ' ' + K.money(K.landedOf(c), lang))));
-      })),
+      })) : h('div', { ref: gridRef, className: 'msc-find-empty' },
+        h('p', null, F.empty),
+        h('div', null,
+          h('button', { type: 'button', className: 'kt-btn kt-btn-outline', onClick: clearAll }, F.clear),
+          h('button', { type: 'button', className: 'kt-btn kt-btn-primary', onClick: function () { p.onInquiry([q.trim()].concat(chips.slice(q.trim() ? 1 : 0).map(function (c) { return c[0]; })).filter(Boolean).join(' · ')); } }, F.emptyAsk))),
       h('div', { className: 'msc-catalog-footer' },
         remaining ? h('button', { type: 'button', className: 'kt-btn kt-btn-outline msc-catalog-more', onClick: function () { setVisible(visible + 12); } }, t.more.replace('{n}', remaining)) : null,
-        h('a', { className: 'kt-link msc-catalog-offers', href: (lang === 'pl' ? 'oferty.html' : 'offers.html') + (brand ? '?q=' + encodeURIComponent(brand) : '') }, t.offers.replace('{n}', catalog.length))),
+        h('button', { type: 'button', className: 'kt-link kt-rack-calc', onClick: p.onCalc }, h(K.CalcIcon, null), s.rackCalc),
+        h('a', { className: 'kt-link msc-catalog-offers', href: (lang === 'pl' ? 'oferty.html' : 'offers.html') + (f.brand.length === 1 ? '?q=' + encodeURIComponent(f.brand[0]) : '') }, t.offers.replace('{n}', catalog.length))),
+      sheet,
       panel ? h(OrderCatalogPanel, { lang: lang, group: panel.group, returnFocus: panel.trigger, onClose: function () { setPanel(null); }, onInquiry: p.onInquiry }) : null);
   }
 
@@ -510,6 +727,20 @@
       // so before going live the attribution has to come back somewhere (a small ⓘ, the footer or the legal page); until then it
       // stays in the markup for screen readers and the model's licence, invisible.
       h('p', { className: 'msw-credit is-hidden' }, h('a', { href: MSW_SOURCE, target: '_blank', rel: 'noopener', tabIndex: -1 }, t.credit)));
+  }
+
+  // 主人 2026-11-06: 「那你就把它弄到页脚去，然后尽可能不那么显眼就行了」: the CC BY 4.0 attribution (author, title, source,
+  // licence, changed) as one faint small line at the bottom of the footer, laid over the footer's bottom padding (wind.css).
+  var MSW_FOOT = {
+    zh: ['风洞 3D 模型「2025 Xiaomi SU7 Ultra」：Dave Love（Sketchfab），', '，已修改'],
+    pl: ['Model 3D w tunelu „2025 Xiaomi SU7 Ultra”: Dave Love (Sketchfab), ', ', zmieniony'],
+    en: ['Wind tunnel 3D model “2025 Xiaomi SU7 Ultra”: Dave Love (Sketchfab), ', ', modified']
+  };
+  function FootNote(p) {
+    var t = MSW_FOOT[p.lang] || MSW_FOOT.pl;
+    return h('p', { className: 'msw-footnote' },
+      h('a', { href: MSW_SOURCE, target: '_blank', rel: 'noopener' }, t[0]),
+      h('a', { href: 'https://creativecommons.org/licenses/by/4.0/', target: '_blank', rel: 'noopener license' }, 'CC BY 4.0'), t[1]);
   }
 
   // ---- inspection report band (主人 2026-10-20: 瓜子检测报告「放到网站哪个地方最好…还有一个波兰版本…说明所有的车都会有
@@ -714,6 +945,7 @@
               h('div', { 'data-reveal': '' }, h(K.ReservedSection, { kind: 'privacy', index: '04', lang: lang }))),
             h('div', { className: 'gap' })),
           h(K.Footer, { lang: lang, onLang: setLang }),
+          h(FootNote, { lang: lang }),
           h(MotionLayer, null),
           // phones: calculator + a question, once the hero is behind you
           h(K.MobileBar, { lang: lang, after: 560, onCalc: quote, onAsk: function () { setLead({ kind: 'inquiry', summary: '' }); } }),

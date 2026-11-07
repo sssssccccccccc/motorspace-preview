@@ -120,3 +120,12 @@
   .msw .wt-sweep, .msw .wt-sweep.is-now { animation: none; }
   .msw .wt-chip i { transition: none; }
 }
+
+/* 主人 2026-11-06: the 3D model's CC BY credit moves to the footer, as unobtrusive as possible (FootNote in make_prototype.py).
+   It sits on the footer's bottom padding (negative margin), so the page does not get taller. Phones keep it above the fixed
+   bottom bar (.kt-mbar, up to 760px), which would otherwise cover the last ~80px. */
+.msw-footnote { position: relative; z-index: 2; margin: -34px 0 0; padding: 0 48px 14px; font-size: 10px; line-height: 1.45; letter-spacing: .01em; color: rgba(161, 161, 166, .36); pointer-events: none; }
+.msw-footnote a { color: inherit; text-decoration: none; pointer-events: auto; }
+.msw-footnote a:hover, .msw-footnote a:focus-visible { color: rgba(200, 200, 205, .7); text-decoration: underline; text-underline-offset: 2px; }
+@media (max-width: 860px) { .msw-footnote { padding: 0 16px 14px; } }
+@media (max-width: 760px) { .msw-footnote { margin-top: -108px; padding-bottom: 72px; } }
