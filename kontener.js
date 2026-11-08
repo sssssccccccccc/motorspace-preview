@@ -63,6 +63,8 @@
   // all car data comes from data/cars.json, served as data/kontener-data.js (window.KT_DATA) and loaded before this bundle
   var DATA = (typeof window !== 'undefined' && window.KT_DATA) || {};
   var SAMPLE_CARS = DATA.boxes || [], SAMPLE_LISTINGS = DATA.listings || [], SAMPLE_STOCK = DATA.stock || [], SAMPLE_ORDERS = DATA.orders || [], COMPANY = DATA.company || {};
+  // company WhatsApp (主人 2026-11-07): wa.me link, optional pre-filled text; '' when the number is not set
+  function waHref(text) { var n = String(COMPANY.whatsapp || '').replace(/[^0-9]/g, ''); return n ? 'https://wa.me/' + n + (text ? '?text=' + encodeURIComponent(text) : '') : ''; }
   var SAMPLE_CATALOG = DATA.catalog || [];
   if (!SAMPLE_CATALOG.length) SAMPLE_CATALOG = SAMPLE_LISTINGS;
   function t(lang) { return T[lang] || T.pl; }
@@ -262,7 +264,7 @@
           h('div', { className: 'kt-menu-foot' },
             h('div', null, h('div', { className: 'kt-label' }, s.langL), h(LangSwitch, { value: p.lang || 'pl', onChange: function (x) { p.onClose(); if (p.onLang) p.onLang(x); } })),
             tel || mail ? h('div', { className: 'kt-menu-contact' }, h('div', { className: 'kt-label' }, s.contactH),
-              tel ? h('a', { href: 'tel:' + String(tel).replace(/[^+0-9]/g, '') }, tel) : null,
+              COMPANY.whatsapp ? h('a', { href: waHref(), target: '_blank', rel: 'noopener' }, 'WhatsApp ' + COMPANY.whatsapp) : tel ? h('a', { href: 'tel:' + String(tel).replace(/[^+0-9]/g, '') }, tel) : null,
               mail ? h('a', { href: 'mailto:' + mail }, mail) : null) : null))),
       document.body);
   }
@@ -282,13 +284,14 @@
     return String(x).replace(/\{(\w+)\}/g, function (m, k) { return COMPANY[k] != null && COMPANY[k] !== '' ? COMPANY[k] : m; });
   }
   function LegalPage(p) {
-    var lang = p.lang || 'pl', L = (DATA.legal || {})[p.doc] || {}, d = L[lang] || L.pl || {}, updated = (DATA.legal || {}).updated;
+    var lang = p.lang || 'pl', L = (DATA.legal || {})[p.doc] || {}, d = L[lang] || L.pl || {}, updated = L.updated || (DATA.legal || {}).updated;   // a document can carry its own date (privacy, 2026-11-07)
     if (p.doc === 'contact') {
       var tel = COMPANY.phone, mail = COMPANY.email;
       return h('section', { className: 'kt kt-legal kt-contact', 'aria-labelledby': 'kt-legal-title' },
         h('header', { className: 'kt-legal-head' }, h('span', { className: 'kt-sechead-n' }, d.eyebrow), h('h1', { id: 'kt-legal-title' }, d.title), h('p', null, d.intro)),
         h('div', { className: 'kt-contact-grid' },
-          tel ? h('a', { className: 'kt-contact-card', href: 'tel:' + String(tel).replace(/[^+0-9]/g, '') }, h('span', { className: 'kt-label' }, d.call), h('b', null, tel), h('span', { className: 'kt-arrow', 'aria-hidden': true }, '→')) : null,
+          COMPANY.whatsapp ? h('a', { className: 'kt-contact-card', href: waHref(), target: '_blank', rel: 'noopener' }, h('span', { className: 'kt-label' }, 'WhatsApp'), h('b', null, COMPANY.whatsapp), h('span', { className: 'kt-arrow', 'aria-hidden': true }, '→'))
+            : tel ? h('a', { className: 'kt-contact-card', href: 'tel:' + String(tel).replace(/[^+0-9]/g, '') }, h('span', { className: 'kt-label' }, d.call), h('b', null, tel), h('span', { className: 'kt-arrow', 'aria-hidden': true }, '→')) : null,
           mail ? h('a', { className: 'kt-contact-card', href: 'mailto:' + mail }, h('span', { className: 'kt-label' }, d.mail), h('b', null, mail), h('span', { className: 'kt-arrow', 'aria-hidden': true }, '→')) : null,
           h('button', { type: 'button', className: 'kt-contact-card is-primary', onClick: p.onAsk }, h('span', { className: 'kt-label' }, d.write), h('b', null, t(lang).ask), h('span', { className: 'kt-arrow', 'aria-hidden': true }, '→'))),
         h('dl', { className: 'kt-contact-co' },
@@ -1732,7 +1735,7 @@
           h('li', { id: lid + '-' + i, role: 'option', 'aria-selected': i === act, className: cx('kt-sf-item', it.kind === 'query' && 'is-query'),
             onMouseDown: function (e) { e.preventDefault(); choose(it); }, onMouseEnter: function () { setAct(i); } },
             it.kind === 'model' ? h('span', { className: 'kt-sf-car' }, h(CarSilhouette, { body: it.car.body })) : null,
-            h('span', { className: 'kt-sf-text' }, it.kind === 'query' ? s.searchFor + ' „' + it.label + '”' : it.label),
+            h('span', { className: 'kt-sf-text' }, it.kind === 'query' ? s.searchFor + (lang === 'pl' ? ' „' : ' “') + it.label + '”' : it.label),
             it.kind === 'model' ? h('span', { className: 'kt-sf-meta' }, it.car.year + ' · ' + money(landedOf(it.car), lang)) : h('span', { className: 'kt-sf-meta' }, nWord(lang, it.count, s.cars))));
       })) : null);
   }
@@ -1807,7 +1810,7 @@
     if (f.rangeMin) chips.push(['≥ ' + f.rangeMin + ' km EV', 'rangeMin']);
     if (f.seats) chips.push([f.seats + '+ ' + s.seats.toLowerCase(), 'seats']);
     if (f.noExcise) chips.push([s.noExcise, 'noExcise']);
-    if (p.query) chips.unshift(['„' + p.query + '”', '_q']);
+    if (p.query) chips.unshift([(lang === 'pl' ? '„' : '“') + p.query + '”', '_q']);
     if (!chips.length) return null;
     return h('div', { className: 'kt kt-chips' }, chips.map(function (c) {
       return h('button', { key: c[1] + (c[2] || ''), type: 'button', className: 'kt-chip', onClick: function () { c[1] === '_q' ? p.onQuery && p.onQuery('') : rm(c[1], c[2]); } }, c[0], h('span', { 'aria-hidden': true }, '×'));
@@ -1999,6 +2002,8 @@
         err[k] ? h('span', { className: 'kt-lead-err', role: 'alert' }, err[k]) : null);
     }
     var sent = state === 'done' || state === 'demo';
+    var WA = { pl: ['Kontynuuj na WhatsApp', 'Dzień dobry! Piszę w sprawie zapytania ze strony motorspace.pl'], en: ['Continue on WhatsApp', 'Hello! I am writing about my enquiry on motorspace.pl'], zh: ['用 WhatsApp 继续聊', '您好！我刚在 motorspace.pl 提交了咨询'] }[lang] || null;
+    var waLink = WA && waHref([WA[1], ctx.summary, f.name].filter(Boolean).join('\n'));
     return h('div', { className: 'kt kt-lead-wrap', onMouseDown: function (e) { if (e.target === e.currentTarget) p.onClose && p.onClose(); } },
       h('div', { className: 'kt-lead', role: 'dialog', 'aria-modal': true, 'aria-labelledby': 'kt-lead-title' },
         h('button', { type: 'button', className: 'kt-sheet-close', 'aria-label': L.close, onClick: p.onClose }, '×'),
@@ -2012,7 +2017,9 @@
               h('div', null, h('dt', null, L.contact), h('dd', null, L.contacts[f.contact] + ' · ' + f.phone + (f.email ? ' · ' + f.email : ''))),
               f.message ? h('div', null, h('dt', null, L.message), h('dd', null, f.message)) : null),
             state === 'demo' ? h('p', { className: 'kt-note' }, L.demo) : null,
-            h(Button, { variant: 'primary', onClick: p.onClose }, L.close))
+            h('div', { className: 'kt-lead-actions' },
+              waLink ? h('a', { className: 'kt-btn kt-btn-primary kt-lead-wa', href: waLink, target: '_blank', rel: 'noopener' }, WA[0]) : null,
+              h(Button, { variant: waLink ? 'outline' : 'primary', onClick: p.onClose }, L.close)))
         : h('form', { className: 'kt-lead-form', onSubmit: submit, noValidate: true },
             h('div', { className: 'kt-label' }, s.sec.order[0]),
             h('h2', { id: 'kt-lead-title' }, L.titles[kind] || L.titles.inquiry),
@@ -2028,10 +2035,11 @@
               h('input', { type: 'checkbox', checked: f.consent, onChange: function (e) { set('consent', e.target.checked); } }),
               h('span', null, L.consent, window.KT_PRIVACY_URL ? h('a', { className: 'kt-lead-policy', href: window.KT_PRIVACY_URL, target: '_blank', rel: 'noopener' }, ' ' + t(lang).readPolicy) : null)),
             err.consent ? h('span', { className: 'kt-lead-err', role: 'alert' }, err.consent) : null,
-            state === 'failed' ? h('p', { className: 'kt-lead-err', role: 'alert' }, L.failed + ' ', h('a', { href: 'mailto:' + (company.email || '') }, company.email || '')) : null,
+            state === 'failed' ? h('p', { className: 'kt-lead-err', role: 'alert' }, L.failed + ' ', h('a', { href: 'mailto:' + (company.email || '') }, company.email || ''), waLink ? h('span', null, ' · ', h('a', { href: waLink, target: '_blank', rel: 'noopener' }, 'WhatsApp')) : null) : null,
             h('div', { className: 'kt-lead-actions' },
               h(Button, { variant: 'primary', type: 'submit', arrow: true, disabled: state === 'sending' }, state === 'sending' ? L.sending : L.send),
-              company.phone ? h('a', { className: 'kt-lead-alt', href: 'tel:' + company.phone.replace(/\s/g, '') }, company.phone) : null))));
+              company.whatsapp ? h('a', { className: 'kt-lead-alt', href: waHref(), target: '_blank', rel: 'noopener' }, 'WhatsApp ' + company.whatsapp)
+                : company.phone ? h('a', { className: 'kt-lead-alt', href: 'tel:' + company.phone.replace(/\s/g, '') }, company.phone) : null))));
   }
   // one summary line for the form and the quote: "Zeekr 9X Max · Pro · czarny · 349 569 PLN"
   function leadSummary(o, lang) {
@@ -2085,7 +2093,7 @@
         h('p', { className: 'kt-quote-rate' }, (fx ? '1 ' + quoteCurrency + ' = ' + fx.toFixed(4) + ' PLN' + ' (' + rateNote(lang) + ') · ' : '') + Q.rateSrc + ' ' + (RULES.asOf || '')),
         h('p', { className: 'kt-quote-note' }, Q.note),
         h('footer', { className: 'kt-quote-foot' },
-          h('div', null, h('span', null, Q.contact), h('b', null, [company.phone, company.email, company.address].filter(Boolean).join(' · '))),
+          h('div', null, h('span', null, Q.contact), h('b', null, [company.whatsapp ? 'WhatsApp ' + company.whatsapp : company.phone, company.email, company.address].filter(Boolean).join(' · '))),
           h('div', null, h('span', null, Q.prepared), h('b', null, location.host || 'motorspace'))),
         h('p', { className: 'kt-quote-hint' }, Q.hint)),
       el.current);
