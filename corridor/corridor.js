@@ -271,7 +271,7 @@
       S.nextPull = t + CYCLE_WALK;
     }
     function pushAll() { S.active.forEach(function (a) { startPush(a, S.t); }); }
-    function stageXY(cx, cy) { var r = stage.getBoundingClientRect(), k = r.width / 1920; return { x: (cx - r.left) / k, y: (cy - r.top) / k }; }
+    function stageXY(cx, cy) { var r = root.getBoundingClientRect(); return { x: (cx - r.left - VW / 2) / SK + 960, y: (cy - r.top - VH * SCY) / SK + 540 }; }
     // which panel is under the pointer: invert the perspective onto the wall plane (more reliable than 3D hit-testing)
     function pickPanel(cx, cy) {
       var pt = stageXY(cx, cy), m = (pt.x - 960) / P, best = null, bestD = 1e9;
@@ -292,11 +292,14 @@
     function pickSpot(cx, cy) {
       for (var i = 0; i < spots.length; i++) {
         var sp = spots[i]; if (sp.e.style.display === 'none') continue;
-        var r = sp.e.getBoundingClientRect();
-        if (cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom) return sp;
+        var r = sp.e.getBoundingClientRect(), z = rectZoom();
+        if (cx >= r.left * z && cx <= r.right * z && cy >= r.top * z && cy <= r.bottom * z) return sp;
       }
       return null;
     }
+    // 1 where element rects are on-screen pixels (all engines with standard zoom); SK on older WebKit, which reports
+    // rects inside a zoomed element divided by its zoom
+    function rectZoom() { if (!stage.style.zoom) return 1; var w = stage.getBoundingClientRect().width; return Math.abs(w - 1920 * SK) < 2 ? 1 : (1920 * SK) / w; }
     function showing() { return S.active.some(function (a) { return a.phase !== 'push'; }); }
     function overUI(target) { return !!(target && target.closest && target.closest('.msc-info, .msc-bar, .msc-credits, .msc-hero-live, .kt-nav, a, button, input, select, textarea, label')); }
     function updateHover(cx, cy, target) {
@@ -397,7 +400,8 @@
     info.addEventListener('pointerleave', function () { infoHover = false; });
 
     // ---------- layout: the 1920×1080 stage covers the section ----------
-    var VW = 0, VH = 0, portrait = false;
+    var ZOOM_OK = !!(window.CSS && CSS.supports && CSS.supports('zoom', '0.5'));   // Firefox before 126 has no zoom: keeps scale()
+    var VW = 0, VH = 0, portrait = false, SK = 1, SCY = 0.5;   // SK, SCY: the stage's scale and its centre's height (share of VH)
     var dockTop = 1e9, infoH = 0;
     function layout() {
       VW = root.clientWidth; VH = root.clientHeight;
@@ -406,7 +410,13 @@
       // wide screens: the stage covers the section. Tall screens: pull the camera back so both walls
       // stay in view, and lift the vanishing point so the search below does not hide the cars
       var k = portrait ? VW / 1040 : Math.max(VW / 1920, VH / 1080), cy = portrait ? 0.3 : 0.5;
-      stage.style.transform = 'scale(' + k + ')';
+      // Small screens (phones, k ~0.4): zoom, not scale(). Both give the same picture, but under scale() the browser
+      // paints every panel at its full stage size × the pixel ratio: ~1.8 GB of layer memory on an iPhone, and the
+      // tab was killed (主人 2026-11-08: 手机 Chrome「无法打开此网页」). zoom lays the stage out at its on-screen size
+      // (~0.4 GB). Desktops and tablets keep scale(), as before.
+      if (k < 0.6 && ZOOM_OK) { stage.style.transform = ''; stage.style.zoom = String(k); }
+      else { stage.style.zoom = ''; stage.style.transform = 'scale(' + k + ')'; }
+      SK = k; SCY = cy;
       stage.style.top = (cy * 100) + '%';
       root.style.setProperty('--vy', (cy * 100 - 1) + '%');
       var u = portrait ? VW / 820 : Math.min(VW / 1920, VH / 1080);
